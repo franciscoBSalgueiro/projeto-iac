@@ -34,6 +34,10 @@ LARGURA_METEORO_BOM EQU 5           ; largura do meteoro bom
 ALTURA_METEORO_BOM  EQU 5           ; altura do meteoro bom
 COR_METEORO_BOM     EQU 0F8F8H
 
+LARGURA_METEORO_MAU EQU 5           ; largura do meteoro bom
+ALTURA_METEORO_MAU  EQU 5           ; altura do meteoro bom
+COR_METEORO_MAU     EQU 0FF00H		; cor do meteoro mau: vermelho em ARGB ( opaco e vermelho ao máximo, verde e azul a 0)
+
 ; #######################################################################
 ; * ZONA DE DADOS 
 ; #######################################################################
