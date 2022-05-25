@@ -18,6 +18,7 @@ TOCA_SOM                EQU 605AH      ; endereço do comando para tocar um som
 APAGA_AVISO     		EQU 6040H      ; endereço do comando para apagar o aviso de nenhum cenário selecionado
 APAGA_ECRÃ	 		EQU 6002H      ; endereço do comando para apagar todos os pixels já desenhados
 SELECIONA_CENARIO_FUNDO  EQU 6042H      ; endereço do comando para selecionar uma imagem de fundo
+SELECIONA_VIDEO_FUNDO	EQU 605CH	; endereço do comando para selecionar um video de fundo
 
 LINHA        	EQU  16        ; linha do boneco (a meio do ecrã))
 COLUNA			EQU  30        ; coluna do boneco (a meio do ecrã)
@@ -47,8 +48,8 @@ DEF_NAVE:					; tabela que define o boneco (cor, largura, pixels)
 inicio:
      MOV  [APAGA_AVISO], R1	; apaga o aviso de nenhum cenário selecionado (o valor de R1 não é relevante)
      MOV  [APAGA_ECRÃ], R1	; apaga todos os pixels já desenhados (o valor de R1 não é relevante)
-	MOV	R1, 0			; cenário de fundo número 0
-     MOV  [SELECIONA_CENARIO_FUNDO], R1	; seleciona o cenário de fundo
+	MOV	R1, 1			; cenário de fundo número 0
+     MOV  [SELECIONA_VIDEO_FUNDO], R1	; seleciona o cenário de fundo
      
 posição_boneco:
      MOV  R1, LINHA			; linha do boneco
