@@ -22,8 +22,8 @@ SELECIONA_CENARIO_FUNDO  EQU 6042H      ; endereço do comando para selecionar u
 LINHA        	EQU  16        ; linha do boneco (a meio do ecrã))
 COLUNA			EQU  30        ; coluna do boneco (a meio do ecrã)
 
-LARGURA		EQU	5			; largura do boneco
-ALTURA		EQU 4
+LARGURA		EQU	5			; largura da nave
+ALTURA		EQU 4           ; altura da nave
 COR_NAVE	EQU	0FF9CH		; cor da nave: rosa em ARGB (opaco e vermelho no máximo, verde a 60 e azul a 40)
 
 ; #######################################################################
