@@ -18,21 +18,30 @@ SELECIONA_CENARIO_FUNDO  EQU 6042H      ; endereço do comando para selecionar u
 SELECIONA_VIDEO_FUNDO	EQU 605CH	; endereço do comando para selecionar um video de fundo
 
 
-Y_NAVE        		EQU  26        ; linha do boneco (a meio do ecrã))
-X_NAVE				EQU  30        ; coluna do boneco (a meio do ecrã)
+YES_T                EQU 1
+FALSE               EQU 0
+
+Y_NAVE        		EQU  26        ; linha da nave 
+X_NAVE				EQU  30        ; coluna da nave 
+
+Y_METEORO           EQU 10         ; linha meteoro
+X_METEORO           EQU 20         ; coluna meteoro
+
+Y_NAVE_MÁ           EQU 10         ; linha nave má
+X_NAVE_MÁ           EQU 50         ; coluna nave má
 
 
 L_NAVE	    EQU	5			; largura da nave
 H_NAVE		    EQU 4           ; altura da nave
 COR_NAVE	        EQU	0FF9CH		; cor da nave: rosa em ARGB (opaco e vermelho no máximo, verde a 60 e azul a 40)
 
-L_METEORO EQU 5           ; largura do meteoro bom
-H_METEORO  EQU 5           ; altura do meteoro bom
+L_METEORO EQU 5           ; largura do meteoro
+H_METEORO  EQU 5           ; altura do meteoro
 COR_METEORO     EQU 0F8F8H
 
-L_NAVE_MÁ EQU 5           ; largura do meteoro bom
-H_NAVE_MÁ  EQU 5           ; altura do meteoro bom
-COR_NAVE_MÁ     EQU 0FF00H		; cor do meteoro mau: vermelho em ARGB ( opaco e vermelho ao máximo, verde e azul a 0)
+L_NAVE_MÁ EQU 5           ; largura da nave má
+H_NAVE_MÁ  EQU 5           ; altura da nave má
+COR_NAVE_MÁ     EQU 0FF00H		;) cor da nave má: vermelho em ARGB (opaco e vermelho ao máximo, verde e azul a 0)
 
 ; #######################################################################
 ; * TABELAS DE DESENHOS 
@@ -53,15 +62,15 @@ DEF_NAVE:					; tabela que define a nave (cor, largura, altura)
 	WORD		COR_NAVE, COR_NAVE, COR_NAVE, COR_NAVE, COR_NAVE    
     WORD        0, COR_NAVE, 0, COR_NAVE, 0
 
-DEF_METEORO :           ; tabela que define o meteoro bom
-    WORD        L_METEORO, H_METEORO ; largura e altura do meteoro bom
+DEF_METEORO :           ; tabela que define o meteoro
+    WORD        L_METEORO, H_METEORO ; largura e altura do meteoro
     WORD        0, COR_METEORO, COR_METEORO, COR_METEORO, 0
     WORD        COR_METEORO, COR_METEORO, COR_METEORO, COR_METEORO, COR_METEORO
     WORD        COR_METEORO, COR_METEORO, COR_METEORO, COR_METEORO, COR_METEORO
     WORD        COR_METEORO, COR_METEORO, COR_METEORO, COR_METEORO, COR_METEORO
     WORD        0, COR_METEORO, COR_METEORO, COR_METEORO, 0
 
-DEF_NAVE_MÁ:						; tabela que define o boneco do meteoro mau
+DEF_NAVE_MÁ:						; tabela que define a nave má
 	WORD		L_NAVE_MÁ, H_NAVE_MÁ
 	WORD		COR_NAVE_MÁ, 0, 0, 0, COR_NAVE_MÁ
 	WORD		COR_NAVE_MÁ, 0, COR_NAVE_MÁ, 0, COR_NAVE_MÁ
@@ -83,25 +92,25 @@ inicio:
 	MOV	R1, 1			; cenário de fundo número 0
 	MOV  [SELECIONA_VIDEO_FUNDO], R1	; seleciona o cenário de fundo
     
-    ; desenhar meteoro bom
-    MOV R1, 10
-    MOV R2, 20
-    MOV R0, 1
+    ; desenhar meteoro
+    MOV R1, Y_METEORO
+    MOV R2, X_METEORO
+    MOV R0, YES_T
     MOV R4, DEF_METEORO
     CALL  desenha_boneco
 
-    ; desenhar meteoro mau
-    MOV R1, 10
-    MOV R2, 50
-    MOV R0, 1
+    ; desenhar nave má
+    MOV R1, Y_NAVE_MÁ
+    MOV R2, X_NAVE_MÁ
+    MOV R0, YES_T
     MOV R4, DEF_NAVE_MÁ
     CALL  desenha_boneco
 
     ; desenhar nave
-    MOV  R1, Y_NAVE			; linha do boneco
-	MOV  R2, X_NAVE		; coluna do boneco
-	MOV R0, 0
-    MOV	R4, DEF_NAVE		; endereço da tabela que define o boneco
+    MOV  R1, Y_NAVE			; linha da nave
+	MOV  R2, X_NAVE		; coluna da nave
+	MOV R0, YES_T
+    MOV	R4, DEF_NAVE		; endereço da tabela que define a nave
 	CALL	desenha_boneco		; desenha o boneco
 
 fim:
