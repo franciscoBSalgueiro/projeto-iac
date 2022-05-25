@@ -54,6 +54,15 @@ DEF_METEORO_BOM :           ; tabela que define o meteoro bom
     WORD        COR_METEORO_BOM, COR_METEORO_BOM, COR_METEORO_BOM, COR_METEORO_BOM, COR_METEORO_BOM
     WORD        0, COR_METEORO_BOM, COR_METEORO_BOM, COR_METEORO_BOM, 0
 
+DEF_METEORO_MAU:						; tabela que define o boneco do meteoro mau
+	WORD		LARGURA_METEORO_MAU, ALTURA_METEORO_MAU
+	WORD		COR_METEORO_MAU, 0, 0, 0, COR_METEORO_MAU
+	WORD		COR_METEORO_MAU, 0, COR_METEORO_MAU, 0, COR_METEORO_MAU
+	WORD		0, COR_METEORO_MAU, COR_METEORO_MAU, COR_METEORO_MAU, 0
+	WORD		COR_METEORO_MAU, 0, COR_METEORO_MAU, 0, COR_METEORO_MAU
+	WORD		COR_METEORO_MAU, 0, 0, 0, COR_METEORO_MAU
+
+
 ; *********************************************************************************
 ; * Código
 ; *********************************************************************************
