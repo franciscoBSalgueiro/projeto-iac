@@ -18,21 +18,21 @@ SELECIONA_CENARIO_FUNDO  EQU 6042H      ; endereço do comando para selecionar u
 SELECIONA_VIDEO_FUNDO	EQU 605CH	; endereço do comando para selecionar um video de fundo
 
 
-LINHA_NAVE        		EQU  26        ; linha do boneco (a meio do ecrã))
-COLUNA_NAVE				EQU  30        ; coluna do boneco (a meio do ecrã)
+Y_NAVE        		EQU  26        ; linha do boneco (a meio do ecrã))
+X_NAVE				EQU  30        ; coluna do boneco (a meio do ecrã)
 
 
-LARGURA_NAVE	    EQU	5			; largura da nave
-ALTURA_NAVE		    EQU 4           ; altura da nave
+L_NAVE	    EQU	5			; largura da nave
+H_NAVE		    EQU 4           ; altura da nave
 COR_NAVE	        EQU	0FF9CH		; cor da nave: rosa em ARGB (opaco e vermelho no máximo, verde a 60 e azul a 40)
 
-LARGURA_METEORO_BOM EQU 5           ; largura do meteoro bom
-ALTURA_METEORO_BOM  EQU 5           ; altura do meteoro bom
-COR_METEORO_BOM     EQU 0F8F8H
+L_METEORO EQU 5           ; largura do meteoro bom
+H_METEORO  EQU 5           ; altura do meteoro bom
+COR_METEORO     EQU 0F8F8H
 
-LARGURA_METEORO_MAU EQU 5           ; largura do meteoro bom
-ALTURA_METEORO_MAU  EQU 5           ; altura do meteoro bom
-COR_METEORO_MAU     EQU 0FF00H		; cor do meteoro mau: vermelho em ARGB ( opaco e vermelho ao máximo, verde e azul a 0)
+L_NAVE_MÁ EQU 5           ; largura do meteoro bom
+H_NAVE_MÁ  EQU 5           ; altura do meteoro bom
+COR_NAVE_MÁ     EQU 0FF00H		; cor do meteoro mau: vermelho em ARGB ( opaco e vermelho ao máximo, verde e azul a 0)
 
 ; #######################################################################
 ; * TABELAS DE DESENHOS 
@@ -47,27 +47,27 @@ SP_inicial:				; este é o endereço (1200H) com que o SP deve ser
 						; armazenado em 11FEH (1200H-2)				
 
 DEF_NAVE:					; tabela que define a nave (cor, largura, altura)
-	WORD		LARGURA_NAVE, ALTURA_NAVE               ; largura e altura da nave
+	WORD		L_NAVE, H_NAVE               ; largura e altura da nave
     WORD        0, 0, COR_NAVE, 0, 0
 	WORD		COR_NAVE, 0, COR_NAVE, 0, COR_NAVE		
 	WORD		COR_NAVE, COR_NAVE, COR_NAVE, COR_NAVE, COR_NAVE    
     WORD        0, COR_NAVE, 0, COR_NAVE, 0
 
-DEF_METEORO_BOM :           ; tabela que define o meteoro bom
-    WORD        LARGURA_METEORO_BOM, ALTURA_METEORO_BOM ; largura e altura do meteoro bom
-    WORD        0, COR_METEORO_BOM, COR_METEORO_BOM, COR_METEORO_BOM, 0
-    WORD        COR_METEORO_BOM, COR_METEORO_BOM, COR_METEORO_BOM, COR_METEORO_BOM, COR_METEORO_BOM
-    WORD        COR_METEORO_BOM, COR_METEORO_BOM, COR_METEORO_BOM, COR_METEORO_BOM, COR_METEORO_BOM
-    WORD        COR_METEORO_BOM, COR_METEORO_BOM, COR_METEORO_BOM, COR_METEORO_BOM, COR_METEORO_BOM
-    WORD        0, COR_METEORO_BOM, COR_METEORO_BOM, COR_METEORO_BOM, 0
+DEF_METEORO :           ; tabela que define o meteoro bom
+    WORD        L_METEORO, H_METEORO ; largura e altura do meteoro bom
+    WORD        0, COR_METEORO, COR_METEORO, COR_METEORO, 0
+    WORD        COR_METEORO, COR_METEORO, COR_METEORO, COR_METEORO, COR_METEORO
+    WORD        COR_METEORO, COR_METEORO, COR_METEORO, COR_METEORO, COR_METEORO
+    WORD        COR_METEORO, COR_METEORO, COR_METEORO, COR_METEORO, COR_METEORO
+    WORD        0, COR_METEORO, COR_METEORO, COR_METEORO, 0
 
-DEF_METEORO_MAU:						; tabela que define o boneco do meteoro mau
-	WORD		LARGURA_METEORO_MAU, ALTURA_METEORO_MAU
-	WORD		COR_METEORO_MAU, 0, 0, 0, COR_METEORO_MAU
-	WORD		COR_METEORO_MAU, 0, COR_METEORO_MAU, 0, COR_METEORO_MAU
-	WORD		0, COR_METEORO_MAU, COR_METEORO_MAU, COR_METEORO_MAU, 0
-	WORD		COR_METEORO_MAU, 0, COR_METEORO_MAU, 0, COR_METEORO_MAU
-	WORD		COR_METEORO_MAU, 0, 0, 0, COR_METEORO_MAU
+DEF_NAVE_MÁ:						; tabela que define o boneco do meteoro mau
+	WORD		L_NAVE_MÁ, H_NAVE_MÁ
+	WORD		COR_NAVE_MÁ, 0, 0, 0, COR_NAVE_MÁ
+	WORD		COR_NAVE_MÁ, 0, COR_NAVE_MÁ, 0, COR_NAVE_MÁ
+	WORD		0, COR_NAVE_MÁ, COR_NAVE_MÁ, COR_NAVE_MÁ, 0
+	WORD		COR_NAVE_MÁ, 0, COR_NAVE_MÁ, 0, COR_NAVE_MÁ
+	WORD		COR_NAVE_MÁ, 0, 0, 0, COR_NAVE_MÁ
 
 
 ; *********************************************************************************
@@ -82,14 +82,26 @@ inicio:
 	MOV  [APAGA_ECRÃ], R1	; apaga todos os pixels já desenhados (o valor de R1 não é relevante)
 	MOV	R1, 1			; cenário de fundo número 0
 	MOV  [SELECIONA_VIDEO_FUNDO], R1	; seleciona o cenário de fundo
-     
+    
+    ; desenhar meteoro bom
+    MOV R1, 10
+    MOV R2, 20
+    MOV R0, 1
+    MOV R4, DEF_METEORO
+    CALL  desenha_boneco
+
+    ; desenhar meteoro mau
     MOV R1, 10
     MOV R2, 50
-    MOV R4, DEF_METEORO_MAU
+    MOV R0, 1
+    MOV R4, DEF_NAVE_MÁ
     CALL  desenha_boneco
-     MOV  R1, LINHA_NAVE			; linha do boneco
-	MOV  R2, COLUNA_NAVE		; coluna do boneco
-	MOV	R4, DEF_NAVE		; endereço da tabela que define o boneco
+
+    ; desenhar nave
+    MOV  R1, Y_NAVE			; linha do boneco
+	MOV  R2, X_NAVE		; coluna do boneco
+	MOV R0, 0
+    MOV	R4, DEF_NAVE		; endereço da tabela que define o boneco
 	CALL	desenha_boneco		; desenha o boneco
 
 fim:
@@ -99,7 +111,8 @@ fim:
 ; **********************************************************************
 ; DESENHA_BONECO - Desenha um boneco na linha e coluna indicadas
 ;			    com a forma e cor definidas na tabela indicada.
-; Argumentos:   R1 - linha
+; Argumentos:   R0 - apaga (0) / desenha (1)
+;               R1 - linha 
 ;               R2 - coluna
 ;               R4 - tabela que define o boneco
 ;
@@ -118,7 +131,13 @@ desenha_boneco:
 	ADD	R4, 2			; endereço da cor do 1º pixel (2 porque a largura é uma word)
 desenha_pixels:
 	desenha_coluna:       		; desenha os pixels do boneco a partir da tabela
+        CMP R0, 0
+        JZ else
 		MOV	R3, [R4]			; obtém a cor do próximo pixel do boneco
+        JMP both
+        else:
+            MOV R3, 0
+        both:
 		CALL escreve_pixel
 		ADD	R4, 2			; endereço da cor do próximo pixel (2 porque cada cor de pixel é uma word)
 		ADD  R2, 1               ; próxima coluna
@@ -136,7 +155,6 @@ desenha_pixels:
 	POP	R3
 	POP	R2
 	RET
-
 
 ; **********************************************************************
 ; ESCREVE_PIXEL - Escreve um pixel na linha e coluna indicadas.
