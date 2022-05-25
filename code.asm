@@ -19,26 +19,39 @@ APAGA_AVISO     		EQU 6040H      ; endereço do comando para apagar o aviso de n
 APAGA_ECRÃ	 		EQU 6002H      ; endereço do comando para apagar todos os pixels já desenhados
 SELECIONA_CENARIO_FUNDO  EQU 6042H      ; endereço do comando para selecionar uma imagem de fundo
 
-LINHA        	EQU  16        ; linha do boneco (a meio do ecrã))
-COLUNA			EQU  30        ; coluna do boneco (a meio do ecrã)
+LINHA_NAVE        	EQU  16        ; linha da nave (a meio do ecrã))
+COLUNA_NAVE			EQU  30        ; coluna da nave (a meio do ecrã)
 
-LARGURA		EQU	5			; largura da nave
-ALTURA		EQU 4           ; altura da nave
-COR_NAVE	EQU	0FF9CH		; cor da nave: rosa em ARGB (opaco e vermelho no máximo, verde a 60 e azul a 40)
+LINHA_METEORO_BOM   EQU  5         ; linha do meteoro bom
+COLUNA_METEORO_BOM  EQU  30        ; coluna do meteoro bom
+
+LARGURA_NAVE	    EQU	5			; largura da nave
+ALTURA_NAVE		    EQU 4           ; altura da nave
+COR_NAVE	        EQU	0FF9CH		; cor da nave: rosa em ARGB (opaco e vermelho no máximo, verde a 60 e azul a 40)
+
+LARGURA_METEORO_BOM EQU 5           ; largura do meteoro bom
+ALTURA_METEORO_BOM  EQU 5           ; altura do meteoro bom
+COR_METEORO_BOM     EQU 0F8F8H
 
 ; #######################################################################
 ; * ZONA DE DADOS 
 ; #######################################################################
 	PLACE		0100H				
 
-DEF_NAVE:					; tabela que define o boneco (cor, largura, pixels)
-	WORD		LARGURA, ALTURA
+DEF_NAVE:					; tabela que define a nave (cor, largura, altura)
+	WORD		LARGURA_NAVE, ALTURA_NAVE               ; largura e altura da nave
     WORD        0, 0, COR_NAVE, 0, 0
-	WORD		COR_NAVE, 0, COR_NAVE, 0, COR_NAVE		; # # #   as cores podem ser diferentes
-	WORD		COR_NAVE, COR_NAVE, COR_NAVE, COR_NAVE, COR_NAVE    ; # # #   as cores podem ser diferentes
+	WORD		COR_NAVE, 0, COR_NAVE, 0, COR_NAVE		
+	WORD		COR_NAVE, COR_NAVE, COR_NAVE, COR_NAVE, COR_NAVE    
     WORD        0, COR_NAVE, 0, COR_NAVE, 0
 
-     
+DEF_METEORO_BOM :           ; tabela que define o meteoro bom
+    WORD        LARGURA_METEORO_BOM, ALTURA_METEORO_BOM ; largura e altura do meteoro bom
+    WORD        0, COR_METEORO_BOM, COR_METEORO_BOM, COR_METEORO_BOM, 0
+    WORD        COR_METEORO_BOM, COR_METEORO_BOM, COR_METEORO_BOM, COR_METEORO_BOM, COR_METEORO_BOM
+    WORD        COR_METEORO_BOM, COR_METEORO_BOM, COR_METEORO_BOM, COR_METEORO_BOM, COR_METEORO_BOM
+    WORD        COR_METEORO_BOM, COR_METEORO_BOM, COR_METEORO_BOM, COR_METEORO_BOM, COR_METEORO_BOM
+    WORD        0, COR_METEORO_BOM, COR_METEORO_BOM, COR_METEORO_BOM, 0
 
 ; *********************************************************************************
 ; * Código
@@ -50,16 +63,19 @@ inicio:
 	MOV	R1, 0			; cenário de fundo número 0
      MOV  [SELECIONA_CENARIO_FUNDO], R1	; seleciona o cenário de fundo
      
-posição_boneco:
-     MOV  R1, LINHA			; linha do boneco
-     MOV  R2, COLUNA		; coluna do boneco
+posição_nave:
+     MOV  R1, LINHA_NAVE		; linha da nave
+     MOV  R2, COLUNA_NAVE		; coluna da nave
 
-desenha_boneco:       		; desenha o boneco a partir da tabela
+desenha_nave:       		; desenha o boneco a partir da tabela
 	MOV	R4, DEF_NAVE		; endereço da tabela que define o boneco
 	MOV	R5, [R4]			; obtém a largura do boneco
 	ADD	R4, 2				; endereço da cor do 1º pixel (2 porque a largura é uma word)
 	MOV R6, [R4]			; obtém a altura do boneco
 	ADD R4, 2				; endereço da cor do 2º pixel (2 porque a altura é uma word)
+
+posição_meteoro_bom:
+    MOV
 desenha_linha:
 	desenha_pixels:       		; desenha os pixels do boneco a partir da tabela
 		MOV	R3, [R4]			; obtém a cor do próximo pixel do boneco
@@ -71,8 +87,8 @@ desenha_linha:
 		SUB  R5, 1			; menos uma coluna para tratar
 		JNZ  desenha_pixels      ; continua até percorrer toda a largura da primeira linha
 	ADD R1, 1					; próxima linha
-	MOV R5, LARGURA				; repor a largura
-	MOV R2, COLUNA				; alterar a coluna para a inicial
+	MOV R5, LARGURA_NAVE				; repor a largura
+	MOV R2, COLUNA_NAVE				; alterar a coluna para a inicial
 	SUB R6, 1					; menos uma coluna para tratar
 	JNZ desenha_linha 			; continua até percorrer toda a largura da segunda linha
 
