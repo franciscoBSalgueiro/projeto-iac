@@ -18,9 +18,6 @@ SELECIONA_CENARIO_FUNDO  EQU 6042H      ; endereço do comando para selecionar u
 SELECIONA_VIDEO_FUNDO	EQU 605CH	; endereço do comando para selecionar um video de fundo
 
 
-YES_T                EQU 1
-FALSE               EQU 0
-
 Y_NAVE        		EQU  26        ; linha da nave 
 X_NAVE				EQU  30        ; coluna da nave 
 
@@ -39,9 +36,9 @@ L_METEORO EQU 5           ; largura do meteoro
 H_METEORO  EQU 5           ; altura do meteoro
 COR_METEORO     EQU 0F8F8H
 
-L_NAVE_MÁ EQU 5           ; largura da nave má
-H_NAVE_MÁ  EQU 5           ; altura da nave má
-COR_NAVE_MÁ     EQU 0FF00H		;) cor da nave má: vermelho em ARGB (opaco e vermelho ao máximo, verde e azul a 0)
+L_NAVE_MÁ 		EQU 5           ; largura da nave má
+H_NAVE_MÁ  		EQU 5           ; altura da nave má
+COR_NAVE_MÁ     EQU 0FF00H		; cor da nave má: vermelho em ARGB (opaco e vermelho ao máximo, verde e azul a 0)
 
 ; #######################################################################
 ; * TABELAS DE DESENHOS 
@@ -95,21 +92,21 @@ inicio:
     ; desenhar meteoro
     MOV R1, Y_METEORO
     MOV R2, X_METEORO
-    MOV R0, YES_T
+    MOV R0, 1
     MOV R4, DEF_METEORO
     CALL  desenha_boneco
 
     ; desenhar nave má
     MOV R1, Y_NAVE_MÁ
     MOV R2, X_NAVE_MÁ
-    MOV R0, YES_T
+    MOV R0, 1
     MOV R4, DEF_NAVE_MÁ
     CALL  desenha_boneco
 
     ; desenhar nave
     MOV  R1, Y_NAVE			; linha da nave
 	MOV  R2, X_NAVE		; coluna da nave
-	MOV R0, YES_T
+	MOV R0, 1
     MOV	R4, DEF_NAVE		; endereço da tabela que define a nave
 	CALL	desenha_boneco		; desenha o boneco
 
