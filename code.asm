@@ -28,12 +28,12 @@ Y_NAVE_MÁ           EQU 10         ; linha nave má
 X_NAVE_MÁ           EQU 50         ; coluna nave má
 
 
-L_NAVE	    EQU	5			; largura da nave
+L_NAVE	    	EQU	5			; largura da nave
 H_NAVE		    EQU 4           ; altura da nave
-COR_NAVE	        EQU	0FF9CH		; cor da nave: rosa em ARGB (opaco e vermelho no máximo, verde a 60 e azul a 40)
+COR_NAVE	    EQU	0FF9CH		; cor da nave: rosa em ARGB (opaco e vermelho no máximo, verde a 60 e azul a 40)
 
-L_METEORO EQU 5           ; largura do meteoro
-H_METEORO  EQU 5           ; altura do meteoro
+L_METEORO 		EQU 5           ; largura do meteoro
+H_METEORO  		EQU 5           ; altura do meteoro
 COR_METEORO     EQU 0F8F8H
 
 L_NAVE_MÁ 		EQU 5           ; largura da nave má
@@ -86,7 +86,7 @@ inicio:
                             
 	MOV  [APAGA_AVISO], R1	; apaga o aviso de nenhum cenário selecionado (o valor de R1 não é relevante)
 	MOV  [APAGA_ECRÃ], R1	; apaga todos os pixels já desenhados (o valor de R1 não é relevante)
-	MOV	R1, 1			; cenário de fundo número 0
+	MOV	R1, 0			; cenário de fundo número 0
 	MOV  [SELECIONA_VIDEO_FUNDO], R1	; seleciona o cenário de fundo
     
     ; desenhar meteoro
