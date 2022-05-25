@@ -21,8 +21,6 @@ SELECIONA_VIDEO_FUNDO	EQU 605CH	; endereço do comando para selecionar um video 
 LINHA_NAVE        		EQU  26        ; linha do boneco (a meio do ecrã))
 COLUNA_NAVE				EQU  30        ; coluna do boneco (a meio do ecrã)
 
-LINHA_METEORO_BOM   EQU  5         ; linha do meteoro bom
-COLUNA_METEORO_BOM  EQU  30        ; coluna do meteoro bom
 
 LARGURA_NAVE	    EQU	5			; largura da nave
 ALTURA_NAVE		    EQU 4           ; altura da nave
@@ -40,7 +38,13 @@ COR_METEORO_MAU     EQU 0FF00H		; cor do meteoro mau: vermelho em ARGB ( opaco e
 ; * TABELAS DE DESENHOS 
 ; #######################################################################
 
-PLACE		1000H				
+PLACE		1000H
+pilha:
+	STACK 100H			; espaço reservado para a pilha 
+						; (200H bytes, pois são 100H words)
+SP_inicial:				; este é o endereço (1200H) com que o SP deve ser 
+						; inicializado. O 1.º end. de retorno será 
+						; armazenado em 11FEH (1200H-2)				
 
 DEF_NAVE:					; tabela que define a nave (cor, largura, altura)
 	WORD		LARGURA_NAVE, ALTURA_NAVE               ; largura e altura da nave
@@ -69,7 +73,7 @@ DEF_METEORO_MAU:						; tabela que define o boneco do meteoro mau
 ; *********************************************************************************
 ; * Código
 ; *********************************************************************************
-	PLACE   0				; o código tem de começar em 0000H
+PLACE   0				; o código tem de começar em 0000H
 inicio:
 	MOV  SP, SP_inicial		; inicializa SP para a palavra a seguir
 						; à última da pilha
@@ -79,6 +83,10 @@ inicio:
 	MOV	R1, 1			; cenário de fundo número 0
 	MOV  [SELECIONA_VIDEO_FUNDO], R1	; seleciona o cenário de fundo
      
+    MOV R1, 10
+    MOV R2, 50
+    MOV R4, DEF_METEORO_MAU
+    CALL  desenha_boneco
      MOV  R1, LINHA_NAVE			; linha do boneco
 	MOV  R2, COLUNA_NAVE		; coluna do boneco
 	MOV	R4, DEF_NAVE		; endereço da tabela que define o boneco
@@ -102,7 +110,9 @@ desenha_boneco:
 	PUSH	R4
 	PUSH	R5
 	PUSH	R6
+    PUSH    R7
 	MOV	R5, [R4]			; obtém a largura do boneco
+    MOV R7, [R4]
 	ADD R4, 2				
 	MOV R6, [R4]			; obtem a altura do boneco
 	ADD	R4, 2			; endereço da cor do 1º pixel (2 porque a largura é uma word)
@@ -115,10 +125,11 @@ desenha_pixels:
 		SUB  R5, 1			; menos uma coluna para tratar
 		JNZ  desenha_coluna      ; continua até percorrer toda a largura da primeira linha
 	ADD R1, 1					; próxima linha
-	MOV R5, LARGURA_NAVE				; repor a largura
-	MOV R2, COLUNA_NAVE				; alterar a coluna para a inicial
+	MOV R5, R7				; repor a largura
+	SUB R2, R7				; alterar a coluna para a inicial
 	SUB R6, 1					; menos uma coluna para tratar
 	JNZ desenha_pixels 			; continua até percorrer toda a largura da segunda linha
+    POP R7
 	POP R6
 	POP	R5
 	POP	R4
