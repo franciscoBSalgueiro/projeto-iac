@@ -32,17 +32,15 @@ LARGURA_METEORO_BOM EQU 5           ; largura do meteoro bom
 ALTURA_METEORO_BOM  EQU 5           ; altura do meteoro bom
 COR_METEORO_BOM     EQU 0F8F8H
 
-; *********************************************************************************
-; * Dados 
-; *********************************************************************************
-	PLACE       1000H
-pilha:
-	STACK 100H			; espaço reservado para a pilha 
-						; (200H bytes, pois são 100H words)
-SP_inicial:				; este é o endereço (1200H) com que o SP deve ser 
-						; inicializado. O 1.º end. de retorno será 
-						; armazenado em 11FEH (1200H-2)
-							
+LARGURA_METEORO_MAU EQU 5           ; largura do meteoro bom
+ALTURA_METEORO_MAU  EQU 5           ; altura do meteoro bom
+COR_METEORO_MAU     EQU 0FF00H		; cor do meteoro mau: vermelho em ARGB ( opaco e vermelho ao máximo, verde e azul a 0)
+
+; #######################################################################
+; * TABELAS DE DESENHOS 
+; #######################################################################
+
+PLACE		1000H				
 
 DEF_NAVE:					; tabela que define a nave (cor, largura, altura)
 	WORD		LARGURA_NAVE, ALTURA_NAVE               ; largura e altura da nave
@@ -58,6 +56,16 @@ DEF_METEORO_BOM :           ; tabela que define o meteoro bom
     WORD        COR_METEORO_BOM, COR_METEORO_BOM, COR_METEORO_BOM, COR_METEORO_BOM, COR_METEORO_BOM
     WORD        COR_METEORO_BOM, COR_METEORO_BOM, COR_METEORO_BOM, COR_METEORO_BOM, COR_METEORO_BOM
     WORD        0, COR_METEORO_BOM, COR_METEORO_BOM, COR_METEORO_BOM, 0
+
+DEF_METEORO_MAU:						; tabela que define o boneco do meteoro mau
+	WORD		LARGURA_METEORO_MAU, ALTURA_METEORO_MAU
+	WORD		COR_METEORO_MAU, 0, 0, 0, COR_METEORO_MAU
+	WORD		COR_METEORO_MAU, 0, COR_METEORO_MAU, 0, COR_METEORO_MAU
+	WORD		0, COR_METEORO_MAU, COR_METEORO_MAU, COR_METEORO_MAU, 0
+	WORD		COR_METEORO_MAU, 0, COR_METEORO_MAU, 0, COR_METEORO_MAU
+	WORD		COR_METEORO_MAU, 0, 0, 0, COR_METEORO_MAU
+
+
 ; *********************************************************************************
 ; * Código
 ; *********************************************************************************
