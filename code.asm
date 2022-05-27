@@ -9,10 +9,25 @@
 ; *********************************************************************************
 TEC_LIN				EQU 0C000H	; endereço das linhas do teclado (periférico POUT-2)
 TEC_COL				EQU 0E000H	; endereço das colunas do teclado (periférico PIN)
-LINHA_TECLADO			EQU 8		; linha a testar (4ª linha, 1000b)
+LINHA_TECLADO			EQU 1		; linha a testar (4ª linha, 1000b)
 MASCARA				EQU 0FH		; para isolar os 4 bits de menor peso, ao ler as colunas do teclado
-TECLA_ESQUERDA			EQU 1		; tecla na primeira coluna do teclado (tecla C)
-TECLA_DIREITA			EQU 2		; tecla na segunda coluna do teclado (tecla D)
+
+TECLA_0				EQU 0011H
+TECLA_1				EQU 0012H
+TECLA_2				EQU	0014H
+TECLA_3				EQU	0018H
+TECLA_4				EQU 0021H
+TECLA_5				EQU 0022H
+TECLA_6				EQU	0024H
+TECLA_7				EQU	0028H
+TECLA_8				EQU 0041H
+TECLA_9				EQU 0042H
+TECLA_A				EQU	0044H
+TECLA_B				EQU	0048H
+TECLA_C				EQU 0081H
+TECLA_D				EQU 0082H
+TECLA_E				EQU	0084H
+TECLA_F				EQU	0088H
 
 DEFINE_LINHA    		EQU 600AH      ; endereço do comando para definir a linha
 DEFINE_COLUNA   		EQU 600CH      ; endereço do comando para definir a coluna
@@ -61,7 +76,7 @@ pilha:
 						; (200H bytes, pois são 100H words)
 SP_inicial:				; este é o endereço (1200H) com que o SP deve ser 
 						; inicializado. O 1.º end. de retorno será 
-						; armazenado em 11FEH (1200H-2)				
+						; armazenado em 11FEH (1200H-2)	
 
 DEF_NAVE:					; tabela que define a nave (cor, largura, altura)
 	WORD		L_NAVE, H_NAVE               ; largura e altura da nave
@@ -114,15 +129,24 @@ mostra_boneco:
 
 espera_tecla:				; neste ciclo espera-se até uma tecla ser premida
 	MOV  R6, LINHA_TECLADO	; linha a testar no teclado
-	CALL	teclado			; leitura às teclas
-	CMP	R9, 0
-	JZ	espera_tecla		; espera, enquanto não houver tecla
-	CMP	R9, TECLA_ESQUERDA
+	testa_linha:
+		CALL	teclado			; leitura às teclas
+		CMP	R9, 0
+		JNZ	encontrou_tecla		; espera, enquanto não houver tecla
+		SHL R6, 1
+		JZ espera_tecla
+		JMP testa_linha
+encontrou_tecla:
+	SHL  R6, 4         ; coloca linha no nibble high
+    OR   R6, R9        ; junta coluna (nibble low)
+	MOV R7, TECLA_0
+	CMP	R6, R7
 	JNZ	testa_direita
 	MOV	R7, -1			; vai deslocar para a esquerda
 	JMP	ve_limites
 testa_direita:
-	CMP	R9, TECLA_DIREITA
+	MOV R7, TECLA_2
+	CMP	R6, R7
 	JNZ	espera_tecla		; tecla que não interessa
 	MOV	R7, +1			; vai deslocar para a direita
 
