@@ -64,7 +64,7 @@ COR_NAVE_MÁ     EQU 0FF00H		; cor da nave má: vermelho em ARGB (opaco e vermel
 
 MIN_COLUNA		EQU  0		; número da coluna mais à esquerda que o objeto pode ocupar
 MAX_COLUNA		EQU  63        ; número da coluna mais à direita que o objeto pode ocupar
-ATRASO			EQU	8000H		; atraso para limitar a velocidade de movimento do boneco
+ATRASO			EQU	4000H		; atraso para limitar a velocidade de movimento do boneco
 
 ; #######################################################################
 ; * TABELAS DE DESENHOS 
@@ -79,6 +79,7 @@ SP_inicial:				; este é o endereço (1200H) com que o SP deve ser
 						; armazenado em 11FEH (1200H-2)	
 
 DEF_NAVE:					; tabela que define a nave (cor, largura, altura)
+	WORD		X_NAVE, Y_NAVE ; posição inicial da nave
 	WORD		L_NAVE, H_NAVE               ; largura e altura da nave
     WORD        0, 0, COR_NAVE, 0, 0
 	WORD		COR_NAVE, 0, COR_NAVE, 0, COR_NAVE		
@@ -86,6 +87,7 @@ DEF_NAVE:					; tabela que define a nave (cor, largura, altura)
     WORD        0, COR_NAVE, 0, COR_NAVE, 0
 
 DEF_METEORO :           ; tabela que define o meteoro
+	WORD		X_METEORO, Y_METEORO ; posição inicial do meteoro
     WORD        L_METEORO, H_METEORO ; largura e altura do meteoro
     WORD        0, COR_METEORO, COR_METEORO, COR_METEORO, 0
     WORD        COR_METEORO, COR_METEORO, COR_METEORO, COR_METEORO, COR_METEORO
@@ -94,6 +96,7 @@ DEF_METEORO :           ; tabela que define o meteoro
     WORD        0, COR_METEORO, COR_METEORO, COR_METEORO, 0
 
 DEF_NAVE_MÁ:						; tabela que define a nave má
+	WORD		X_NAVE_MÁ, Y_NAVE_MÁ ; posição inicial da nave má
 	WORD		L_NAVE_MÁ, H_NAVE_MÁ
 	WORD		COR_NAVE_MÁ, 0, 0, 0, COR_NAVE_MÁ
 	WORD		COR_NAVE_MÁ, 0, COR_NAVE_MÁ, 0, COR_NAVE_MÁ
@@ -114,18 +117,15 @@ inicio:
 	MOV  [APAGA_ECRÃ], R1	; apaga todos os pixels já desenhados (o valor de R1 não é relevante)
 	MOV	R1, 1			; cenário de fundo número 0
 	MOV  [SELECIONA_VIDEO_FUNDO], R1	; seleciona o cenário de fundo
-    
-    MOV  R1, Y_NAVE			; linha da nave
-	MOV  R2, X_NAVE		; coluna da nave
-    MOV	R4, DEF_NAVE		; endereço da tabela que define a nave
 
 mostra_boneco:
     ; desenhar nave
-	MOV R0, 1
-	MOV R1, Y_NAVE
+	MOV R0, 1	; vai desenhar
 	MOV R4, DEF_NAVE
-	CALL	desenha_boneco		; desenha o boneco
+	CALL	desenha_boneco
 
+	MOV R4, DEF_METEORO
+	CALL	desenha_boneco
 
 espera_tecla:				; neste ciclo espera-se até uma tecla ser premida
 	MOV  R6, LINHA_TECLADO	; linha a testar no teclado
@@ -151,7 +151,8 @@ testa_direita:
 	MOV	R7, +1			; vai deslocar para a direita
 
 ve_limites:
-	MOV	R6, [R4]			; obtém a largura do boneco
+	MOV	R6, [DEF_NAVE + 4]			; obtém a largura do boneco
+	MOV R2, [DEF_NAVE]
 	CALL	testa_limites		; vê se chegou aos limites do ecrã e se sim força R7 a 0
 	CMP	R7, 0
 	JZ	espera_tecla		; se não é para movimentar o objeto, vai ler o teclado de novo
@@ -161,30 +162,38 @@ move_boneco:
 	CALL atraso
     ; apagar nave
 	MOV R0, 0
-	MOV R1, Y_NAVE
 	MOV R4, DEF_NAVE
 	CALL	desenha_boneco
 
+	MOV R4, DEF_METEORO
+	CALL	desenha_boneco
+
 coluna_seguinte:
-	ADD	R2, R7			; para desenhar objeto na coluna seguinte (direita ou esquerda)
+	MOV R4, DEF_NAVE
+	MOV R0, [R4]
+	ADD	R0, R7			; para desenhar objeto na coluna seguinte (direita ou esquerda)
+	MOV [R4], R0
 	JMP	mostra_boneco		; vai desenhar o boneco de novo
 
 ; **********************************************************************
 ; DESENHA_BONECO - Desenha um boneco na linha e coluna indicadas
 ;			    com a forma e cor definidas na tabela indicada.
 ; Argumentos:   R0 - apaga (0) / desenha (1)
-;               R1 - linha 
-;               R2 - coluna
 ;               R4 - tabela que define o boneco
 ;
 ; **********************************************************************
 desenha_boneco:
+	PUSH	R1
 	PUSH	R2
 	PUSH	R3
 	PUSH	R4
 	PUSH	R5
 	PUSH	R6
     PUSH    R8
+	MOV R2, [R4]
+	ADD R4, 2
+	MOV R1, [R4]
+	ADD R4, 2
 	MOV	R5, [R4]			; obtém a largura do boneco
     MOV R8, [R4]
 	ADD R4, 2				
@@ -215,6 +224,7 @@ desenha_pixels:
 	POP	R4
 	POP	R3
 	POP	R2
+	POP R1
 	RET
 
 ; **********************************************************************
@@ -229,7 +239,6 @@ escreve_pixel:
 	MOV  [DEFINE_COLUNA], R2		; seleciona a coluna
 	MOV  [DEFINE_PIXEL], R3		; altera a cor do pixel na linha e coluna já selecionadas
 	RET
-
 
 ; **********************************************************************
 ; ATRASO - Executa um ciclo para implementar um atraso.
