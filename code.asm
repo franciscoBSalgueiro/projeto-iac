@@ -7,9 +7,10 @@
 ; *********************************************************************************
 ; * Constantes
 ; *********************************************************************************
+DISPLAYS   EQU 0A000H  ; endere�o dos displays de 7 segmentos (perif�rico POUT-1)
+
 TEC_LIN				EQU 0C000H	; endereço das linhas do teclado (periférico POUT-2)
 TEC_COL				EQU 0E000H	; endereço das colunas do teclado (periférico PIN)
-LINHA_TECLADO			EQU 1		; linha a testar (4ª linha, 1000b)
 MASCARA				EQU 0FH		; para isolar os 4 bits de menor peso, ao ler as colunas do teclado
 
 TECLA_0				EQU 0011H
@@ -72,11 +73,14 @@ ATRASO			EQU	4000H		; atraso para limitar a velocidade de movimento do boneco
 
 PLACE		1000H
 pilha:
-	STACK 100H			; espaço reservado para a pilha 
+	STACK 200H			; espaço reservado para a pilha 
 						; (200H bytes, pois são 100H words)
 SP_inicial:				; este é o endereço (1200H) com que o SP deve ser 
 						; inicializado. O 1.º end. de retorno será 
 						; armazenado em 11FEH (1200H-2)	
+
+ENERGIA:
+	WORD 100
 
 DEF_NAVE:					; tabela que define a nave (cor, largura, altura)
 	WORD		X_NAVE, Y_NAVE ; posição inicial da nave
@@ -104,6 +108,9 @@ DEF_NAVE_MÁ:						; tabela que define a nave má
 	WORD		COR_NAVE_MÁ, 0, COR_NAVE_MÁ, 0, COR_NAVE_MÁ
 	WORD		COR_NAVE_MÁ, 0, 0, 0, COR_NAVE_MÁ
 
+CARREGOU_BOTAO:
+	WORD	0	; botão 4
+	WORD	0	; botão 5
 
 ; *********************************************************************************
 ; * Código
@@ -117,6 +124,9 @@ inicio:
 	MOV  [APAGA_ECRÃ], R1	; apaga todos os pixels já desenhados (o valor de R1 não é relevante)
 	MOV	R1, 1			; cenário de fundo número 0
 	MOV  [SELECIONA_VIDEO_FUNDO], R1	; seleciona o cenário de fundo
+	MOV R1, 100H
+	MOV R7, DISPLAYS
+	MOV [R7], R1
 
 mostra_boneco:
     ; desenhar nave
@@ -128,12 +138,22 @@ mostra_boneco:
 	CALL	desenha_boneco
 
 espera_tecla:				; neste ciclo espera-se até uma tecla ser premida
-	MOV  R6, LINHA_TECLADO	; linha a testar no teclado
+	MOV  R6, 1	; testa a primeira linha
 	testa_linha:
 		CALL	teclado			; leitura às teclas
 		CMP	R9, 0
 		JNZ	encontrou_tecla		; espera, enquanto não houver tecla
+
+		CMP	R6, 2 ; verifica se a linha sem teclas premidas é a segunda
+		JNZ muda_coluna
+		MOV R7, CARREGOU_BOTAO
+		MOV R1, 0
+		MOV [R7], R1
+
+		muda_coluna:
 		SHL R6, 1
+		MOV R0, 0010H
+		CMP R6, R0
 		JZ espera_tecla
 		JMP testa_linha
 encontrou_tecla:
@@ -144,11 +164,39 @@ encontrou_tecla:
 	JNZ	testa_direita
 	MOV	R7, -1			; vai deslocar para a esquerda
 	JMP	ve_limites
+
 testa_direita:
-	MOV R7, TECLA_2
+	MOV R7, TECLA_F
 	CMP	R6, R7
-	JNZ	espera_tecla		; tecla que não interessa
+	JNZ	testa_display		; tecla que não interessa
 	MOV	R7, +1			; vai deslocar para a direita
+	JMP ve_limites
+
+testa_display:
+	; verifica se a tecla pressionada é o 4
+	MOV R7, TECLA_4
+	CMP	R6, R7
+	JNZ	espera_tecla
+
+	; verifica se a tecla já foi pressionada
+	MOV R7, [CARREGOU_BOTAO]
+	CMP R7, 0
+	JNZ espera_tecla
+
+	MOV R6, 1
+	MOV R7, CARREGOU_BOTAO
+	MOV [R7], R6
+
+	; decrementa o valor nos displays
+	MOV	R7, [ENERGIA]
+	SUB R7, 1
+	MOV R0, ENERGIA
+	MOV [R0], R7
+
+	MOV R0, DISPLAYS
+	CALL converte_hex
+	MOV [R0], R9
+	JMP espera_tecla
 
 ve_limites:
 	MOV	R6, [DEF_NAVE + 4]			; obtém a largura do boneco
@@ -286,6 +334,26 @@ impede_movimento:
 sai_testa_limites:	
 	POP	R6
 	POP	R5
+	RET
+
+; **********************************************************************
+; CONVERTE_HEX - Converte o valor para falso hexadecimal para o display
+; Argumentos:	R7 - valor real
+;
+; Retorna: 	R9 - valor formatado em hexadecimal para o decimal
+; **********************************************************************
+converte_hex:
+	PUSH R0
+	PUSH R7
+	CMP R7, R0
+	MOV R0, 10
+	MOV R9, R7
+	DIV R9, R0
+	SHL R9, 4
+	MOD R7, R0
+	ADD R9, R7
+	POP R7
+	POP R0
 	RET
 
 ; **********************************************************************
