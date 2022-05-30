@@ -1525,6 +1525,12 @@
       "relative start time" : 0.0,
       "relative stop time" : 1.0,
       "playAsClip" : false
+    }, {
+      "filePathName" : "sounds\\musica.mp3",
+      "relative sound volume" : 1.0,
+      "relative start time" : 0.0,
+      "relative stop time" : 1.0,
+      "playAsClip" : false
     } ],
     "addressable data" : {
       "className" : "ModuleExtensionMemoryMediaCenter",
