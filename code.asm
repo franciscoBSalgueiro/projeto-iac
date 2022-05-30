@@ -34,6 +34,8 @@ DEFINE_LINHA    		EQU 600AH      ; endereço do comando para definir a linha
 DEFINE_COLUNA   		EQU 600CH      ; endereço do comando para definir a coluna
 DEFINE_PIXEL    		EQU 6012H      ; endereço do comando para escrever um pixel
 TOCA_SOM                EQU 605AH      ; endereço do comando para tocar um som
+TERMINA_SOM             EQU 6066H      ; endereço do comando para tocar um som
+
 
 APAGA_AVISO     		EQU 6040H      ; endereço do comando para apagar o aviso de nenhum cenário selecionado
 APAGA_ECRÃ	 		EQU 6002H      ; endereço do comando para apagar todos os pixels já desenhados
@@ -68,6 +70,9 @@ COR_NAVE_MÁ     EQU 0FF00H		; cor da nave má: vermelho em ARGB (opaco e vermel
 
 MIN_COLUNA		EQU  0		; número da coluna mais à esquerda que o objeto pode ocupar
 MAX_COLUNA		EQU  63        ; número da coluna mais à direita que o objeto pode ocupar
+MIN_LINHA		EQU  0		; número da coluna mais à esquerda que o objeto pode ocupar
+MAX_LINHA		EQU  32        ; número da coluna mais à direita que o objeto pode ocupar
+
 ATRASO			EQU	4000H		; atraso para limitar a velocidade de movimento do boneco
 
 ; #######################################################################
@@ -137,7 +142,10 @@ mostra_boneco:
 	MOV R0, 1	; vai desenhar
 	MOV R4, DEF_NAVE
 	CALL	desenha_boneco
-
+	MOV R4, [DEF_METEORO + 2]
+	MOV R2, MAX_LINHA
+	CMP R4, R2
+	JGE espera_tecla
 	MOV R4, DEF_METEORO
 	CALL	desenha_boneco
 
@@ -257,6 +265,10 @@ pressionou_6:
 	MOV R1, 0
 	MOV [R6], R1
 
+	MOV R6, TERMINA_SOM
+	MOV R1, 0
+	MOV [R6], R1
+
 	JMP move_meteoro
 
 ve_limites:
@@ -269,13 +281,10 @@ ve_limites:
 move_boneco:
 	MOV R11, ATRASO
 	CALL atraso
-    ; apagar nave
-	MOV R0, 0
-	MOV R4, DEF_NAVE
-	CALL	desenha_boneco
-
-	MOV R4, DEF_METEORO
-	CALL	desenha_boneco
+    ; apagar ecrã
+	MOV R0, APAGA_ECRÃ
+	MOV R4, 1
+	MOV [R0], R4
 
 coluna_seguinte:
 	MOV R4, DEF_NAVE
@@ -285,19 +294,16 @@ coluna_seguinte:
 	JMP	mostra_boneco		; vai desenhar o boneco de novo
 
 move_meteoro:
-    ; apagar nave
-	MOV R0, 0
-	MOV R4, DEF_NAVE
-	CALL	desenha_boneco
-
-	MOV R4, DEF_METEORO
-	CALL	desenha_boneco
+    ; apagar ecrã
+	MOV R0, APAGA_ECRÃ
+	MOV R4, 1
+	MOV [R0], R4
 
 linha_seguinte:
 	MOV R4, DEF_METEORO
 	ADD R4, 2
 	MOV R0, [R4]
-	ADD R0, 2
+	ADD R0, 1
 	MOV [R4], R0
 	JMP	mostra_boneco		; vai desenhar o boneco de novo
 
@@ -327,13 +333,13 @@ desenha_boneco:
 	ADD	R4, 2			; endereço da cor do 1º pixel (2 porque a largura é uma word)
 desenha_pixels:
 	desenha_coluna:       		; desenha os pixels do boneco a partir da tabela
-        CMP R0, 0
-        JZ else
+		CMP R0, 0
+		JZ else
 		MOV	R3, [R4]			; obtém a cor do próximo pixel do boneco
         JMP both
         else:
-            MOV R3, 0
-        both:
+			MOV R3, 0
+		both:
 		CALL escreve_pixel
 		ADD	R4, 2			; endereço da cor do próximo pixel (2 porque cada cor de pixel é uma word)
 		ADD  R2, 1               ; próxima coluna
@@ -420,17 +426,38 @@ sai_testa_limites:
 ;
 ; Retorna: 	R9 - valor formatado em hexadecimal para o decimal
 ; **********************************************************************
+; a = (n // 100) * 256
+; c = n % 100
+; b = (c // 10) * 16
+; c = c % 10
+; 256*(420 // 100) + 16*( (420%100) // 10 ) + ( (420%100) % 10 )
 converte_hex:
 	PUSH R0
+	PUSH R1
+	PUSH R2
 	PUSH R7
-	CMP R7, R0
+
 	MOV R0, 10
-	MOV R9, R7
+	MOV R1, 100
+
+	MOV R2, R7
+	DIV R7, R1
+	SHL R7, 4
+	SHL R7, 4
+
+	MOD R2, R1
+	MOV R9, R2
 	DIV R9, R0
 	SHL R9, 4
-	MOD R7, R0
+
+	MOD R2, R0
+
+	ADD R9, R2
 	ADD R9, R7
+
 	POP R7
+	POP R2
+	POP R1
 	POP R0
 	RET
 
