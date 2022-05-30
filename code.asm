@@ -53,11 +53,14 @@ X_NAVE_MÁ           EQU 50         ; coluna nave má
 
 L_NAVE	    	EQU	5			; largura da nave
 H_NAVE		    EQU 4           ; altura da nave
-COR_NAVE	    EQU	0FF9CH		; cor da nave: rosa em ARGB (opaco e vermelho no máximo, verde a 60 e azul a 40)
+COR_NAVE	    EQU	0F08CH		; azul
+COR_NAVE2		EQU 0FFB0H		; amarelo
+COR_NAVE3		EQU	0F06CH		; azul escuro
 
 L_METEORO 		EQU 5           ; largura do meteoro
 H_METEORO  		EQU 5           ; altura do meteoro
-COR_METEORO     EQU 0F8F8H
+COR_METEORO     EQU 0FBBBH		; cinzento escuro
+COR_METEORO2	EQU 0F777H		; cinzento claro
 
 L_NAVE_MÁ 		EQU 5           ; largura da nave má
 H_NAVE_MÁ  		EQU 5           ; altura da nave má
@@ -85,19 +88,19 @@ ENERGIA:
 DEF_NAVE:					; tabela que define a nave (cor, largura, altura)
 	WORD		X_NAVE, Y_NAVE ; posição inicial da nave
 	WORD		L_NAVE, H_NAVE               ; largura e altura da nave
-    WORD        0, 0, COR_NAVE, 0, 0
-	WORD		COR_NAVE, 0, COR_NAVE, 0, COR_NAVE		
+    WORD        0, 0, COR_NAVE3, 0, 0
+	WORD		COR_NAVE, 0, COR_NAVE, 0, COR_NAVE			
 	WORD		COR_NAVE, COR_NAVE, COR_NAVE, COR_NAVE, COR_NAVE    
-    WORD        0, COR_NAVE, 0, COR_NAVE, 0
+    WORD        0, COR_NAVE2, 0, COR_NAVE2, 0
 
 DEF_METEORO :           ; tabela que define o meteoro
 	WORD		X_METEORO, Y_METEORO ; posição inicial do meteoro
     WORD        L_METEORO, H_METEORO ; largura e altura do meteoro
-    WORD        0, COR_METEORO, COR_METEORO, COR_METEORO, 0
-    WORD        COR_METEORO, COR_METEORO, COR_METEORO, COR_METEORO, COR_METEORO
-    WORD        COR_METEORO, COR_METEORO, COR_METEORO, COR_METEORO, COR_METEORO
-    WORD        COR_METEORO, COR_METEORO, COR_METEORO, COR_METEORO, COR_METEORO
-    WORD        0, COR_METEORO, COR_METEORO, COR_METEORO, 0
+    WORD        0, COR_METEORO2, COR_METEORO, COR_METEORO2, 0
+    WORD        COR_METEORO, COR_METEORO2, COR_METEORO, COR_METEORO2, COR_METEORO2
+    WORD        COR_METEORO2, COR_METEORO, COR_METEORO2, COR_METEORO, COR_METEORO2
+    WORD        COR_METEORO, COR_METEORO2, COR_METEORO, COR_METEORO2, COR_METEORO2
+    WORD        0, COR_METEORO2, COR_METEORO, COR_METEORO2, 0
 
 DEF_NAVE_MÁ:						; tabela que define a nave má
 	WORD		X_NAVE_MÁ, Y_NAVE_MÁ ; posição inicial da nave má
