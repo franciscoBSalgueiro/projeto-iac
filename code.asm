@@ -52,21 +52,28 @@ X_METEORO           EQU 20         ; coluna meteoro
 Y_NAVE_MÁ           EQU 10         ; linha nave má
 X_NAVE_MÁ           EQU 50         ; coluna nave má
 
+; cores da nave
+AZUL	    	EQU	0F08CH		
+AMARELO			EQU 0FFB0H		
+AZUL_ESCURO		EQU	0F0BEH	
+
+;cores do meteoro
+CINZENTO_ESCURO EQU 0FBBBH		
+CINZENTO_CLARO	EQU 0F777H	
+
+; cor da nave má
+VERMELHO     	EQU 0FF00H
+
 
 L_NAVE	    	EQU	5			; largura da nave
 H_NAVE		    EQU 4           ; altura da nave
-COR_NAVE	    EQU	0F08CH		; azul
-COR_NAVE2		EQU 0FFB0H		; amarelo
-COR_NAVE3		EQU	0F06CH		; azul escuro
+	
 
 L_METEORO 		EQU 5           ; largura do meteoro
 H_METEORO  		EQU 5           ; altura do meteoro
-COR_METEORO     EQU 0FBBBH		; cinzento escuro
-COR_METEORO2	EQU 0F777H		; cinzento claro
 
 L_NAVE_MÁ 		EQU 5           ; largura da nave má
 H_NAVE_MÁ  		EQU 5           ; altura da nave má
-COR_NAVE_MÁ     EQU 0FF00H		; cor da nave má: vermelho em ARGB (opaco e vermelho ao máximo, verde e azul a 0)
 
 MIN_COLUNA		EQU  0		; número da coluna mais à esquerda que o objeto pode ocupar
 MAX_COLUNA		EQU  63        ; número da coluna mais à direita que o objeto pode ocupar
@@ -93,28 +100,28 @@ ENERGIA:
 DEF_NAVE:					; tabela que define a nave (cor, largura, altura)
 	WORD		X_NAVE, Y_NAVE ; posição inicial da nave
 	WORD		L_NAVE, H_NAVE               ; largura e altura da nave
-    WORD        0, 0, COR_NAVE3, 0, 0
-	WORD		COR_NAVE, 0, COR_NAVE, 0, COR_NAVE			
-	WORD		COR_NAVE, COR_NAVE, COR_NAVE, COR_NAVE, COR_NAVE    
-    WORD        0, COR_NAVE2, 0, COR_NAVE2, 0
+    WORD        0, 0, AZUL_ESCURO, 0, 0
+	WORD		AZUL, 0, AZUL, 0, AZUL			
+	WORD		AZUL, AZUL, AZUL, AZUL, AZUL    
+    WORD        0, AMARELO, 0, AMARELO, 0
 
 DEF_METEORO :           ; tabela que define o meteoro
 	WORD		X_METEORO, Y_METEORO ; posição inicial do meteoro
     WORD        L_METEORO, H_METEORO ; largura e altura do meteoro
-    WORD        0, COR_METEORO2, COR_METEORO, COR_METEORO2, 0
-    WORD        COR_METEORO, COR_METEORO2, COR_METEORO, COR_METEORO2, COR_METEORO2
-    WORD        COR_METEORO2, COR_METEORO, COR_METEORO2, COR_METEORO, COR_METEORO2
-    WORD        COR_METEORO, COR_METEORO2, COR_METEORO, COR_METEORO2, COR_METEORO2
-    WORD        0, COR_METEORO2, COR_METEORO, COR_METEORO2, 0
+    WORD        0, CINZENTO_CLARO, CINZENTO_ESCURO, CINZENTO_CLARO, 0
+    WORD        CINZENTO_ESCURO, CINZENTO_CLARO, CINZENTO_ESCURO, CINZENTO_CLARO, CINZENTO_CLARO
+    WORD        CINZENTO_CLARO, CINZENTO_ESCURO, CINZENTO_CLARO, CINZENTO_ESCURO, CINZENTO_CLARO
+    WORD        CINZENTO_ESCURO, CINZENTO_CLARO, CINZENTO_ESCURO, CINZENTO_CLARO, CINZENTO_CLARO
+    WORD        0, CINZENTO_CLARO, CINZENTO_ESCURO, CINZENTO_CLARO, 0
 
 DEF_NAVE_MÁ:						; tabela que define a nave má
 	WORD		X_NAVE_MÁ, Y_NAVE_MÁ ; posição inicial da nave má
 	WORD		L_NAVE_MÁ, H_NAVE_MÁ
-	WORD		COR_NAVE_MÁ, 0, 0, 0, COR_NAVE_MÁ
-	WORD		COR_NAVE_MÁ, 0, COR_NAVE_MÁ, 0, COR_NAVE_MÁ
-	WORD		0, COR_NAVE_MÁ, COR_NAVE_MÁ, COR_NAVE_MÁ, 0
-	WORD		COR_NAVE_MÁ, 0, COR_NAVE_MÁ, 0, COR_NAVE_MÁ
-	WORD		COR_NAVE_MÁ, 0, 0, 0, COR_NAVE_MÁ
+	WORD		VERMELHO, 0, 0, 0, VERMELHO
+	WORD		VERMELHO, 0, VERMELHO, 0, VERMELHO
+	WORD		0, VERMELHO, VERMELHO, VERMELHO, 0
+	WORD		VERMELHO, 0, VERMELHO, 0, VERMELHO
+	WORD		VERMELHO, 0, 0, 0, VERMELHO
 
 CARREGOU_BOTAO:
 	WORD	0	; botão 4
@@ -124,7 +131,7 @@ CARREGOU_BOTAO:
 ; *********************************************************************************
 ; * Código
 ; *********************************************************************************
-PLACE   0				; o código tem de começar em 0000H
+PLACE   0				; o código começa em 0000H
 inicio:
 	MOV  SP, SP_inicial		; inicializa SP para a palavra a seguir
 						; à última da pilha
@@ -133,6 +140,8 @@ inicio:
 	MOV  [APAGA_ECRÃ], R1	; apaga todos os pixels já desenhados (o valor de R1 não é relevante)
 	MOV	R1, 1			; cenário de fundo número 0
 	MOV  [SELECIONA_VIDEO_FUNDO], R1	; seleciona o cenário de fundo
+	MOV	R1, 2			; cenário de fundo número 0
+	MOV  [SELECIONA_VIDEO_FUNDO], R1
 	MOV R1, 100H
 	MOV R7, DISPLAYS
 	MOV [R7], R1
