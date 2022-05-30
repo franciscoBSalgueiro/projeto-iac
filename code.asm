@@ -111,6 +111,7 @@ DEF_NAVE_MÁ:						; tabela que define a nave má
 CARREGOU_BOTAO:
 	WORD	0	; botão 4
 	WORD	0	; botão 5
+	WORD	0	; botão 6
 
 ; *********************************************************************************
 ; * Código
@@ -149,6 +150,10 @@ espera_tecla:				; neste ciclo espera-se até uma tecla ser premida
 		MOV R7, CARREGOU_BOTAO
 		MOV R1, 0
 		MOV [R7], R1
+		ADD R7, 2
+		MOV [R7], R1
+		ADD R7, 2
+		MOV [R7], R1
 
 		muda_coluna:
 		SHL R6, 1
@@ -156,28 +161,42 @@ espera_tecla:				; neste ciclo espera-se até uma tecla ser premida
 		CMP R6, R0
 		JZ espera_tecla
 		JMP testa_linha
+
 encontrou_tecla:
 	SHL  R6, 4         ; coloca linha no nibble high
     OR   R6, R9        ; junta coluna (nibble low)
+
 	MOV R7, TECLA_0
 	CMP	R6, R7
-	JNZ	testa_direita
-	MOV	R7, -1			; vai deslocar para a esquerda
-	JMP	ve_limites
+	JZ	pressionou_0
 
-testa_direita:
-	MOV R7, TECLA_F
+	MOV R7, TECLA_2
 	CMP	R6, R7
-	JNZ	testa_display		; tecla que não interessa
-	MOV	R7, +1			; vai deslocar para a direita
+	JZ	pressionou_2
+
+	MOV R7, TECLA_4
+	CMP R6, R7
+	JZ pressionou_4
+
+	MOV R7, TECLA_5
+	CMP R6, R7
+	JZ pressionou_5
+
+	MOV R7, TECLA_6
+	CMP R6, R7
+	JZ pressionou_6
+
+	JMP espera_tecla
+
+pressionou_0:
+	MOV R7, -1
 	JMP ve_limites
 
-testa_display:
-	; verifica se a tecla pressionada é o 4
-	MOV R7, TECLA_4
-	CMP	R6, R7
-	JNZ	espera_tecla
+pressionou_2:
+	MOV R7, +1
+	JMP ve_limites
 
+pressionou_4:
 	; verifica se a tecla já foi pressionada
 	MOV R7, [CARREGOU_BOTAO]
 	CMP R7, 0
@@ -197,6 +216,45 @@ testa_display:
 	CALL converte_hex
 	MOV [R0], R9
 	JMP espera_tecla
+
+pressionou_5:
+	; verifica se a tecla já foi pressionada
+	MOV R7, [CARREGOU_BOTAO+2]
+	CMP R7, 0
+	JNZ espera_tecla
+
+	MOV R6, 1
+	MOV R7, CARREGOU_BOTAO
+	ADD R7, 2
+	MOV [R7], R6
+
+	; decrementa o valor nos displays
+	MOV	R7, [ENERGIA]
+	ADD R7, 1
+	MOV R0, ENERGIA
+	MOV [R0], R7
+
+	MOV R0, DISPLAYS
+	CALL converte_hex
+	MOV [R0], R9
+	JMP espera_tecla
+
+pressionou_6:
+	; verifica se a tecla já foi pressionada
+	MOV R7, [CARREGOU_BOTAO+4]
+	CMP R7, 0
+	JNZ espera_tecla
+
+	MOV R6, 1
+	MOV R7, CARREGOU_BOTAO
+	ADD R7, 4
+	MOV [R7], R6
+
+	MOV R6, TOCA_SOM
+	MOV R1, 0
+	MOV [R6], R1
+
+	JMP move_meteoro
 
 ve_limites:
 	MOV	R6, [DEF_NAVE + 4]			; obtém a largura do boneco
@@ -220,6 +278,23 @@ coluna_seguinte:
 	MOV R4, DEF_NAVE
 	MOV R0, [R4]
 	ADD	R0, R7			; para desenhar objeto na coluna seguinte (direita ou esquerda)
+	MOV [R4], R0
+	JMP	mostra_boneco		; vai desenhar o boneco de novo
+
+move_meteoro:
+    ; apagar nave
+	MOV R0, 0
+	MOV R4, DEF_NAVE
+	CALL	desenha_boneco
+
+	MOV R4, DEF_METEORO
+	CALL	desenha_boneco
+
+linha_seguinte:
+	MOV R4, DEF_METEORO
+	ADD R4, 2
+	MOV R0, [R4]
+	ADD R0, 2
 	MOV [R4], R0
 	JMP	mostra_boneco		; vai desenhar o boneco de novo
 
