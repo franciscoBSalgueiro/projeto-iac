@@ -7,7 +7,7 @@
 ; *********************************************************************************
 ; * Constantes
 ; *********************************************************************************
-DISPLAYS   EQU 0A000H  ; endere�o dos displays de 7 segmentos (perif�rico POUT-1)
+DISPLAYS   EQU 0A000H  ; endere�o dos displays de 7 segmentos (periférico POUT-1)
 
 TEC_LIN				EQU 0C000H	; endereço das linhas do teclado (periférico POUT-2)
 TEC_COL				EQU 0E000H	; endereço das colunas do teclado (periférico PIN)
@@ -42,6 +42,11 @@ APAGA_ECRÃ	 		EQU 6002H      ; endereço do comando para apagar todos os pixels
 SELECIONA_CENARIO_FUNDO  EQU 6042H      ; endereço do comando para selecionar uma imagem de fundo
 SELECIONA_VIDEO_FUNDO	EQU 605CH	; endereço do comando para selecionar um video de fundo
 
+ATRASO			EQU	4000H		; atraso para limitar a velocidade de movimento do boneco
+
+; *********************
+; * POSIÇÕES INICIAIS
+; *********************
 
 Y_NAVE        		EQU  26        ; linha da nave 
 X_NAVE				EQU  30        ; coluna da nave 
@@ -52,22 +57,12 @@ X_METEORO           EQU 20         ; coluna meteoro
 Y_NAVE_MÁ           EQU 10         ; linha nave má
 X_NAVE_MÁ           EQU 50         ; coluna nave má
 
-; cores da nave
-AZUL	    	EQU	0F08CH		
-AMARELO			EQU 0FFB0H		
-AZUL_ESCURO		EQU	0F0BEH	
-
-;cores do meteoro
-CINZENTO_ESCURO EQU 0FBBBH		
-CINZENTO_CLARO	EQU 0F777H	
-
-; cor da nave má
-VERMELHO     	EQU 0FF00H
-
+; *************
+; * DIMENSÕES
+; *************
 
 L_NAVE	    	EQU	5			; largura da nave
 H_NAVE		    EQU 4           ; altura da nave
-	
 
 L_METEORO 		EQU 5           ; largura do meteoro
 H_METEORO  		EQU 5           ; altura do meteoro
@@ -75,31 +70,50 @@ H_METEORO  		EQU 5           ; altura do meteoro
 L_NAVE_MÁ 		EQU 5           ; largura da nave má
 H_NAVE_MÁ  		EQU 5           ; altura da nave má
 
-MIN_COLUNA		EQU  0		; número da coluna mais à esquerda que o objeto pode ocupar
-MAX_COLUNA		EQU  63        ; número da coluna mais à direita que o objeto pode ocupar
-MIN_LINHA		EQU  0		; número da coluna mais à esquerda que o objeto pode ocupar
-MAX_LINHA		EQU  32        ; número da coluna mais à direita que o objeto pode ocupar
+MIN_COLUNA		EQU  0			; número da coluna mais à esquerda do MediaCenter
+MAX_COLUNA		EQU  63			; número da coluna mais à direita do MediaCenter
+MIN_LINHA		EQU  0			; número da coluna mais à esquerda do MediaCenter
+MAX_LINHA		EQU  32			; número da coluna mais à direita do MediaCenter
 
-ATRASO			EQU	4000H		; atraso para limitar a velocidade de movimento do boneco
+; ***********
+; * CORES
+; ***********
+
+; cores da nave
+AZUL	    	EQU	0F08CH		
+AMARELO			EQU 0FFB0H		
+AZUL_ESCURO		EQU	0F0BEH	
+
+; cores do meteoro
+CINZA_ESCURO EQU 0FBBBH		
+CINZA_CLARO	EQU 0F777H	
+
+; cores da nave má
+VERMELHO     	EQU 0FF00H
 
 ; #######################################################################
-; * TABELAS DE DESENHOS 
+; * VARIÁVEIS E TABELAS
 ; #######################################################################
 
 PLACE		1000H
 pilha:
-	STACK 200H			; espaço reservado para a pilha 
+	STACK 100H			; espaço reservado para a pilha 
 						; (200H bytes, pois são 100H words)
 SP_inicial:				; este é o endereço (1200H) com que o SP deve ser 
 						; inicializado. O 1.º end. de retorno será 
 						; armazenado em 11FEH (1200H-2)	
 
-ENERGIA:
+ENERGIA:	; energia a ser mostrada nos displays
 	WORD 100
 
-DEF_NAVE:					; tabela que define a nave (cor, largura, altura)
-	WORD		X_NAVE, Y_NAVE ; posição inicial da nave
-	WORD		L_NAVE, H_NAVE               ; largura e altura da nave
+CARREGOU_BOTAO:		; tabela que guarda quais as teclas que estão a ser pressionadas
+	WORD	0	; botão 4
+	WORD	0	; botão 5
+	WORD	0	; botão 6
+
+DEF_NAVE:	; tabela que define a nave (posição, dimensões e cores)
+	WORD		X_NAVE, Y_NAVE					; posição inicial da nave
+	WORD		L_NAVE, H_NAVE					; largura e altura da nave
     WORD        0, 0, AZUL_ESCURO, 0, 0
 	WORD		AZUL, 0, AZUL, 0, AZUL			
 	WORD		AZUL, AZUL, AZUL, AZUL, AZUL    
@@ -108,11 +122,11 @@ DEF_NAVE:					; tabela que define a nave (cor, largura, altura)
 DEF_METEORO :           ; tabela que define o meteoro
 	WORD		X_METEORO, Y_METEORO ; posição inicial do meteoro
     WORD        L_METEORO, H_METEORO ; largura e altura do meteoro
-    WORD        0, CINZENTO_CLARO, CINZENTO_ESCURO, CINZENTO_CLARO, 0
-    WORD        CINZENTO_ESCURO, CINZENTO_CLARO, CINZENTO_ESCURO, CINZENTO_CLARO, CINZENTO_CLARO
-    WORD        CINZENTO_CLARO, CINZENTO_ESCURO, CINZENTO_CLARO, CINZENTO_ESCURO, CINZENTO_CLARO
-    WORD        CINZENTO_ESCURO, CINZENTO_CLARO, CINZENTO_ESCURO, CINZENTO_CLARO, CINZENTO_CLARO
-    WORD        0, CINZENTO_CLARO, CINZENTO_ESCURO, CINZENTO_CLARO, 0
+    WORD        0, CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, 0
+    WORD        CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, CINZA_CLARO
+    WORD        CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO
+    WORD        CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, CINZA_CLARO
+    WORD        0, CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, 0
 
 DEF_NAVE_MÁ:						; tabela que define a nave má
 	WORD		X_NAVE_MÁ, Y_NAVE_MÁ ; posição inicial da nave má
@@ -122,11 +136,6 @@ DEF_NAVE_MÁ:						; tabela que define a nave má
 	WORD		0, VERMELHO, VERMELHO, VERMELHO, 0
 	WORD		VERMELHO, 0, VERMELHO, 0, VERMELHO
 	WORD		VERMELHO, 0, 0, 0, VERMELHO
-
-CARREGOU_BOTAO:
-	WORD	0	; botão 4
-	WORD	0	; botão 5
-	WORD	0	; botão 6
 
 ; *********************************************************************************
 ; * Código
@@ -439,7 +448,7 @@ sai_testa_limites:
 ; c = n % 100
 ; b = (c // 10) * 16
 ; c = c % 10
-; 256*(420 // 100) + 16*( (420%100) // 10 ) + ( (420%100) % 10 )
+; total = a + b + c
 converte_hex:
 	PUSH R0
 	PUSH R1
