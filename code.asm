@@ -1,18 +1,22 @@
 ; *********************************************************************************
+; * Projeto IAC - Chuva de Meteoros
 ; * IST-UL
-; * Modulo:    lab5-boneco.asm
-; * Descrição: Este programa ilustra o desenho de um boneco do ecrã, usando rotinas.
+; * Grupo 32 - 103345 - Francisco Salgueiro
+;			   102904 – Mariana Miranda
+;			   102835 – Sofia Paiva
+;
 ; *********************************************************************************
 
 ; *********************************************************************************
 ; * Constantes
 ; *********************************************************************************
-DISPLAYS   EQU 0A000H  ; endere�o dos displays de 7 segmentos (periférico POUT-1)
+DISPLAYS   EQU 0A000H  ; endereço dos displays de 7 segmentos (periférico POUT-1)
 
 TEC_LIN				EQU 0C000H	; endereço das linhas do teclado (periférico POUT-2)
 TEC_COL				EQU 0E000H	; endereço das colunas do teclado (periférico PIN)
 MASCARA				EQU 0FH		; para isolar os 4 bits de menor peso, ao ler as colunas do teclado
 
+; endereços das teclas
 TECLA_0				EQU 0011H
 TECLA_1				EQU 0012H
 TECLA_2				EQU	0014H
@@ -30,18 +34,18 @@ TECLA_D				EQU 0082H
 TECLA_E				EQU	0084H
 TECLA_F				EQU	0088H
 
-DEFINE_LINHA    		EQU 600AH      ; endereço do comando para definir a linha
-DEFINE_COLUNA   		EQU 600CH      ; endereço do comando para definir a coluna
-DEFINE_PIXEL    		EQU 6012H      ; endereço do comando para escrever um pixel
-TOCA_SOM                EQU 605AH      ; endereço do comando para tocar um som
-TERMINA_SOM             EQU 6066H      ; endereço do comando para tocar um som
+DEFINE_LINHA    		EQU 600AH		; endereço do comando para definir a linha
+DEFINE_COLUNA   		EQU 600CH		; endereço do comando para definir a coluna
+DEFINE_PIXEL    		EQU 6012H		; endereço do comando para escrever um pixel
+TOCA_SOM                EQU 605AH		; endereço do comando para tocar um som
+TERMINA_SOM             EQU 6066H		; endereço do comando para tocar um som
 
 
-APAGA_AVISO     		EQU 6040H      ; endereço do comando para apagar o aviso de nenhum cenário selecionado
-APAGA_ECRÃ	 			EQU 6002H      ; endereço do comando para apagar todos os pixels já desenhados
+APAGA_AVISO     		EQU 6040H		; endereço do comando para apagar o aviso de nenhum cenário selecionado
+APAGA_ECRÃ	 			EQU 6002H		; endereço do comando para apagar todos os pixels já desenhados
 SELECIONA_ECRÃ			EQU 6004H
-SELECIONA_CENARIO_FUNDO	EQU 6042H      ; endereço do comando para selecionar uma imagem de fundo
-SELECIONA_VIDEO_FUNDO	EQU 605CH	; endereço do comando para selecionar um video de fundo
+SELECIONA_CENARIO_FUNDO	EQU 6042H		; endereço do comando para selecionar uma imagem de fundo
+SELECIONA_VIDEO_FUNDO	EQU 605CH		; endereço do comando para selecionar um video de fundo
 
 ATRASO			EQU	4000H		; atraso para limitar a velocidade de movimento do boneco
 
@@ -49,7 +53,7 @@ ATRASO			EQU	4000H		; atraso para limitar a velocidade de movimento do boneco
 ; * POSIÇÕES INICIAIS
 ; *********************
 
-Y_NAVE        		EQU  26        ; linha da nave 
+Y_NAVE        		EQU  28        ; linha da nave 
 X_NAVE				EQU  30        ; coluna da nave 
 
 Y_METEORO           EQU 10         ; linha meteoro
@@ -104,7 +108,7 @@ SP_inicial:				; este é o endereço (1200H) com que o SP deve ser
 						; inicializado. O 1.º end. de retorno será 
 						; armazenado em 11FEH (1200H-2)	
 
-ENERGIA:	; energia a ser mostrada nos displays
+ENERGIA:	; energia inicial a ser mostrada nos displays
 	WORD 100
 
 CARREGOU_BOTAO:		; tabela que guarda quais as teclas que estão a ser pressionadas
@@ -112,7 +116,7 @@ CARREGOU_BOTAO:		; tabela que guarda quais as teclas que estão a ser pressionad
 	WORD	0	; botão 5
 	WORD	0	; botão 6
 
-DEF_NAVE:	; tabela que define a nave (posição, dimensões e cores)
+DEF_NAVE:			; tabela que define a nave (posição, dimensões e cores)
 	WORD		X_NAVE, Y_NAVE					; posição inicial da nave
 	WORD		L_NAVE, H_NAVE					; largura e altura da nave
     WORD        0, 0, AZUL_ESCURO, 0, 0
@@ -120,18 +124,18 @@ DEF_NAVE:	; tabela que define a nave (posição, dimensões e cores)
 	WORD		AZUL, AZUL, AZUL, AZUL, AZUL    
     WORD        0, AMARELO, 0, AMARELO, 0
 
-DEF_METEORO :           ; tabela que define o meteoro
-	WORD		X_METEORO, Y_METEORO ; posição inicial do meteoro
-    WORD        L_METEORO, H_METEORO ; largura e altura do meteoro
+DEF_METEORO :		; tabela que define o meteoro
+	WORD		X_METEORO, Y_METEORO 			; posição inicial do meteoro
+    WORD        L_METEORO, H_METEORO 			; largura e altura do meteoro
     WORD        0, CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, 0
     WORD        CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, CINZA_CLARO
     WORD        CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO
     WORD        CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, CINZA_CLARO
     WORD        0, CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, 0
 
-DEF_NAVE_MÁ:						; tabela que define a nave má
-	WORD		X_NAVE_MÁ, Y_NAVE_MÁ ; posição inicial da nave má
-	WORD		L_NAVE_MÁ, H_NAVE_MÁ
+DEF_NAVE_MÁ:		; tabela que define a nave má
+	WORD		X_NAVE_MÁ, Y_NAVE_MÁ 			; posição inicial da nave má
+	WORD		L_NAVE_MÁ, H_NAVE_MÁ			; largura e altura da nave má
 	WORD		VERMELHO, 0, 0, 0, VERMELHO
 	WORD		VERMELHO, 0, VERMELHO, 0, VERMELHO
 	WORD		0, VERMELHO, VERMELHO, VERMELHO, 0
@@ -141,109 +145,101 @@ DEF_NAVE_MÁ:						; tabela que define a nave má
 ; *********************************************************************************
 ; * Código
 ; *********************************************************************************
-PLACE   0				; o código começa em 0000H
+PLACE   0				
 inicio:
-	MOV  SP, SP_inicial		; inicializa SP para a palavra a seguir
-						; à última da pilha
+	MOV  SP, SP_inicial		; inicializa SP
                             
-	MOV  [APAGA_AVISO], R1	; apaga o aviso de nenhum cenário selecionado (o valor de R1 não é relevante)
-	MOV  [APAGA_ECRÃ], R1	; apaga todos os pixels já desenhados (o valor de R1 não é relevante)
-	MOV	R1, 1			; cenário de fundo número 0
+	MOV  [APAGA_AVISO], R1		; apaga o aviso de nenhum cenário selecionado
+	MOV  [APAGA_ECRÃ], R1		; apaga todos os pixels já desenhados
+	MOV	R1, 1					; cenário de fundo número 1
 	MOV  [SELECIONA_VIDEO_FUNDO], R1	; seleciona o cenário de fundo
-	MOV	R1, 2			; cenário de fundo número 0
+	MOV	R1, 2							; cenário de fundo número 2
 	MOV  [SELECIONA_VIDEO_FUNDO], R1
 	MOV R1, 100H
 	MOV R7, DISPLAYS
 	MOV [R7], R1
 
-mostra_boneco:
-    ; desenhar nave
-	MOV R0, 0 ; ecrã 1
+mostra_boneco:		; desenha os bonecos
+	; seleciona o ecrã 0
+	MOV R0, 0 
 	MOV R1, SELECIONA_ECRÃ
 	MOV [R1], R0
 
-	MOV R0, 1	; vai desenhar
 	MOV R4, DEF_NAVE
 	CALL	desenha_boneco
 
+	; seleciona o ecrã 1
+	MOV R0, 1
 	MOV R1, SELECIONA_ECRÃ
 	MOV [R1], R0
 
-	MOV R0, 1
+	; verifica limites do meteoro
 	MOV R4, [DEF_METEORO + 2]
 	MOV R2, MAX_LINHA
-	CMP R4, R2
+	CMP R4, R2 			; verifica se chegou à última linha
 	JGE espera_tecla
 	MOV R4, DEF_METEORO
 	CALL	desenha_boneco
 
-espera_tecla:				; neste ciclo espera-se até uma tecla ser premida
-	MOV  R6, 1	; testa a primeira linha
+espera_tecla:					; neste ciclo espera-se até uma tecla ser premida
+	MOV  R6, 1					; testa a primeira linha
 	testa_linha:
 		CALL	teclado			; leitura às teclas
 		CMP	R9, 0
 		JNZ	encontrou_tecla		; espera, enquanto não houver tecla
 
-		CMP	R6, 2 ; verifica se a linha sem teclas premidas é a segunda
-		JNZ muda_coluna
-		MOV R7, CARREGOU_BOTAO
-		MOV R1, 0
-		MOV [R7], R1
-		ADD R7, 2
-		MOV [R7], R1
-		ADD R7, 2
-		MOV [R7], R1
+		CALL liberta_teclas
 
-		muda_coluna:
-		SHL R6, 1
-		MOV R0, 0010H
+		SHL R6, 1		; avança para a próxima linha
+		MOV R0, 16
 		CMP R6, R0
-		JZ espera_tecla
+		JZ espera_tecla ; se chegar à quinta linha volta ao início
 		JMP testa_linha
 
 encontrou_tecla:
 	SHL  R6, 4         ; coloca linha no nibble high
     OR   R6, R9        ; junta coluna (nibble low)
 
+	; verifica se a tecla pressionada é o 0
 	MOV R7, TECLA_0
 	CMP	R6, R7
 	JZ	pressionou_0
 
+	; verifica se a tecla pressionada é o 2
 	MOV R7, TECLA_2
 	CMP	R6, R7
 	JZ	pressionou_2
 
+	; verifica se a tecla pressionada é o 4
 	MOV R7, TECLA_4
 	CMP R6, R7
 	JZ pressionou_4
 
+	; verifica se a tecla pressionada é o 5
 	MOV R7, TECLA_5
 	CMP R6, R7
 	JZ pressionou_5
 
+	; verifica se a tecla pressionada é o 6
 	MOV R7, TECLA_6
 	CMP R6, R7
 	JZ pressionou_6
 
-	JMP espera_tecla
+	JMP espera_tecla ; outras teclas são ignoradas
 
 pressionou_0:
-	MOV R7, -1
+	MOV R7, -1	; recua a nave uma coluna
 	JMP ve_limites
 
 pressionou_2:
-	MOV R7, +1
+	MOV R7, +1	; avança a nave uma coluna
 	JMP ve_limites
 
 pressionou_4:
 	; verifica se a tecla já foi pressionada
-	MOV R7, [CARREGOU_BOTAO]
-	CMP R7, 0
+	CALL pressiona_teclas
+	CMP R4, 0
 	JNZ espera_tecla
-
-	MOV R6, 1
-	MOV R7, CARREGOU_BOTAO
-	MOV [R7], R6
 
 	; decrementa o valor nos displays
 	MOV	R7, [ENERGIA]
@@ -258,14 +254,9 @@ pressionou_4:
 
 pressionou_5:
 	; verifica se a tecla já foi pressionada
-	MOV R7, [CARREGOU_BOTAO+2]
-	CMP R7, 0
+	CALL pressiona_teclas
+	CMP R4, 0
 	JNZ espera_tecla
-
-	MOV R6, 1
-	MOV R7, CARREGOU_BOTAO
-	ADD R7, 2
-	MOV [R7], R6
 
 	; decrementa o valor nos displays
 	MOV	R7, [ENERGIA]
@@ -280,15 +271,11 @@ pressionou_5:
 
 pressionou_6:
 	; verifica se a tecla já foi pressionada
-	MOV R7, [CARREGOU_BOTAO+4]
-	CMP R7, 0
+	CALL pressiona_teclas
+	CMP R4, 0
 	JNZ espera_tecla
 
-	MOV R6, 1
-	MOV R7, CARREGOU_BOTAO
-	ADD R7, 4
-	MOV [R7], R6
-
+	; reproduz o som quando a tecla 6 é pressionada
 	MOV R6, TOCA_SOM
 	MOV R1, 0
 	MOV [R6], R1
@@ -300,11 +287,11 @@ pressionou_6:
 	JMP move_meteoro
 
 ve_limites:
-	MOV	R6, [DEF_NAVE + 4]			; obtém a largura do boneco
+	MOV	R6, [DEF_NAVE + 4]		; obtém a largura do boneco
 	MOV R2, [DEF_NAVE]
 	CALL	testa_limites		; vê se chegou aos limites do ecrã e se sim força R7 a 0
 	CMP	R7, 0
-	JZ	espera_tecla		; se não é para movimentar o objeto, vai ler o teclado de novo
+	JZ	espera_tecla			; se não é para movimentar o objeto, vai ler o teclado de novo
 
 move_boneco:
 	MOV R11, ATRASO
@@ -319,7 +306,7 @@ coluna_seguinte:
 	MOV R0, [R4]
 	ADD	R0, R7			; para desenhar objeto na coluna seguinte (direita ou esquerda)
 	MOV [R4], R0
-	JMP	mostra_boneco		; vai desenhar o boneco de novo
+	JMP	mostra_boneco	; vai desenhar o boneco de novo
 
 move_meteoro:
     ; apagar ecrã
@@ -338,8 +325,7 @@ linha_seguinte:
 ; **********************************************************************
 ; DESENHA_BONECO - Desenha um boneco na linha e coluna indicadas
 ;			    com a forma e cor definidas na tabela indicada.
-; Argumentos:   R0 - apaga (0) / desenha (1)
-;               R4 - tabela que define o boneco
+; Argumentos:   R4 - tabela que define o boneco
 ;
 ; **********************************************************************
 desenha_boneco:
@@ -358,26 +344,20 @@ desenha_boneco:
     MOV R8, [R4]
 	ADD R4, 2				
 	MOV R6, [R4]			; obtem a altura do boneco
-	ADD	R4, 2			; endereço da cor do 1º pixel (2 porque a largura é uma word)
+	ADD	R4, 2				; endereço da cor do 1º pixel (2 porque a largura é uma word)
 desenha_pixels:
-	desenha_coluna:       		; desenha os pixels do boneco a partir da tabela
-		CMP R0, 0
-		JZ else
-		MOV	R3, [R4]			; obtém a cor do próximo pixel do boneco
-        JMP both
-        else:
-			MOV R3, 0
-		both:
+	desenha_coluna:       	; desenha os pixels do boneco a partir da tabela
+		MOV	R3, [R4]		; obtém a cor do próximo pixel do boneco
 		CALL escreve_pixel
 		ADD	R4, 2			; endereço da cor do próximo pixel (2 porque cada cor de pixel é uma word)
-		ADD  R2, 1               ; próxima coluna
+		ADD  R2, 1          ; próxima coluna
 		SUB  R5, 1			; menos uma coluna para tratar
-		JNZ  desenha_coluna      ; continua até percorrer toda a largura da primeira linha
-	ADD R1, 1					; próxima linha
+		JNZ  desenha_coluna ; continua até percorrer toda a largura da primeira linha
+	ADD R1, 1				; próxima linha
 	MOV R5, R8				; repor a largura
 	SUB R2, R8				; alterar a coluna para a inicial
-	SUB R6, 1					; menos uma coluna para tratar
-	JNZ desenha_pixels 			; continua até percorrer toda a largura da segunda linha
+	SUB R6, 1				; menos uma coluna para tratar
+	JNZ desenha_pixels 		; continua até percorrer toda a largura da segunda linha
     POP R8
 	POP R6
 	POP	R5
@@ -396,7 +376,7 @@ desenha_pixels:
 ; **********************************************************************
 escreve_pixel:
 	MOV  [DEFINE_LINHA], R1		; seleciona a linha
-	MOV  [DEFINE_COLUNA], R2		; seleciona a coluna
+	MOV  [DEFINE_COLUNA], R2	; seleciona a coluna
 	MOV  [DEFINE_PIXEL], R3		; altera a cor do pixel na linha e coluna já selecionadas
 	RET
 
@@ -430,19 +410,19 @@ testa_limite_esquerdo:		; vê se o boneco chegou ao limite esquerdo
 	MOV	R5, MIN_COLUNA
 	CMP	R2, R5
 	JGT	testa_limite_direito
-	CMP	R7, 0			; passa a deslocar-se para a direita
+	CMP	R7, 0				; passa a deslocar-se para a direita
 	JGE	sai_testa_limites
 	JMP	impede_movimento	; entre limites. Mantém o valor do R7
 testa_limite_direito:		; vê se o boneco chegou ao limite direito
-	ADD	R6, R2			; posição a seguir ao extremo direito do boneco
+	ADD	R6, R2				; posição a seguir ao extremo direito do boneco
 	MOV	R5, MAX_COLUNA
 	CMP	R6, R5
 	JLE	sai_testa_limites	; entre limites. Mantém o valor do R7
-	CMP	R7, 0			; passa a deslocar-se para a direita
+	CMP	R7, 0				; passa a deslocar-se para a direita
 	JGT	impede_movimento
 	JMP	sai_testa_limites
 impede_movimento:
-	MOV	R7, 0			; impede o movimento, forçando R7 a 0
+	MOV	R7, 0				; impede o movimento, forçando R7 a 0
 sai_testa_limites:	
 	POP	R6
 	POP	R5
@@ -453,12 +433,13 @@ sai_testa_limites:
 ; Argumentos:	R7 - valor real
 ;
 ; Retorna: 	R9 - valor formatado em hexadecimal para o decimal
-; **********************************************************************
-; a = (n // 100) * 256
-; c = n % 100
+;
+; a = (R7 // 100) * 256
+; c = R7 % 100
 ; b = (c // 10) * 16
 ; c = c % 10
-; total = a + b + c
+; R9 = a + b + c
+; **********************************************************************
 converte_hex:
 	PUSH R0
 	PUSH R1
@@ -508,4 +489,75 @@ teclado:
 	POP	R5
 	POP	R3
 	POP	R2
+	RET
+
+
+; **********************************************************************
+; LIBERTA_TECLAS - liberta teclas que não estão a ser pressionadas
+; Argumentos:	R6 - linha a testar (em formato 1, 2, 4 ou 8)
+; **********************************************************************
+
+liberta_teclas:
+	PUSH R1
+	PUSH R7
+	CMP	R6, 2 		; verifica se a linha sem teclas premidas é a segunda
+	JNZ liberta_teclas_fim
+	MOV R7, CARREGOU_BOTAO
+	MOV R1, 0
+	MOV [R7], R1 	; liberta tecla 4
+	MOV [R7+2], R1	; liberta tecla 5
+	MOV [R7+4], R1	; liberta tecla 6
+	liberta_teclas_fim:
+	POP R7
+	POP R1
+	RET
+
+
+; **********************************************************************
+; PRESSIONA_TECLAS - guarda a tecla que foi pressionada
+; Argumentos:	R6 - linha a testar (em formato 1, 2, 4 ou 8)
+;
+; Retorna: R4 - (0) não carregou tecla / (1) carregou tecla
+; **********************************************************************
+pressiona_teclas:
+	PUSH R5
+	PUSH R6
+	PUSH R7
+	PUSH R8
+	PUSH R9
+
+	MOV R8, 10H
+	MOD R6, R8 ; obter o nº da coluna
+
+	; loop para encontrar o deslocamento necessário para aceder o valor do botão
+	; corresponde a 2*log2(R6)
+	MOV R8, 0
+	pt_loop:
+	SHR R6, 1
+	JZ pt_loop_fim
+	ADD R8, 1
+	JMP pt_loop
+
+	pt_loop_fim:
+	SHL R8, 1
+
+	; vê se botão está pressionado
+	MOV R9, CARREGOU_BOTAO
+	ADD R9, R8
+	MOV R7, [R9]
+	MOV R4, 1
+	CMP R7, 0
+	JNZ pressiona_teclas_fim
+
+	; guarda que botão está a ser pressionado
+	MOV R4, 0
+	MOV R5, 1
+	MOV [R9], R5
+	pressiona_teclas_fim:
+
+	POP R9
+	POP R8
+	POP R7
+	POP R6
+	POP R5
 	RET
