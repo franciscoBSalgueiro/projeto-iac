@@ -38,8 +38,9 @@ TERMINA_SOM             EQU 6066H      ; endereço do comando para tocar um som
 
 
 APAGA_AVISO     		EQU 6040H      ; endereço do comando para apagar o aviso de nenhum cenário selecionado
-APAGA_ECRÃ	 		EQU 6002H      ; endereço do comando para apagar todos os pixels já desenhados
-SELECIONA_CENARIO_FUNDO  EQU 6042H      ; endereço do comando para selecionar uma imagem de fundo
+APAGA_ECRÃ	 			EQU 6002H      ; endereço do comando para apagar todos os pixels já desenhados
+SELECIONA_ECRÃ			EQU 6004H
+SELECIONA_CENARIO_FUNDO	EQU 6042H      ; endereço do comando para selecionar uma imagem de fundo
 SELECIONA_VIDEO_FUNDO	EQU 605CH	; endereço do comando para selecionar um video de fundo
 
 ATRASO			EQU	4000H		; atraso para limitar a velocidade de movimento do boneco
@@ -157,9 +158,18 @@ inicio:
 
 mostra_boneco:
     ; desenhar nave
+	MOV R0, 0 ; ecrã 1
+	MOV R1, SELECIONA_ECRÃ
+	MOV [R1], R0
+
 	MOV R0, 1	; vai desenhar
 	MOV R4, DEF_NAVE
 	CALL	desenha_boneco
+
+	MOV R1, SELECIONA_ECRÃ
+	MOV [R1], R0
+
+	MOV R0, 1
 	MOV R4, [DEF_METEORO + 2]
 	MOV R2, MAX_LINHA
 	CMP R4, R2
