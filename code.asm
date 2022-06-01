@@ -111,10 +111,8 @@ SP_inicial:				; este é o endereço (1200H) com que o SP deve ser
 ENERGIA:	; energia inicial a ser mostrada nos displays
 	WORD 100
 
-CARREGOU_BOTAO:		; tabela que guarda quais as teclas que estão a ser pressionadas
-	WORD	0	; botão 4
-	WORD	0	; botão 5
-	WORD	0	; botão 6
+CARREGOU_BOTAO:		; variável que guarda se alguma tecla está a ser pressionada
+	WORD	0
 
 DEF_NAVE:			; tabela que define a nave (posição, dimensões e cores)
 	WORD		X_NAVE, Y_NAVE					; posição inicial da nave
@@ -504,9 +502,7 @@ liberta_teclas:
 	JNZ liberta_teclas_fim
 	MOV R7, CARREGOU_BOTAO
 	MOV R1, 0
-	MOV [R7], R1 	; liberta tecla 4
-	MOV [R7+2], R1	; liberta tecla 5
-	MOV [R7+4], R1	; liberta tecla 6
+	MOV [R7], R1 	; liberta tecla
 	liberta_teclas_fim:
 	POP R7
 	POP R1
@@ -515,35 +511,15 @@ liberta_teclas:
 
 ; **********************************************************************
 ; PRESSIONA_TECLAS - guarda a tecla que foi pressionada
-; Argumentos:	R6 - linha a testar (em formato 1, 2, 4 ou 8)
 ;
 ; Retorna: R4 - (0) não carregou tecla / (1) carregou tecla
 ; **********************************************************************
 pressiona_teclas:
-	PUSH R5
-	PUSH R6
 	PUSH R7
-	PUSH R8
 	PUSH R9
-
-	MOV R8, 10H
-	MOD R6, R8 ; obter o nº da coluna
-
-	; loop para encontrar o deslocamento necessário para aceder o valor do botão
-	; corresponde a 2*log2(R6)
-	MOV R8, 0
-	pt_loop:
-	SHR R6, 1
-	JZ pt_loop_fim
-	ADD R8, 1
-	JMP pt_loop
-
-	pt_loop_fim:
-	SHL R8, 1
 
 	; vê se botão está pressionado
 	MOV R9, CARREGOU_BOTAO
-	ADD R9, R8
 	MOV R7, [R9]
 	MOV R4, 1
 	CMP R7, 0
@@ -551,13 +527,10 @@ pressiona_teclas:
 
 	; guarda que botão está a ser pressionado
 	MOV R4, 0
-	MOV R5, 1
-	MOV [R9], R5
+	MOV R7, 1
+	MOV [R9], R7
 	pressiona_teclas_fim:
 
 	POP R9
-	POP R8
 	POP R7
-	POP R6
-	POP R5
 	RET
