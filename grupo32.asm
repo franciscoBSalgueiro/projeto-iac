@@ -456,14 +456,14 @@ converte_hex:
 	MOV R2, R7
 	DIV R7, R1
 	SHL R7, 4
-	SHL R7, 4
+	SHL R7, 4	; R7 é o dígito mais à esquerda no hexadecimal
 
 	MOD R2, R1
 	MOV R9, R2
 	DIV R9, R0
-	SHL R9, 4
+	SHL R9, 4	; R9 é o dígito do meio no hexadecimal
 
-	MOD R2, R0
+	MOD R2, R0	; R2 é o dígito da direita no hexadecimal
 
 	ADD R9, R2
 	ADD R9, R7
