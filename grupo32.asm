@@ -162,6 +162,7 @@ mostra_boneco:		; desenha os bonecos
 	MOV R1, SELECIONA_ECRÃ
 	MOV [R1], R0
 
+	; desenha a nave
 	MOV R4, DEF_NAVE
 	CALL	desenha_boneco
 
@@ -175,7 +176,7 @@ mostra_boneco:		; desenha os bonecos
 	MOV R2, MAX_LINHA
 	CMP R4, R2 			; verifica se chegou à última linha
 	JGE espera_tecla
-	MOV R4, DEF_METEORO
+	MOV R4, DEF_METEORO		; se não chegou ao limite, desenha meteoro
 	CALL	desenha_boneco
 
 espera_tecla:					; neste ciclo espera-se até uma tecla ser premida
