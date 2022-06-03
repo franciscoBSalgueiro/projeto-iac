@@ -306,8 +306,7 @@ coluna_seguinte:
 	JMP	mostra_boneco	; vai desenhar o boneco de novo
 
 move_meteoro:
-    ; apagar ecrã
-	MOV R0, APAGA_ECRÃ
+	MOV R0, APAGA_ECRÃ ; apaga todos os pixeis do ecrã
 	MOV R4, 1
 	MOV [R0], R4
 
@@ -333,9 +332,9 @@ desenha_boneco:
 	PUSH	R5
 	PUSH	R6
     PUSH    R8
-	MOV R2, [R4]
+	MOV R2, [R4]			; obtém a posição x do boneco
 	ADD R4, 2
-	MOV R1, [R4]
+	MOV R1, [R4]			; obtém a posição y do boneco
 	ADD R4, 2
 	MOV	R5, [R4]			; obtém a largura do boneco
     MOV R8, [R4]
