@@ -241,13 +241,7 @@ pressionou_4:
 	; decrementa o valor nos displays
 	MOV	R7, [ENERGIA]
 	SUB R7, 1
-	MOV R0, ENERGIA
-	MOV [R0], R7
-
-	MOV R0, DISPLAYS
-	CALL converte_hex
-	MOV [R0], R9
-	JMP espera_tecla
+	JMP mostra_displays
 
 pressionou_5:
 	; verifica se a tecla já foi pressionada
@@ -255,16 +249,10 @@ pressionou_5:
 	CMP R4, 0
 	JNZ espera_tecla
 
-	; decrementa o valor nos displays
+	; aumenta o valor nos displays
 	MOV	R7, [ENERGIA]
 	ADD R7, 1
-	MOV R0, ENERGIA
-	MOV [R0], R7
-
-	MOV R0, DISPLAYS
-	CALL converte_hex
-	MOV [R0], R9
-	JMP espera_tecla
+	JMP mostra_displays
 
 pressionou_6:
 	; verifica se a tecla já foi pressionada
@@ -277,6 +265,7 @@ pressionou_6:
 	MOV R1, 0
 	MOV [R6], R1
 
+	; pára o som de tocar
 	MOV R6, TERMINA_SOM
 	MOV R1, 0
 	MOV [R6], R1
@@ -293,10 +282,7 @@ ve_limites:
 move_boneco:
 	MOV R11, ATRASO
 	CALL atraso
-    ; apagar ecrã
-	MOV R0, APAGA_ECRÃ
-	MOV R4, 1
-	MOV [R0], R4
+    CALL apaga_pixeis
 
 coluna_seguinte:
 	MOV R4, DEF_NAVE
@@ -306,17 +292,24 @@ coluna_seguinte:
 	JMP	mostra_boneco	; vai desenhar o boneco de novo
 
 move_meteoro:
-	MOV R0, APAGA_ECRÃ ; apaga todos os pixeis do ecrã
-	MOV R4, 1
-	MOV [R0], R4
+	CALL apaga_pixeis
 
 linha_seguinte:
 	MOV R4, DEF_METEORO
 	ADD R4, 2
-	MOV R0, [R4]
-	ADD R0, 1
+	MOV R0, [R4]			; obtém posição y do meteoro
+	ADD R0, 1				; move para a linha seguinte
 	MOV [R4], R0
 	JMP	mostra_boneco		; vai desenhar o boneco de novo
+
+mostra_displays:
+	MOV R0, ENERGIA
+	MOV [R0], R7			; altera o valor da energia
+
+	MOV R0, DISPLAYS
+	CALL converte_hex		; converte valor de energia para ser legível nos displays
+	MOV [R0], R9
+	JMP espera_tecla
 
 ; **********************************************************************
 ; DESENHA_BONECO - Desenha um boneco na linha e coluna indicadas
@@ -387,6 +380,20 @@ ciclo_atraso:
 	SUB	R11, 1
 	JNZ	ciclo_atraso
 	POP	R11
+	RET
+
+; **********************************************************************
+; APAGA_PIXEIS - Apaga todos os pixéis no ecrã
+;
+; **********************************************************************
+apaga_pixeis:
+	PUSH R0
+	PUSH R4
+	MOV R0, APAGA_ECRÃ
+	MOV R4, 1
+	MOV [R0], R4
+	POP R0
+	POP R4
 	RET
 
 ; **********************************************************************
