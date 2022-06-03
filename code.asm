@@ -102,11 +102,10 @@ VERMELHO     	EQU 0FF00H
 
 PLACE		1000H
 pilha:
-	STACK 100H			; espaço reservado para a pilha 
-						; (200H bytes, pois são 100H words)
-SP_inicial:				; este é o endereço (1200H) com que o SP deve ser 
-						; inicializado. O 1.º end. de retorno será 
-						; armazenado em 11FEH (1200H-2)	
+	STACK 100H			; espaço reservado para a pilha (200 bytes)
+					
+SP_inicial:				; inicialização do SP no endereço 1200H
+						
 
 ENERGIA:	; energia inicial a ser mostrada nos displays
 	WORD 100
