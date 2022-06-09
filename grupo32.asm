@@ -59,6 +59,12 @@ X_NAVE				EQU  30        ; coluna da nave
 Y_METEORO           EQU 10         ; linha meteoro
 X_METEORO           EQU 20         ; coluna meteoro
 
+Y_METEORO_2			EQU 16
+X_METEORO_2			EQU 20
+
+Y_METEORO_3			EQU 21
+X_METEORO_3			EQU 20
+
 Y_NAVE_MÁ           EQU 10         ; linha nave má
 X_NAVE_MÁ           EQU 50         ; coluna nave má
 
@@ -70,7 +76,14 @@ L_NAVE	    	EQU	5			; largura da nave
 H_NAVE		    EQU 4           ; altura da nave
 
 L_METEORO 		EQU 5           ; largura do meteoro
-H_METEORO  		EQU 5           ; altura do meteoro
+H_METEORO  		EQU 5           ; altura do meteoro~
+
+L_METEORO_2		EQU 4			; largura do meteoro 2
+H_METEORO_2		EQU 4			; altura do meteoro 2
+
+L_METEORO_3		EQU 3			; largura do meteoro 3
+H_METEORO_3		EQU 3			; altura do meteoro 3
+
 
 L_NAVE_MÁ 		EQU 5           ; largura da nave má
 H_NAVE_MÁ  		EQU 5           ; altura da nave má
@@ -90,8 +103,8 @@ AMARELO			EQU 0FFB0H
 AZUL_ESCURO		EQU	0F0BEH	
 
 ; cores do meteoro
-CINZA_ESCURO EQU 0FBBBH		
-CINZA_CLARO	EQU 0F777H	
+CINZA_ESCURO EQU 0F777H	
+CINZA_CLARO	EQU 0FBBBH
 
 ; cores da nave má
 VERMELHO     	EQU 0FF00H
@@ -124,11 +137,26 @@ DEF_NAVE:			; tabela que define a nave (posição, dimensões e cores)
 DEF_METEORO :		; tabela que define o meteoro
 	WORD		X_METEORO, Y_METEORO 			; posição inicial do meteoro
     WORD        L_METEORO, H_METEORO 			; largura e altura do meteoro
-    WORD        0, CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, 0
-    WORD        CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, CINZA_CLARO
-    WORD        CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO
-    WORD        CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, CINZA_CLARO
-    WORD        0, CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, 0
+    WORD        0, CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, 0
+    WORD        CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, CINZA_ESCURO
+    WORD        CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO
+    WORD        CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, CINZA_ESCURO
+    WORD        0, CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, 0
+
+DEF_METEORO_2 :		; tabela que define o meteoro
+	WORD		X_METEORO_2, Y_METEORO_2 			; posição inicial do meteoro
+    WORD        L_METEORO_2, H_METEORO_2 			; largura e altura do meteoro
+    WORD        0, CINZA_ESCURO, CINZA_ESCURO, 0
+    WORD        CINZA_CLARO, CINZA_CLARO, CINZA_ESCURO, CINZA_ESCURO
+    WORD        CINZA_CLARO, CINZA_CLARO, CINZA_CLARO, CINZA_ESCURO
+    WORD        0, CINZA_ESCURO, CINZA_ESCURO, 0
+
+DEF_METEORO_3 :		; tabela que define o meteoro
+	WORD		X_METEORO_3, Y_METEORO_3 			; posição inicial do meteoro
+    WORD        L_METEORO_3, H_METEORO_3 			; largura e altura do meteoro
+    WORD        0, CINZA_ESCURO, 0
+    WORD        CINZA_CLARO, CINZA_CLARO, CINZA_ESCURO 
+    WORD        0, CINZA_ESCURO, 0
 
 DEF_NAVE_MÁ:		; tabela que define a nave má
 	WORD		X_NAVE_MÁ, Y_NAVE_MÁ 			; posição inicial da nave má
@@ -177,6 +205,22 @@ mostra_boneco:		; desenha os bonecos
 	CMP R4, R2 			; verifica se chegou à última linha
 	JGE espera_tecla
 	MOV R4, DEF_METEORO		; se não chegou ao limite, desenha meteoro
+	CALL	desenha_boneco
+
+	; desenha o meteoro de tamanho 2
+	MOV R4, [DEF_METEORO_2 + 2]
+	MOV R2, MAX_LINHA
+	CMP R4, R2 			; verifica se chegou à última linha
+	JGE espera_tecla
+	MOV R4, DEF_METEORO_2		; se não chegou ao limite, desenha meteoro
+	CALL	desenha_boneco
+
+	; desenha o meteoro de tamanho 3
+	MOV R4, [DEF_METEORO_3 + 2]
+	MOV R2, MAX_LINHA
+	CMP R4, R2 			; verifica se chegou à última linha
+	JGE espera_tecla
+	MOV R4, DEF_METEORO_3		; se não chegou ao limite, desenha meteoro
 	CALL	desenha_boneco
 
 espera_tecla:					; neste ciclo espera-se até uma tecla ser premida
