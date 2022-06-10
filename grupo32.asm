@@ -65,14 +65,14 @@ X_METEORO_2			EQU 20			; coluna meteoro 2
 Y_METEORO_3			EQU 21			; linha meteoro 3
 X_METEORO_3			EQU 20			; coluna meteoro 3
 
-Y_NAVE_MÁ			EQU 10			; linha nave má
-X_NAVE_MÁ			EQU 50			; coluna nave má
+Y_NAVE_MA			EQU 10			; linha nave má
+X_NAVE_MA			EQU 50			; coluna nave má
 
-Y_NAVE_MÁ_2			EQU 16			; linha nave má 2
-X_NAVE_MÁ_2			EQU 50			; coluna nave má 2
+Y_NAVE_MA_2			EQU 16			; linha nave má 2
+X_NAVE_MA_2			EQU 50			; coluna nave má 2
 
-Y_NAVE_MÁ_3         EQU 21			; linha nave má 3
-X_NAVE_MÁ_3         EQU 50			; coluna nave má 3
+Y_NAVE_MA_3         EQU 21			; linha nave má 3
+X_NAVE_MA_3         EQU 50			; coluna nave má 3
 
 Y_PEW_PEW			EQU 10			; linha míssil
 X_PEW_PEW			EQU 30			; coluna míssil
