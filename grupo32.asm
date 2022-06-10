@@ -240,11 +240,27 @@ mostra_boneco:		; desenha os bonecos
 	MOV [R1], R0
 
 	; verifica limites do meteoro
-	MOV R4, [DEF_METEORO + 2]
+	MOV R4, [DEF_METEORO_GRANDE + 2]
 	MOV R2, MAX_LINHA
 	CMP R4, R2 			; verifica se chegou à última linha
 	JGE espera_tecla
-	MOV R4, DEF_METEORO		; se não chegou ao limite, desenha meteoro
+	MOV R4, DEF_METEORO_GRANDE		; se não chegou ao limite, desenha meteoro
+	CALL	desenha_boneco
+
+	; desenha o meteoro de tamanho 2
+	MOV R4, [DEF_METEORO_MEDIO + 2]
+	MOV R2, MAX_LINHA
+	CMP R4, R2 			; verifica se chegou à última linha
+	JGE espera_tecla
+	MOV R4, DEF_METEORO_MEDIO		; se não chegou ao limite, desenha meteoro
+	CALL	desenha_boneco
+
+	; desenha o meteoro de tamanho 3
+	MOV R4, [DEF_METEORO_MINI + 2]
+	MOV R2, MAX_LINHA
+	CMP R4, R2 			; verifica se chegou à última linha
+	JGE espera_tecla
+	MOV R4, DEF_METEORO_MINI		; se não chegou ao limite, desenha meteoro
 	CALL	desenha_boneco
 
 espera_tecla:					; neste ciclo espera-se até uma tecla ser premida
@@ -364,7 +380,7 @@ move_meteoro:
 	CALL apaga_pixeis
 
 linha_seguinte:
-	MOV R4, DEF_METEORO
+	MOV R4, DEF_METEORO_GRANDE
 	ADD R4, 2
 	MOV R0, [R4]			; obtém posição y do meteoro
 	ADD R0, 1				; move para a linha seguinte
