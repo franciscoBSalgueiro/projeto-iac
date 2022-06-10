@@ -53,8 +53,8 @@ ATRASO			EQU	4000H		; atraso para limitar a velocidade de movimento do boneco
 ; * POSIÇÕES INICIAIS
 ; *********************
 
-Y_NAVE        		EQU  28			; linha da nave 
-X_NAVE				EQU  30			; coluna da nave 
+Y_NAVE        		EQU 28			; linha da nave 
+X_NAVE				EQU 30			; coluna da nave 
 
 Y_METEORO           EQU 10			; linha meteoro
 X_METEORO           EQU 20			; coluna meteoro
@@ -65,11 +65,17 @@ X_METEORO_2			EQU 20			; coluna meteoro 2
 Y_METEORO_3			EQU 21			; linha meteoro 3
 X_METEORO_3			EQU 20			; coluna meteoro 3
 
-Y_NAVE_MÁ           EQU 10			; linha nave má
-X_NAVE_MÁ           EQU 50			; coluna nave má
+Y_NAVE_MÁ			EQU 10			; linha nave má
+X_NAVE_MÁ			EQU 50			; coluna nave má
 
-Y_PEW_PEW			EQU 16		   ; linha míssil
-X_PEW_PEW			EQU 30		   ; coluna míssil
+Y_NAVE_MÁ_2			EQU 16			; linha nave má 2
+X_NAVE_MÁ_2			EQU 50			; coluna nave má 2
+
+Y_NAVE_MÁ_3         EQU 10			; linha nave má 3
+X_NAVE_MÁ_3         EQU 50			; coluna nave má 3
+
+Y_PEW_PEW			EQU 10			; linha míssil
+X_PEW_PEW			EQU 30			; coluna míssil
 
 ; *************
 ; * DIMENSÕES
@@ -87,10 +93,10 @@ H_NAVE_MÁ  		EQU 5           ; altura da nave má
 L_PEW_PEW		EQU 1			; largura do míssil
 H_PEW_PEW		EQU 1			; altura do míssil
 
-MIN_COLUNA		EQU  0			; número da coluna mais à esquerda do MediaCenter
-MAX_COLUNA		EQU  63			; número da coluna mais à direita do MediaCenter
-MIN_LINHA		EQU  0			; número da coluna mais à esquerda do MediaCenter
-MAX_LINHA		EQU  32			; número da coluna mais à direita do MediaCenter
+MIN_COLUNA		EQU 0			; número da coluna mais à esquerda do MediaCenter
+MAX_COLUNA		EQU 63			; número da coluna mais à direita do MediaCenter
+MIN_LINHA		EQU 0			; número da coluna mais à esquerda do MediaCenter
+MAX_LINHA		EQU 32			; número da coluna mais à direita do MediaCenter
 
 ; ***********
 ; * CORES
