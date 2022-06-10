@@ -81,34 +81,34 @@ X_PEW_PEW			EQU 30			; coluna míssil
 ; * DIMENSÕES
 ; *************
 
-L_NAVE	    	EQU	5			; largura da nave
-H_NAVE		    EQU 4           ; altura da nave
+L_NAVE	    			EQU	5			; largura da nave
+H_NAVE		    		EQU 4           ; altura da nave
 
 L_METEORO_GRANDE		EQU 5           ; largura do meteoro
 H_METEORO_GRANDE		EQU 5           ; altura do meteoro
 
-L_METEORO_MEDIO		EQU 4			; largura do meteoro 2
-H_METEORO_MEDIO		EQU 4			; altura do meteoro 2
+L_METEORO_MEDIO			EQU 4			; largura do meteoro 2
+H_METEORO_MEDIO			EQU 4			; altura do meteoro 2
 
-L_METEORO_MINI		EQU 3			; largura do meteoro 3
-H_METEORO_MINI		EQU 3			; altura do meteoro 3
+L_METEORO_MINI			EQU 3			; largura do meteoro 3
+H_METEORO_MINI			EQU 3			; altura do meteoro 3
 
-L_NAVE_MA 		EQU 5           ; largura da nave má
-H_NAVE_MA  		EQU 5           ; altura da nave má
+L_NAVE_MA_GRANDE 		EQU 5           ; largura da nave má
+H_NAVE_MA_GRANDE  		EQU 5           ; altura da nave má
 
-L_NAVE_MA_2 	EQU 4           ; largura da nave má 2
-H_NAVE_MA_2 	EQU 4           ; altura da nave má 2
+L_NAVE_MA_MEDIO 		EQU 4           ; largura da nave má 2
+H_NAVE_MA_MEDIO 		EQU 4           ; altura da nave má 2
 
-L_NAVE_MA_3 	EQU 3           ; largura da nave má
-H_NAVE_MA_3  	EQU 3           ; altura da nave má
+L_NAVE_MA_MINI 			EQU 3           ; largura da nave má
+H_NAVE_MA_MINI  		EQU 3           ; altura da nave má
 
-L_PEW_PEW		EQU 1			; largura do míssil
-H_PEW_PEW		EQU 1			; altura do míssil
+L_PEW_PEW				EQU 1			; largura do míssil
+H_PEW_PEW				EQU 1			; altura do míssil
 
-MIN_COLUNA		EQU 0			; número da coluna mais à esquerda do MediaCenter
-MAX_COLUNA		EQU 63			; número da coluna mais à direita do MediaCenter
-MIN_LINHA		EQU 0			; número da coluna mais à esquerda do MediaCenter
-MAX_LINHA		EQU 32			; número da coluna mais à direita do MediaCenter
+MIN_COLUNA				EQU 0			; número da coluna mais à esquerda do MediaCenter
+MAX_COLUNA				EQU 63			; número da coluna mais à direita do MediaCenter
+MIN_LINHA				EQU 0			; número da coluna mais à esquerda do MediaCenter
+MAX_LINHA				EQU 32			; número da coluna mais à direita do MediaCenter
 
 ; ***********
 ; * CORES
@@ -178,26 +178,26 @@ DEF_METEORO_MINI :		; tabela que define o meteoro
     WORD        CINZA_CLARO, CINZA_CLARO, CINZA_ESCURO 
     WORD        0, CINZA_ESCURO, 0
 
-DEF_NAVE_MA:		; tabela que define a nave má
-	WORD		X_NAVE_MA, Y_NAVE_MA 			; posição inicial da nave má
-	WORD		L_NAVE_MA, H_NAVE_MA			; largura e altura da nave má
+DEF_NAVE_MA_GRANDE:		; tabela que define a nave má grande
+	WORD		X_NAVE_MA_GRANDE, Y_NAVE_MA_GRANDE 			; posição inicial da nave má grande
+	WORD		L_NAVE_MA_GRANDE, H_NAVE_MA_GRANDE			; largura e altura da nave má grande
 	WORD		VERMELHO, 0, 0, 0, VERMELHO
 	WORD		VERMELHO, 0, VERMELHO, 0, VERMELHO
 	WORD		0, VERMELHO, VERMELHO, VERMELHO, 0
 	WORD		VERMELHO, 0, VERMELHO, 0, VERMELHO
 	WORD		VERMELHO, 0, 0, 0, VERMELHO
 
-DEF_NAVE_MA_2:		; tabela que define a nave má 2
-	WORD		X_NAVE_MA_2, Y_NAVE_MA_2 			; posição inicial da nave má 2
-	WORD		L_NAVE_MA, H_NAVE_MA			; largura e altura da nave má 2
+DEF_NAVE_MA_MEDIO:		; tabela que define a nave má tamanho médio
+	WORD		X_NAVE_MA_MEDIO, Y_NAVE_MA_MEDIO 			; posição inicial da nave má tamanho médio
+	WORD		L_NAVE_MA_MEDIO, H_NAVE_MA_MEDIO			; largura e altura da nave má tamanho médio
 	WORD		VERMELHO, 0, 0, VERMELHO
 	WORD		VERMELHO, 0, 0, VERMELHO
 	WORD		0, VERMELHO, VERMELHO, 0
 	WORD		VERMELHO, 0, 0, VERMELHO
 
-DEF_NAVE_MA_3:		; tabela que define a nave má 3
-	WORD		X_NAVE_MA_3, Y_NAVE_MA_3 			; posição inicial da nave má 3
-	WORD		L_NAVE_MA_3, H_NAVE_MA_3			; largura e altura da nave má 3
+DEF_NAVE_MA_MINI:		; tabela que define a nave má pequena
+	WORD		X_NAVE_MA_MINI, Y_NAVE_MA_MINI 			; posição inicial da nave má pequena
+	WORD		L_NAVE_MA_MINI, H_NAVE_MA_MINI			; largura e altura da nave má pequena
 	WORD		VERMELHO, 0, 0, 0, VERMELHO
 	WORD		0, VERMELHO, 0
 	WORD		VERMELHO, 0, VERMELHO
