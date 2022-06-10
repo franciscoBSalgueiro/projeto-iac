@@ -71,7 +71,7 @@ X_NAVE_MÁ			EQU 50			; coluna nave má
 Y_NAVE_MÁ_2			EQU 16			; linha nave má 2
 X_NAVE_MÁ_2			EQU 50			; coluna nave má 2
 
-Y_NAVE_MÁ_3         EQU 10			; linha nave má 3
+Y_NAVE_MÁ_3         EQU 21			; linha nave má 3
 X_NAVE_MÁ_3         EQU 50			; coluna nave má 3
 
 Y_PEW_PEW			EQU 10			; linha míssil
@@ -87,8 +87,14 @@ H_NAVE		    EQU 4           ; altura da nave
 L_METEORO 		EQU 5           ; largura do meteoro
 H_METEORO  		EQU 5           ; altura do meteoro
 
-L_NAVE_MÁ 		EQU 5           ; largura da nave má
-H_NAVE_MÁ  		EQU 5           ; altura da nave má
+L_NAVE_MA 		EQU 5           ; largura da nave má
+H_NAVE_MA  		EQU 5           ; altura da nave má
+
+L_NAVE_MA_2 	EQU 4           ; largura da nave má 2
+H_NAVE_MA_2 	EQU 4           ; altura da nave má 2
+
+L_NAVE_MA_3 	EQU 3           ; largura da nave má
+H_NAVE_MA_3  	EQU 3           ; altura da nave má
 
 L_PEW_PEW		EQU 1			; largura do míssil
 H_PEW_PEW		EQU 1			; altura do míssil
@@ -108,8 +114,8 @@ AMARELO			EQU 0FFB0H
 AZUL_ESCURO		EQU	0F0BEH	
 
 ; cores do meteoro
-CINZA_ESCURO EQU 0FBBBH		
-CINZA_CLARO	EQU 0F777H	
+CINZA_ESCURO 	EQU 0FBBBH		
+CINZA_CLARO		EQU 0F777H	
 
 ; cores da nave má
 VERMELHO     	EQU 0FF00H
@@ -142,7 +148,7 @@ DEF_NAVE:			; tabela que define a nave (posição, dimensões e cores)
 	WORD		AZUL, AZUL, AZUL, AZUL, AZUL    
     WORD        0, AMARELO, 0, AMARELO, 0
 
-DEF_METEORO :		; tabela que define o meteoro
+DEF_METEORO:		; tabela que define o meteoro
 	WORD		X_METEORO, Y_METEORO 			; posição inicial do meteoro
     WORD        L_METEORO, H_METEORO 			; largura e altura do meteoro
     WORD        0, CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, 0
@@ -151,14 +157,29 @@ DEF_METEORO :		; tabela que define o meteoro
     WORD        CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, CINZA_CLARO
     WORD        0, CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, 0
 
-DEF_NAVE_MÁ:		; tabela que define a nave má
-	WORD		X_NAVE_MÁ, Y_NAVE_MÁ 			; posição inicial da nave má
-	WORD		L_NAVE_MÁ, H_NAVE_MÁ			; largura e altura da nave má
+DEF_NAVE_MA:		; tabela que define a nave má
+	WORD		X_NAVE_MA, Y_NAVE_MA 			; posição inicial da nave má
+	WORD		L_NAVE_MA, H_NAVE_MA			; largura e altura da nave má
 	WORD		VERMELHO, 0, 0, 0, VERMELHO
 	WORD		VERMELHO, 0, VERMELHO, 0, VERMELHO
 	WORD		0, VERMELHO, VERMELHO, VERMELHO, 0
 	WORD		VERMELHO, 0, VERMELHO, 0, VERMELHO
 	WORD		VERMELHO, 0, 0, 0, VERMELHO
+
+DEF_NAVE_MA_2:		; tabela que define a nave má 2
+	WORD		X_NAVE_MA_2, Y_NAVE_MA_2 			; posição inicial da nave má 2
+	WORD		L_NAVE_MA, H_NAVE_MA			; largura e altura da nave má 2
+	WORD		VERMELHO, 0, 0, VERMELHO
+	WORD		VERMELHO, 0, 0, VERMELHO
+	WORD		0, VERMELHO, VERMELHO, 0
+	WORD		VERMELHO, 0, 0, VERMELHO
+
+DEF_NAVE_MA_3:		; tabela que define a nave má 3
+	WORD		X_NAVE_MA_3, Y_NAVE_MA_3 			; posição inicial da nave má 3
+	WORD		L_NAVE_MA_3, H_NAVE_MA_3			; largura e altura da nave má 3
+	WORD		VERMELHO, 0, 0, 0, VERMELHO
+	WORD		0, VERMELHO, 0
+	WORD		VERMELHO, 0, VERMELHO
 
 DEF_PEW_PEW:
 	WORD		X_PEW_PEW, Y_PEW_PEW			; posição inicial do míssil
