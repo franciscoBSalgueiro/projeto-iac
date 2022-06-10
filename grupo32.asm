@@ -56,29 +56,29 @@ ATRASO			EQU	4000H		; atraso para limitar a velocidade de movimento do boneco
 Y_NAVE        			EQU 28			; linha da nave 
 X_NAVE					EQU 30			; coluna da nave 
 
-Y_METEORO_GRANDE        EQU 10			; linha meteoro
-X_METEORO_GRANDE        EQU 20			; coluna meteoro
+Y_METEORO_MINI			EQU 21			; linha meteoro pequeno
+X_METEORO_MINI			EQU 20			; coluna meteoro pequeno
 
-Y_METEORO_MEDIO			EQU 16			; linha meteoro 2
-X_METEORO_MEDIO			EQU 20			; coluna meteoro 2
+Y_METEORO_MEDIO			EQU 16			; linha meteoro médio
+X_METEORO_MEDIO			EQU 20			; coluna meteoro médio
 
-Y_METEORO_MINI			EQU 21			; linha meteoro 3
-X_METEORO_MINI			EQU 20			; coluna meteoro 3
-
-Y_NAVE_MA_GRANDE		EQU 17			; linha nave má grande
-X_NAVE_MA_GRANDE		EQU 50			; coluna nave má grande
-
-Y_NAVE_MA_MEDIA			EQU 10			; linha nave má média
-X_NAVE_MA_MEDIA			EQU 50			; coluna nave má média
+Y_METEORO_GRANDE        EQU 10			; linha meteoro grande
+X_METEORO_GRANDE        EQU 20			; coluna meteoro grande
 
 Y_NAVE_MA_MINI          EQU 5			; linha nave má pequena
 X_NAVE_MA_MINI          EQU 50			; coluna nave má pequena
 
+Y_NAVE_MA_MEDIA			EQU 10			; linha nave má média
+X_NAVE_MA_MEDIA			EQU 50			; coluna nave má média
+
+Y_NAVE_MA_GRANDE		EQU 17			; linha nave má grande
+X_NAVE_MA_GRANDE		EQU 50			; coluna nave má grande
+
 Y_PEW_PEW			    EQU 10			; linha míssil
 X_PEW_PEW			    EQU 30			; coluna míssil
 
-Y_EXPLOSAO				EQU 23			; linha explosão
-X_EXPLOSAO				EQU 50			; coluna explosão
+Y_EXPLOSAO				EQU 10			; linha explosão
+X_EXPLOSAO				EQU 30			; coluna explosão
 
 ; *************
 ; * DIMENSÕES
@@ -87,14 +87,14 @@ X_EXPLOSAO				EQU 50			; coluna explosão
 L_NAVE	    			EQU	5			; largura da nave
 H_NAVE		    		EQU 4           ; altura da nave
 
-L_METEORO_GRANDE		EQU 5           ; largura do meteoro
-H_METEORO_GRANDE		EQU 5           ; altura do meteoro
+L_METEORO_MINI			EQU 3			; largura do meteoro pequeno
+H_METEORO_MINI			EQU 3			; altura do meteoro pequeno
 
-L_METEORO_MEDIO			EQU 4			; largura do meteoro 2
-H_METEORO_MEDIO			EQU 4			; altura do meteoro 2
+L_METEORO_MEDIO			EQU 4			; largura do meteoro médio
+H_METEORO_MEDIO			EQU 4			; altura do meteoro médio
 
-L_METEORO_MINI			EQU 3			; largura do meteoro 3
-H_METEORO_MINI			EQU 3			; altura do meteoro 3
+L_METEORO_GRANDE		EQU 5           ; largura do meteoro grande
+H_METEORO_GRANDE		EQU 5           ; altura do meteoro grande
 
 L_NAVE_MA_GRANDE 		EQU 5           ; largura da nave má grande
 H_NAVE_MA_GRANDE  		EQU 5           ; altura da nave má grande
@@ -216,6 +216,11 @@ DEF_PEW_PEW:
 DEF_EXPLOSAO:
 	WORD		X_EXPLOSAO, Y_EXPLOSAO			;posição inicial da explosão
 	WORD		L_EXPLOSAO, H_EXPLOSAO			;largura e altura da explosão
+	WORD		0, AMARELO, 0, AMARELO, 0
+	WORD		AMARELO, 0, LARANJA, 0, AMARELO
+	WORD		0, VERMELHO, 0, VERMELHO, 0
+	WORD		AMARELO, 0, LARANJA, 0, AMARELO
+	WORD		0, AMARELO, 0, AMARELO, 0
 
 ; *********************************************************************************
 ; * Código
@@ -295,6 +300,14 @@ mostra_boneco:		; desenha os bonecos
 	CMP R4, R2 			; verifica se chegou à última linha
 	JGE espera_tecla
 	MOV R4, DEF_NAVE_MA_MINI		; se não chegou ao limite, desenha nave má pequena
+	CALL	desenha_boneco
+
+	; desenha a nave má pequena
+	MOV R4, [DEF_EXPLOSAO + 2]
+	MOV R2, MAX_LINHA
+	CMP R4, R2 			; verifica se chegou à última linha
+	JGE espera_tecla
+	MOV R4, DEF_EXPLOSAO		; se não chegou ao limite, desenha nave má pequena
 	CALL	desenha_boneco
 
 espera_tecla:					; neste ciclo espera-se até uma tecla ser premida
