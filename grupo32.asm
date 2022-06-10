@@ -65,17 +65,20 @@ X_METEORO_MEDIO			EQU 20			; coluna meteoro 2
 Y_METEORO_MINI			EQU 21			; linha meteoro 3
 X_METEORO_MINI			EQU 20			; coluna meteoro 3
 
-Y_NAVE_MA_GRANDE		EQU 10			; linha nave má grande
+Y_NAVE_MA_GRANDE		EQU 17			; linha nave má grande
 X_NAVE_MA_GRANDE		EQU 50			; coluna nave má grande
 
-Y_NAVE_MA_MEDIA			EQU 16			; linha nave má média
+Y_NAVE_MA_MEDIA			EQU 12			; linha nave má média
 X_NAVE_MA_MEDIA			EQU 50			; coluna nave má média
 
-Y_NAVE_MA_MINI          EQU 21			; linha nave má pequena
+Y_NAVE_MA_MINI          EQU 5			; linha nave má pequena
 X_NAVE_MA_MINI          EQU 50			; coluna nave má pequena
 
 Y_PEW_PEW			    EQU 10			; linha míssil
 X_PEW_PEW			    EQU 30			; coluna míssil
+
+Y_EXPLOSAO				EQU 23			; linha explosão
+X_EXPLOSAO				EQU 50			; coluna explosão
 
 ; *************
 ; * DIMENSÕES
@@ -104,6 +107,9 @@ H_NAVE_MA_MINI  		EQU 3           ; altura da nave má pequena
 
 L_PEW_PEW				EQU 1			; largura do míssil
 H_PEW_PEW				EQU 1			; altura do míssil
+
+L_EXPLOSAO				EQU 5			; largura da explosão
+H_EXPLOSAO				EQU 5			; altura da explosão
 
 MIN_COLUNA				EQU 0			; número da coluna mais à esquerda do MediaCenter
 MAX_COLUNA				EQU 63			; número da coluna mais à direita do MediaCenter
@@ -206,6 +212,11 @@ DEF_PEW_PEW:
 	WORD		X_PEW_PEW, Y_PEW_PEW			; posição inicial do míssil
 	WORD		L_PEW_PEW, H_PEW_PEW			; largura e altura do míssil
 	WORD		LARANJA
+
+DEF_EXPLOSAO:
+	WORD		X_EXPLOSAO, Y_EXPLOSAO			;posição inicial da explosão
+	WORD		L_EXPLOSAO, H_EXPLOSAO			;largura e altura da explosão
+	WORD		COR
 
 ; *********************************************************************************
 ; * Código
