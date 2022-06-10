@@ -65,14 +65,14 @@ X_METEORO_MEDIO			EQU 20			; coluna meteoro 2
 Y_METEORO_MINI			EQU 21			; linha meteoro 3
 X_METEORO_MINI			EQU 20			; coluna meteoro 3
 
-Y_NAVE_MA_GRANDE		EQU 10			; linha nave má
-X_NAVE_MA_GRANDE		EQU 50			; coluna nave má
+Y_NAVE_MA_GRANDE		EQU 10			; linha nave má grande
+X_NAVE_MA_GRANDE		EQU 50			; coluna nave má grande
 
-Y_NAVE_MA_MEDIO			EQU 16			; linha nave má 2
-X_NAVE_MA_MEDIO			EQU 50			; coluna nave má 2
+Y_NAVE_MA_MEDIA			EQU 16			; linha nave má média
+X_NAVE_MA_MEDIA			EQU 50			; coluna nave má média
 
-Y_NAVE_MA_MINI          EQU 21			; linha nave má 3
-X_NAVE_MA_MINI          EQU 50			; coluna nave má 3
+Y_NAVE_MA_MINI          EQU 21			; linha nave má pequena
+X_NAVE_MA_MINI          EQU 50			; coluna nave má pequena
 
 Y_PEW_PEW			    EQU 10			; linha míssil
 X_PEW_PEW			    EQU 30			; coluna míssil
@@ -93,14 +93,14 @@ H_METEORO_MEDIO			EQU 4			; altura do meteoro 2
 L_METEORO_MINI			EQU 3			; largura do meteoro 3
 H_METEORO_MINI			EQU 3			; altura do meteoro 3
 
-L_NAVE_MA_GRANDE 		EQU 5           ; largura da nave má
-H_NAVE_MA_GRANDE  		EQU 5           ; altura da nave má
+L_NAVE_MA_GRANDE 		EQU 5           ; largura da nave má grande
+H_NAVE_MA_GRANDE  		EQU 5           ; altura da nave má grande
 
-L_NAVE_MA_MEDIO 		EQU 4           ; largura da nave má 2
-H_NAVE_MA_MEDIO 		EQU 4           ; altura da nave má 2
+L_NAVE_MA_MEDIA 		EQU 4           ; largura da nave má média
+H_NAVE_MA_MEDIA 		EQU 4           ; altura da nave má média
 
-L_NAVE_MA_MINI 			EQU 3           ; largura da nave má
-H_NAVE_MA_MINI  		EQU 3           ; altura da nave má
+L_NAVE_MA_MINI 			EQU 3           ; largura da nave má pequena
+H_NAVE_MA_MINI  		EQU 3           ; altura da nave má pequena
 
 L_PEW_PEW				EQU 1			; largura do míssil
 H_PEW_PEW				EQU 1			; altura do míssil
