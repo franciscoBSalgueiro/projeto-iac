@@ -273,6 +273,14 @@ mostra_boneco:		; desenha os bonecos
 	MOV R4, DEF_METEORO_MINI		; se não chegou ao limite, desenha meteoro
 	CALL	desenha_boneco
 
+	; desenha a nave má grande de tamanho 3
+	MOV R4, [DEF_NAVE_MA_GRANDE + 2]
+	MOV R2, MAX_LINHA
+	CMP R4, R2 			; verifica se chegou à última linha
+	JGE espera_tecla
+	MOV R4, DEF_NAVE_MA_GRANDE		; se não chegou ao limite, desenha nave má
+	CALL	desenha_boneco
+
 espera_tecla:					; neste ciclo espera-se até uma tecla ser premida
 	MOV  R6, 1					; testa a primeira linha
 	testa_linha:
