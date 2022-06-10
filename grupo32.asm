@@ -53,11 +53,11 @@ ATRASO			EQU	4000H		; atraso para limitar a velocidade de movimento do boneco
 ; * POSIÇÕES INICIAIS
 ; *********************
 
-Y_NAVE        		EQU 28			; linha da nave 
-X_NAVE				EQU 30			; coluna da nave 
+Y_NAVE        			EQU 28			; linha da nave 
+X_NAVE					EQU 30			; coluna da nave 
 
-Y_METEORO_GRANDE           EQU 10			; linha meteoro
-X_METEORO_GRANDE           EQU 20			; coluna meteoro
+Y_METEORO_GRANDE        EQU 10			; linha meteoro
+X_METEORO_GRANDE        EQU 20			; coluna meteoro
 
 Y_METEORO_MEDIO			EQU 16			; linha meteoro 2
 X_METEORO_MEDIO			EQU 20			; coluna meteoro 2
@@ -65,17 +65,17 @@ X_METEORO_MEDIO			EQU 20			; coluna meteoro 2
 Y_METEORO_MINI			EQU 21			; linha meteoro 3
 X_METEORO_MINI			EQU 20			; coluna meteoro 3
 
-Y_NAVE_MA			EQU 10			; linha nave má
-X_NAVE_MA			EQU 50			; coluna nave má
+Y_NAVE_MA_GRANDE		EQU 10			; linha nave má
+X_NAVE_MA_GRANDE		EQU 50			; coluna nave má
 
-Y_NAVE_MA_2			EQU 16			; linha nave má 2
-X_NAVE_MA_2			EQU 50			; coluna nave má 2
+Y_NAVE_MA_MEDIO			EQU 16			; linha nave má 2
+X_NAVE_MA_MEDIO			EQU 50			; coluna nave má 2
 
-Y_NAVE_MA_3         EQU 21			; linha nave má 3
-X_NAVE_MA_3         EQU 50			; coluna nave má 3
+Y_NAVE_MA_MINI          EQU 21			; linha nave má 3
+X_NAVE_MA_MINI          EQU 50			; coluna nave má 3
 
-Y_PEW_PEW			EQU 10			; linha míssil
-X_PEW_PEW			EQU 30			; coluna míssil
+Y_PEW_PEW			    EQU 10			; linha míssil
+X_PEW_PEW			    EQU 30			; coluna míssil
 
 ; *************
 ; * DIMENSÕES
