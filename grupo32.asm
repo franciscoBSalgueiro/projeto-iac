@@ -189,9 +189,9 @@ DEF_METEORO_CINZA_MINI:	; tabela que define o meteoro cinzento pequeno
 	WORD		L_METEORO_CINZA_MINI, H_METEORO_CINZA_MINI	; largura e altura do meteoro cinzento pequeno
 	WORD		CINZA_CLARO
 
-DEF_NAVE_MA_CINZA_MEDIA:	; tabela que define o meteoro cinzento médio
+DEF_METEORO_CINZA_MEDIO:	; tabela que define o meteoro cinzento médio
 	WORD		X_METEORO_CINZA_MEDIO, Y_METEORO_CINZA_MEDIO	; posição inicial do meteoro cinzenta médio
-	WORD		L_METEORO_CINZA_MEDIO, H_MTEORO_CINZA_MEDIO		; largura e altura do meteoro cinzento médio
+	WORD		L_METEORO_CINZA_MEDIO, H_METEORO_CINZA_MEDIO		; largura e altura do meteoro cinzento médio
 	WORD		CINZA_CLARO, CINZA_CLARO
 	WORD		CINZA_CLARO, CINZA_CLARO
 
@@ -223,13 +223,13 @@ DEF_METEORO_GRANDE:		; tabela que define o meteoro grande
 DEF_NAVE_MA_CINZA_MINI:	; tabela que define a nave má cinzenta pequena
 	WORD		X_NAVE_MA_CINZA_MINI, Y_NAVE_MA_CINZA_MINI	; posição inicial da nave má cinzenta pequena
 	WORD		L_NAVE_MA_CINZA_MINI, H_NAVE_MA_CINZA_MINI	; largura e altura da nave má cinzenta pequena
-	WORD		CINZA_CLARO
+	WORD		VERMELHO
 
 DEF_NAVE_MA_CINZA_MEDIA:	; tabela que define a nave má cinzenta média
 	WORD		X_NAVE_MA_CINZA_MEDIA, Y_NAVE_MA_CINZA_MEDIA	; posição inicial da nave má cinzenta média
 	WORD		L_NAVE_MA_CINZA_MEDIA, H_NAVE_MA_CINZA_MEDIA	; largura e altura da nave má cinzenta média
-	WORD		CINZA_CLARO, CINZA_CLARO
-	WORD		CINZA_CLARO, CINZA_CLARO
+	WORD		VERMELHO, VERMELHO
+	WORD		VERMELHO, VERMELHO
 
 DEF_NAVE_MA_MINI:		; tabela que define a nave má pequena
 	WORD		X_NAVE_MA_MINI, Y_NAVE_MA_MINI 			; posição inicial da nave má pequena
@@ -301,6 +301,22 @@ mostra_boneco:		; desenha os bonecos
 	MOV R1, SELECIONA_ECRÃ
 	MOV [R1], R0
 
+	; desenha o meteoro cinzento pequeno
+	MOV R4, [DEF_METEORO_CINZA_MINI + 2]
+	MOV R2, MAX_LINHA
+	CMP R4, R2 			; verifica se chegou à última linha
+	JGE espera_tecla
+	MOV R4, DEF_METEORO_CINZA_MINI		; se não chegou ao limite, desenha meteoro cinzento pequeno
+	CALL	desenha_boneco
+
+	; desenha o meteoro cinzento médio
+	MOV R4, [DEF_METEORO_CINZA_MEDIO + 2]
+	MOV R2, MAX_LINHA
+	CMP R4, R2 			; verifica se chegou à última linha
+	JGE espera_tecla
+	MOV R4, DEF_METEORO_CINZA_MEDIO		; se não chegou ao limite, desenha meteoro cinzento médio
+	CALL	desenha_boneco
+
 	; desenha o meteoro pequeno
 	MOV R4, [DEF_METEORO_MINI + 2]
 	MOV R2, MAX_LINHA
@@ -323,6 +339,22 @@ mostra_boneco:		; desenha os bonecos
 	CMP R4, R2 			; verifica se chegou à última linha
 	JGE espera_tecla
 	MOV R4, DEF_METEORO_GRANDE		; se não chegou ao limite, desenha meteoro grande
+	CALL	desenha_boneco
+
+	; desenha a nave má cinzenta pequena
+	MOV R4, [DEF_NAVE_MA_CINZA_MINI + 2]
+	MOV R2, MAX_LINHA
+	CMP R4, R2 			; verifica se chegou à última linha
+	JGE espera_tecla
+	MOV R4, DEF_NAVE_MA_CINZA_MINI		; se não chegou ao limite, desenha nave má cinzenta pequena
+	CALL	desenha_boneco
+
+	; desenha a nave má cinzenta média
+	MOV R4, [DEF_NAVE_MA_CINZA_MEDIA + 2]
+	MOV R2, MAX_LINHA
+	CMP R4, R2 			; verifica se chegou à última linha
+	JGE espera_tecla
+	MOV R4, DEF_NAVE_MA_CINZA_MEDIA		; se não chegou ao limite, desenha nave má cinzenta média
 	CALL	desenha_boneco
 
 	; desenha a nave má pequena
