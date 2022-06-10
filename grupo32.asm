@@ -193,9 +193,9 @@ DEF_NAVE_MA_GRANDE:		; tabela que define a nave má grande
 	WORD		VERMELHO, 0, VERMELHO, 0, VERMELHO
 	WORD		VERMELHO, 0, 0, 0, VERMELHO
 
-DEF_NAVE_MA_MEDIO:		; tabela que define a nave má tamanho médio
-	WORD		X_NAVE_MA_MEDIO, Y_NAVE_MA_MEDIO 			; posição inicial da nave má tamanho médio
-	WORD		L_NAVE_MA_MEDIO, H_NAVE_MA_MEDIO			; largura e altura da nave má tamanho médio
+DEF_NAVE_MA_MEDIO:		; tabela que define a nave má
+	WORD		X_NAVE_MA_MEDIA, Y_NAVE_MA_MEDIA 			; posição inicial da nave má 
+	WORD		L_NAVE_MA_MEDIA, H_NAVE_MA_MEDIA			; largura e altura da nave má 
 	WORD		VERMELHO, 0, 0, VERMELHO
 	WORD		VERMELHO, 0, 0, VERMELHO
 	WORD		0, VERMELHO, VERMELHO, 0
@@ -216,7 +216,6 @@ DEF_PEW_PEW:
 DEF_EXPLOSAO:
 	WORD		X_EXPLOSAO, Y_EXPLOSAO			;posição inicial da explosão
 	WORD		L_EXPLOSAO, H_EXPLOSAO			;largura e altura da explosão
-	WORD		COR
 
 ; *********************************************************************************
 ; * Código
