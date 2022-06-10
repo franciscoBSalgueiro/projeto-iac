@@ -87,6 +87,12 @@ H_NAVE		    EQU 4           ; altura da nave
 L_METEORO 		EQU 5           ; largura do meteoro
 H_METEORO  		EQU 5           ; altura do meteoro
 
+L_METEORO_2 	EQU 4           ; largura do meteoro 2
+H_METEORO_2  	EQU 4           ; altura do meteoro 2
+
+L_METEORO_3 	EQU 3           ; largura do meteoro 3
+H_METEORO_3  	EQU 3           ; altura do meteoro 3
+
 L_NAVE_MA 		EQU 5           ; largura da nave má
 H_NAVE_MA  		EQU 5           ; altura da nave má
 
