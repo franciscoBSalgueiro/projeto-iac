@@ -84,14 +84,14 @@ X_PEW_PEW			EQU 30			; coluna míssil
 L_NAVE	    	EQU	5			; largura da nave
 H_NAVE		    EQU 4           ; altura da nave
 
-L_METEORO 		EQU 5           ; largura do meteoro
-H_METEORO  		EQU 5           ; altura do meteoro
+L_METEORO_GRANDE		EQU 5           ; largura do meteoro
+H_METEORO_GRANDE		EQU 5           ; altura do meteoro
 
-L_METEORO_2 	EQU 4           ; largura do meteoro 2
-H_METEORO_2  	EQU 4           ; altura do meteoro 2
+L_METEORO_MEDIO		EQU 4			; largura do meteoro 2
+H_METEORO_MEDIO		EQU 4			; altura do meteoro 2
 
-L_METEORO_3 	EQU 3           ; largura do meteoro 3
-H_METEORO_3  	EQU 3           ; altura do meteoro 3
+L_METEORO_MINI		EQU 3			; largura do meteoro 3
+H_METEORO_MINI		EQU 3			; altura do meteoro 3
 
 L_NAVE_MA 		EQU 5           ; largura da nave má
 H_NAVE_MA  		EQU 5           ; altura da nave má
@@ -120,8 +120,8 @@ AMARELO			EQU 0FFB0H
 AZUL_ESCURO		EQU	0F0BEH	
 
 ; cores do meteoro
-CINZA_ESCURO 	EQU 0FBBBH		
-CINZA_CLARO		EQU 0F777H	
+CINZA_ESCURO EQU 0F777H	
+CINZA_CLARO	EQU 0FBBBH	
 
 ; cores da nave má
 VERMELHO     	EQU 0FF00H
@@ -154,14 +154,29 @@ DEF_NAVE:			; tabela que define a nave (posição, dimensões e cores)
 	WORD		AZUL, AZUL, AZUL, AZUL, AZUL    
     WORD        0, AMARELO, 0, AMARELO, 0
 
-DEF_METEORO:		; tabela que define o meteoro
+DEF_METEORO_GRANDE :		; tabela que define o meteoro
 	WORD		X_METEORO, Y_METEORO 			; posição inicial do meteoro
     WORD        L_METEORO, H_METEORO 			; largura e altura do meteoro
-    WORD        0, CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, 0
-    WORD        CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, CINZA_CLARO
-    WORD        CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO
-    WORD        CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, CINZA_CLARO
-    WORD        0, CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, 0
+    WORD        0, CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, 0
+    WORD        CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, CINZA_ESCURO
+    WORD        CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO
+    WORD        CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, CINZA_ESCURO
+    WORD        0, CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, 0
+
+DEF_METEORO_MEDIO :		; tabela que define o meteoro
+	WORD		X_METEORO_2, Y_METEORO_2 			; posição inicial do meteoro
+    WORD        L_METEORO_2, H_METEORO_2 			; largura e altura do meteoro
+    WORD        0, CINZA_ESCURO, CINZA_ESCURO, 0
+    WORD        CINZA_CLARO, CINZA_CLARO, CINZA_ESCURO, CINZA_ESCURO
+    WORD        CINZA_CLARO, CINZA_CLARO, CINZA_CLARO, CINZA_ESCURO
+    WORD        0, CINZA_ESCURO, CINZA_ESCURO, 0
+
+DEF_METEORO_MINI :		; tabela que define o meteoro
+	WORD		X_METEORO_3, Y_METEORO_3 			; posição inicial do meteoro
+    WORD        L_METEORO_3, H_METEORO_3 			; largura e altura do meteoro
+    WORD        0, CINZA_ESCURO, 0
+    WORD        CINZA_CLARO, CINZA_CLARO, CINZA_ESCURO 
+    WORD        0, CINZA_ESCURO, 0
 
 DEF_NAVE_MA:		; tabela que define a nave má
 	WORD		X_NAVE_MA, Y_NAVE_MA 			; posição inicial da nave má
