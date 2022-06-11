@@ -288,10 +288,6 @@ inicio:
 	MOV BTE, tab_exc
 	MOV	[APAGA_ECRÃ], R1
 	MOV	[APAGA_AVISO], R1		; apaga o aviso de nenhum cenário selecionado
-	EI0					; permite interrupcões 0
-	EI1					; permite interrupcões 1
-	EI2					; permite interrupcões 2
-	EI					; permite interrupcões geral
 
 start_menu:
 	MOV	R1, 1					; cenário de fundo número 1
@@ -304,6 +300,15 @@ start_menu:
 		CALL pressiona_teclas
 
 game_loop:
+	EI0					; permite interrupcões 0
+	EI1					; permite interrupcões 1
+	EI2					; permite interrupcões 2
+	EI					; permite interrupcões geral
+	MOV R0, evento_int
+	MOV R1, 0
+	MOV [R0], R1
+	MOV [R0+2], R1
+	MOV [R0+4], R1
 	MOV	R1, 1					; cenário de fundo número 1
 	MOV  [SELECIONA_VIDEO_FUNDO], R1	; seleciona o cenário de fundo
 	MOV	R1, 2							; cenário de fundo número 2
@@ -345,7 +350,7 @@ encontrou_tecla:
 	CMP	R6, R7
 	JZ	pressionou_2
 
-	; verifica se a tecla pressionada é o 6
+	; verifica se a tecla pressionada é o D
 	MOV R7, TECLA_D
 	CMP R6, R7
 	JZ pressionou_D
@@ -405,6 +410,10 @@ coluna_seguinte:
 
 
 pause_loop:
+	DI0
+	DI1
+	DI2
+	DI					; desativa interrupcões
 	MOV	R1, 0					; cenário de fundo número 0
 	MOV  [SELECIONA_CENARIO_FUNDO], R1	; seleciona o cenário de fundo
 	MOV	R1, 1							; cenário de fundo número 2
