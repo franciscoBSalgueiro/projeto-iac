@@ -171,10 +171,14 @@ SP_inicial:				; inicialização do SP no endereço 1200H
 
 ; Tabela das rotinas de exceções
 tab_exc:
-	WORD rot_int_0			; rotina de atendimento da interrupcão 0	
+	WORD rot_int_0			; rotina de atendimento da interrupcão 0
+	WORD rot_int_1
+	WORD rot_int_2
 
 evento_int:
 	WORD 0				; se 1, indica que a interrupcão 0 ocorreu
+	WORD 0				; se 1, indica que a interrupcão 1 ocorreu
+	WORD 0				; se 1, indica que a interrupcão 2 ocorreu
 
 ENERGIA:	; energia inicial a ser mostrada nos displays
 	WORD 100
@@ -294,121 +298,17 @@ inicio:
 	MOV R7, DISPLAYS
 	MOV [R7], R1
 	EI0					; permite interrupcões 0
+	EI1
+	EI2
 	EI
 
 
 mostra_boneco:		; desenha os bonecos
-
-	; seleciona o ecrã 0
-	MOV R0, 0 
-	MOV R1, SELECIONA_ECRÃ
-	MOV [R1], R0
-
-	; desenha a nave
-	MOV R4, DEF_NAVE
-	CALL	desenha_boneco
-
-	; seleciona o ecrã 1
-	MOV R0, 1
-	MOV R1, SELECIONA_ECRÃ
-	MOV [R1], R0
-
-	; desenha o meteoro cinzento pequeno
-	MOV R4, [DEF_METEORO_CINZA_MINI + 2]
-	MOV R2, MAX_LINHA
-	CMP R4, R2 			; verifica se chegou à última linha
-	JGE espera_tecla
-	MOV R4, DEF_METEORO_CINZA_MINI		; se não chegou ao limite, desenha meteoro cinzento pequeno
-	CALL	desenha_boneco
-
-	; desenha o meteoro cinzento médio
-	MOV R4, [DEF_METEORO_CINZA_MEDIO + 2]
-	MOV R2, MAX_LINHA
-	CMP R4, R2 			; verifica se chegou à última linha
-	JGE espera_tecla
-	MOV R4, DEF_METEORO_CINZA_MEDIO		; se não chegou ao limite, desenha meteoro cinzento médio
-	CALL	desenha_boneco
-
-	; desenha o meteoro pequeno
-	MOV R4, [DEF_METEORO_MINI + 2]
-	MOV R2, MAX_LINHA
-	CMP R4, R2 			; verifica se chegou à última linha
-	JGE espera_tecla
-	MOV R4, DEF_METEORO_MINI		; se não chegou ao limite, desenha meteoro pequeno
-	CALL	desenha_boneco
-
-	; desenha o meteoro médio
-	MOV R4, [DEF_METEORO_MEDIO + 2]
-	MOV R2, MAX_LINHA
-	CMP R4, R2 			; verifica se chegou à última linha
-	JGE espera_tecla
-	MOV R4, DEF_METEORO_MEDIO		; se não chegou ao limite, desenha meteoro médio
-	CALL	desenha_boneco
-
-	; verifica limites do meteoro grande
-	MOV R4, [DEF_METEORO_GRANDE + 2]
-	MOV R2, MAX_LINHA
-	CMP R4, R2 			; verifica se chegou à última linha
-	JGE espera_tecla
-	MOV R4, DEF_METEORO_GRANDE		; se não chegou ao limite, desenha meteoro grande
-	CALL	desenha_boneco
-
-	; desenha a nave má cinzenta pequena
-	MOV R4, [DEF_NAVE_MA_CINZA_MINI + 2]
-	MOV R2, MAX_LINHA
-	CMP R4, R2 			; verifica se chegou à última linha
-	JGE espera_tecla
-	MOV R4, DEF_NAVE_MA_CINZA_MINI		; se não chegou ao limite, desenha nave má cinzenta pequena
-	CALL	desenha_boneco
-
-	; desenha a nave má cinzenta média
-	MOV R4, [DEF_NAVE_MA_CINZA_MEDIA + 2]
-	MOV R2, MAX_LINHA
-	CMP R4, R2 			; verifica se chegou à última linha
-	JGE espera_tecla
-	MOV R4, DEF_NAVE_MA_CINZA_MEDIA		; se não chegou ao limite, desenha nave má cinzenta média
-	CALL	desenha_boneco
-
-	; desenha a nave má pequena
-	MOV R4, [DEF_NAVE_MA_MINI + 2]
-	MOV R2, MAX_LINHA
-	CMP R4, R2 			; verifica se chegou à última linha
-	JGE espera_tecla
-	MOV R4, DEF_NAVE_MA_MINI		; se não chegou ao limite, desenha nave má pequena
-	CALL	desenha_boneco
-
-	; desenha a nave má média
-	MOV R4, [DEF_NAVE_MA_MEDIA + 2]
-	MOV R2, MAX_LINHA
-	CMP R4, R2 			; verifica se chegou à última linha
-	JGE espera_tecla
-	MOV R4, DEF_NAVE_MA_MEDIA		; se não chegou ao limite, desenha nave má média
-	CALL	desenha_boneco
-
-	; desenha a nave má grande
-	MOV R4, [DEF_NAVE_MA_GRANDE + 2]
-	MOV R2, MAX_LINHA
-	CMP R4, R2 			; verifica se chegou à última linha
-	JGE espera_tecla
-	MOV R4, DEF_NAVE_MA_GRANDE		; se não chegou ao limite, desenha nave má grande
-	CALL	desenha_boneco
-
-	; desenha explosão
-	MOV R4, [DEF_EXPLOSAO + 2]
-	MOV R2, MAX_LINHA
-	CMP R4, R2 			; verifica se chegou à última linha
-	JGE espera_tecla
-	MOV R4, DEF_EXPLOSAO		; se não chegou ao limite, desenha explosão
-	CALL	desenha_boneco
+	CALL redesenha_ecra
 
 espera_tecla:					; neste ciclo espera-se até uma tecla ser premida ou uma exceção acontecer
 	CALL testa_excecoes
-	CMP R8, 0
-	JZ primeira_linha
-	CALL move_meteoro
-	JMP mostra_boneco
 
-primeira_linha:
 	MOV  R6, 1					; testa a primeira linha
 	testa_linha:
 		CALL	teclado			; leitura às teclas
@@ -437,16 +337,6 @@ encontrou_tecla:
 	CMP	R6, R7
 	JZ	pressionou_2
 
-	; verifica se a tecla pressionada é o 4
-	MOV R7, TECLA_4
-	CMP R6, R7
-	JZ pressionou_4
-
-	; verifica se a tecla pressionada é o 5
-	MOV R7, TECLA_5
-	CMP R6, R7
-	JZ pressionou_5
-
 	; verifica se a tecla pressionada é o 6
 	MOV R7, TECLA_6
 	CMP R6, R7
@@ -461,28 +351,6 @@ pressionou_0:
 pressionou_2:
 	MOV R7, +1	; avança a nave uma coluna
 	JMP ve_limites
-
-pressionou_4:
-	; verifica se a tecla já foi pressionada
-	CALL pressiona_teclas
-	CMP R4, 0
-	JNZ espera_tecla
-
-	; decrementa o valor nos displays
-	MOV	R7, [ENERGIA]
-	SUB R7, 1
-	JMP mostra_displays
-
-pressionou_5:
-	; verifica se a tecla já foi pressionada
-	CALL pressiona_teclas
-	CMP R4, 0
-	JNZ espera_tecla
-
-	; aumenta o valor nos displays
-	MOV	R7, [ENERGIA]
-	ADD R7, 1
-	JMP mostra_displays
 
 pressionou_6:
 	; verifica se a tecla já foi pressionada
@@ -512,15 +380,6 @@ coluna_seguinte:
 	ADD	R0, R7			; para desenhar objeto na coluna seguinte (direita ou esquerda)
 	MOV [R4], R0
 	JMP	mostra_boneco	; vai desenhar o boneco de novo
-
-mostra_displays:
-	MOV R0, ENERGIA
-	MOV [R0], R7			; altera o valor da energia
-
-	MOV R0, DISPLAYS
-	CALL converte_hex		; converte valor de energia para ser legível nos displays
-	MOV [R0], R9
-	JMP espera_tecla
 
 fim:
 	JMP fim
@@ -757,24 +616,52 @@ pressiona_teclas:
 testa_excecoes:
 	PUSH R0
 	PUSH R1
-	MOV R8, 0
 	MOV R0, evento_int
-	MOV R1, [R0]
-	CMP R1, 0
-	JZ sai_testa_excecoes
-	MOV [R0], R8
-	MOV R8, 1
+
+	testa_exc_0:
+		MOV R1, [R0]
+		CMP R1, 0
+		JZ testa_exc_1
+		
+		CALL move_meteoro
+
+		; consumir exceção
+		MOV R1, 0
+		MOV [R0], R1
+
+
+	testa_exc_1:
+		MOV R1, [R0+2]
+		CMP R1, 0
+		JZ testa_exc_2
+
+		; consumir exceção
+		MOV R1, 0
+		MOV [R0+2], R1
+
+
+	testa_exc_2:
+		MOV R1, [R0+4]
+		CMP R1, 0
+		JZ sai_testa_excecoes
+
+		CALL diminui_energia
+
+		; consumir exceção
+		MOV R1, 0
+		MOV [R0+4], R1
+
+
 	sai_testa_excecoes:
-	POP R0
 	POP R1
+	POP R0
 	RET
 
 move_meteoro:
-	PUSH R6
-	PUSH R4
-	PUSH R1
 	PUSH R0
-	CALL apaga_pixeis
+	PUSH R1
+	PUSH R4
+	PUSH R6
 
 	; reproduz o som quando a tecla 6 é pressionada
 	MOV R6, TOCA_SOM
@@ -791,6 +678,8 @@ move_meteoro:
 	MOV R0, [R4]			; obtém posição y do meteoro
 	ADD R0, 1				; move para a linha seguinte
 	MOV [R4], R0
+	
+	CALL redesenha_ecra
 	POP R6
 	POP R4
 	POP R1
@@ -816,3 +705,171 @@ rot_int_0:
 	POP  R1
 	POP  R0
 	RFE
+
+
+; TODO: avançar míssil
+rot_int_1:
+	RFE
+
+; **********************************************************************
+; ROT_INT_2 - 	Rotina de atendimento da interrupcão 2
+;			Assinala o evento na componente 2 da variável evento_int
+; **********************************************************************
+rot_int_2:
+	PUSH R0
+	PUSH R1
+	MOV  R0, evento_int
+	ADD R0, 4
+	MOV  R1, 1			; assinala que houve uma interrupcao 0
+	MOV  [R0], R1			; na componente 0 da variável evento_int
+	POP  R1
+	POP  R0
+	RFE
+
+
+redesenha_ecra:
+	PUSH R0
+	PUSH R1
+	PUSH R2
+	PUSH R4
+
+	CALL apaga_pixeis
+
+	; seleciona o ecrã 0
+	MOV R0, 0 
+	MOV R1, SELECIONA_ECRÃ
+	MOV [R1], R0
+
+	; desenha a nave
+	MOV R4, DEF_NAVE
+	CALL	desenha_boneco
+
+	; seleciona o ecrã 1
+	MOV R0, 1
+	MOV R1, SELECIONA_ECRÃ
+	MOV [R1], R0
+
+	; desenha o meteoro cinzento pequeno
+	MOV R4, [DEF_METEORO_CINZA_MINI + 2]
+	MOV R2, MAX_LINHA
+	CMP R4, R2 			; verifica se chegou à última linha
+	JGE sai_redesenha_ecra
+	MOV R4, DEF_METEORO_CINZA_MINI		; se não chegou ao limite, desenha meteoro cinzento pequeno
+	CALL	desenha_boneco
+
+	; desenha o meteoro cinzento médio
+	MOV R4, [DEF_METEORO_CINZA_MEDIO + 2]
+	MOV R2, MAX_LINHA
+	CMP R4, R2 			; verifica se chegou à última linha
+	JGE sai_redesenha_ecra
+	MOV R4, DEF_METEORO_CINZA_MEDIO		; se não chegou ao limite, desenha meteoro cinzento médio
+	CALL	desenha_boneco
+
+	; desenha o meteoro pequeno
+	MOV R4, [DEF_METEORO_MINI + 2]
+	MOV R2, MAX_LINHA
+	CMP R4, R2 			; verifica se chegou à última linha
+	JGE sai_redesenha_ecra
+	MOV R4, DEF_METEORO_MINI		; se não chegou ao limite, desenha meteoro pequeno
+	CALL	desenha_boneco
+
+	; desenha o meteoro médio
+	MOV R4, [DEF_METEORO_MEDIO + 2]
+	MOV R2, MAX_LINHA
+	CMP R4, R2 			; verifica se chegou à última linha
+	JGE sai_redesenha_ecra
+	MOV R4, DEF_METEORO_MEDIO		; se não chegou ao limite, desenha meteoro médio
+	CALL	desenha_boneco
+
+	; verifica limites do meteoro grande
+	MOV R4, [DEF_METEORO_GRANDE + 2]
+	MOV R2, MAX_LINHA
+	CMP R4, R2 			; verifica se chegou à última linha
+	JGE sai_redesenha_ecra
+	MOV R4, DEF_METEORO_GRANDE		; se não chegou ao limite, desenha meteoro grande
+	CALL	desenha_boneco
+
+	; desenha a nave má cinzenta pequena
+	MOV R4, [DEF_NAVE_MA_CINZA_MINI + 2]
+	MOV R2, MAX_LINHA
+	CMP R4, R2 			; verifica se chegou à última linha
+	JGE sai_redesenha_ecra
+	MOV R4, DEF_NAVE_MA_CINZA_MINI		; se não chegou ao limite, desenha nave má cinzenta pequena
+	CALL	desenha_boneco
+
+	; desenha a nave má cinzenta média
+	MOV R4, [DEF_NAVE_MA_CINZA_MEDIA + 2]
+	MOV R2, MAX_LINHA
+	CMP R4, R2 			; verifica se chegou à última linha
+	JGE sai_redesenha_ecra
+	MOV R4, DEF_NAVE_MA_CINZA_MEDIA		; se não chegou ao limite, desenha nave má cinzenta média
+	CALL	desenha_boneco
+
+	; desenha a nave má pequena
+	MOV R4, [DEF_NAVE_MA_MINI + 2]
+	MOV R2, MAX_LINHA
+	CMP R4, R2 			; verifica se chegou à última linha
+	JGE sai_redesenha_ecra
+	MOV R4, DEF_NAVE_MA_MINI		; se não chegou ao limite, desenha nave má pequena
+	CALL	desenha_boneco
+
+	; desenha a nave má média
+	MOV R4, [DEF_NAVE_MA_MEDIA + 2]
+	MOV R2, MAX_LINHA
+	CMP R4, R2 			; verifica se chegou à última linha
+	JGE sai_redesenha_ecra
+	MOV R4, DEF_NAVE_MA_MEDIA		; se não chegou ao limite, desenha nave má média
+	CALL	desenha_boneco
+
+	; desenha a nave má grande
+	MOV R4, [DEF_NAVE_MA_GRANDE + 2]
+	MOV R2, MAX_LINHA
+	CMP R4, R2 			; verifica se chegou à última linha
+	JGE sai_redesenha_ecra
+	MOV R4, DEF_NAVE_MA_GRANDE		; se não chegou ao limite, desenha nave má grande
+	CALL	desenha_boneco
+
+	; desenha explosão
+	MOV R4, [DEF_EXPLOSAO + 2]
+	MOV R2, MAX_LINHA
+	CMP R4, R2 			; verifica se chegou à última linha
+	JGE sai_redesenha_ecra
+	MOV R4, DEF_EXPLOSAO		; se não chegou ao limite, desenha explosão
+	CALL	desenha_boneco
+
+	sai_redesenha_ecra:
+	POP R4
+	POP R2
+	POP R1
+	POP R0
+	RET
+
+
+
+; TODO adicionar docstring
+diminui_energia:
+	; diminui em 5 o valor nos displays
+	MOV	R7, [ENERGIA]
+	SUB R7, 5
+	CALL mostra_displays
+	RET
+
+; **********************************************************************
+; mostra_displays - Atualiza o valor mostrado nos displays
+;
+; Argumentos:   R7 - Novo valor para a energia
+; **********************************************************************
+mostra_displays:
+	PUSH R0
+	PUSH R7
+	PUSH R9
+	MOV R0, ENERGIA
+	MOV [R0], R7			; altera o valor da energia
+
+	MOV R0, DISPLAYS
+	CALL converte_hex		; converte valor de energia para ser legível nos displays
+	MOV [R0], R9
+	POP R9
+	POP R7
+	POP R0
+	RET
