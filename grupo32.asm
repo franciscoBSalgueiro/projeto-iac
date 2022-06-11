@@ -56,7 +56,7 @@ ATRASO			EQU	4000H		; atraso para limitar a velocidade de movimento do boneco
 Y_NAVE        		EQU 28			; linha da nave 
 X_NAVE				EQU 30			; coluna da nave 
 
-Y_METEORO           EQU 10			; linha meteoro
+Y_METEORO           EQU 0			; linha meteoro
 X_METEORO           EQU 20			; coluna meteoro
 
 Y_METEORO_2			EQU 16			; linha meteoro 2
@@ -126,7 +126,13 @@ pilha:
 	STACK 100H			; espaço reservado para a pilha (200 bytes)
 					
 SP_inicial:				; inicialização do SP no endereço 1200H
-						
+
+; Tabela das rotinas de exceções
+tab_exc:
+	WORD rot_int_0			; rotina de atendimento da interrupcão 0	
+
+evento_int:
+	WORD 0				; se 1, indica que a interrupcão 0 ocorreu
 
 ENERGIA:	; energia inicial a ser mostrada nos displays
 	WORD 100
@@ -171,7 +177,9 @@ DEF_PEW_PEW:
 PLACE   0				
 inicio:
 	MOV  SP, SP_inicial		; inicializa SP
-                            
+
+	MOV BTE, tab_exc
+
 	MOV  [APAGA_AVISO], R1		; apaga o aviso de nenhum cenário selecionado
 	MOV  [APAGA_ECRÃ], R1		; apaga todos os pixels já desenhados
 	MOV	R1, 1					; cenário de fundo número 1
@@ -181,8 +189,12 @@ inicio:
 	MOV R1, 100H
 	MOV R7, DISPLAYS
 	MOV [R7], R1
+	EI0					; permite interrupcões 0
+	EI
+
 
 mostra_boneco:		; desenha os bonecos
+
 	; seleciona o ecrã 0
 	MOV R0, 0 
 	MOV R1, SELECIONA_ECRÃ
@@ -205,7 +217,14 @@ mostra_boneco:		; desenha os bonecos
 	MOV R4, DEF_METEORO		; se não chegou ao limite, desenha meteoro
 	CALL	desenha_boneco
 
-espera_tecla:					; neste ciclo espera-se até uma tecla ser premida
+espera_tecla:					; neste ciclo espera-se até uma tecla ser premida ou uma exceção acontecer
+	CALL testa_excecoes
+	CMP R8, 0
+	JZ primeira_linha
+	CALL move_meteoro
+	JMP mostra_boneco
+
+primeira_linha:
 	MOV  R6, 1					; testa a primeira linha
 	testa_linha:
 		CALL	teclado			; leitura às teclas
@@ -287,17 +306,9 @@ pressionou_6:
 	CMP R4, 0
 	JNZ espera_tecla
 
-	; reproduz o som quando a tecla 6 é pressionada
-	MOV R6, TOCA_SOM
-	MOV R1, 0
-	MOV [R6], R1
+	CALL move_meteoro
 
-	; pára o som de tocar
-	MOV R6, TERMINA_SOM
-	MOV R1, 0
-	MOV [R6], R1
-
-	JMP move_meteoro
+	JMP mostra_boneco
 
 ve_limites:
 	MOV	R6, [DEF_NAVE + 4]		; obtém a largura do boneco
@@ -318,17 +329,6 @@ coluna_seguinte:
 	MOV [R4], R0
 	JMP	mostra_boneco	; vai desenhar o boneco de novo
 
-move_meteoro:
-	CALL apaga_pixeis
-
-linha_seguinte:
-	MOV R4, DEF_METEORO
-	ADD R4, 2
-	MOV R0, [R4]			; obtém posição y do meteoro
-	ADD R0, 1				; move para a linha seguinte
-	MOV [R4], R0
-	JMP	mostra_boneco		; vai desenhar o boneco de novo
-
 mostra_displays:
 	MOV R0, ENERGIA
 	MOV [R0], R7			; altera o valor da energia
@@ -337,6 +337,9 @@ mostra_displays:
 	CALL converte_hex		; converte valor de energia para ser legível nos displays
 	MOV [R0], R9
 	JMP espera_tecla
+
+fim:
+	JMP fim
 
 ; **********************************************************************
 ; DESENHA_BONECO - Desenha um boneco na linha e coluna indicadas
@@ -566,3 +569,66 @@ pressiona_teclas:
 	POP R9
 	POP R7
 	RET
+
+testa_excecoes:
+	PUSH R0
+	PUSH R1
+	MOV R8, 0
+	MOV R0, evento_int
+	MOV R1, [R0]
+	CMP R1, 0
+	JZ sai_testa_excecoes
+	MOV [R0], R8
+	MOV R8, 1
+	sai_testa_excecoes:
+	POP R0
+	POP R1
+	RET
+
+move_meteoro:
+	PUSH R6
+	PUSH R4
+	PUSH R1
+	PUSH R0
+	CALL apaga_pixeis
+
+	; reproduz o som quando a tecla 6 é pressionada
+	MOV R6, TOCA_SOM
+	MOV R1, 0
+	MOV [R6], R1
+
+	; pára o som de tocar
+	MOV R6, TERMINA_SOM
+	MOV R1, 0
+	MOV [R6], R1
+
+	MOV R4, DEF_METEORO
+	ADD R4, 2
+	MOV R0, [R4]			; obtém posição y do meteoro
+	ADD R0, 1				; move para a linha seguinte
+	MOV [R4], R0
+	POP R6
+	POP R4
+	POP R1
+	POP R0
+	RET
+
+
+; **********************************************************************
+; Rotinas de interrupção
+; **********************************************************************
+
+
+; **********************************************************************
+; ROT_INT_0 - 	Rotina de atendimento da interrupcão 0
+;			Assinala o evento na componente 0 da variável evento_int
+; **********************************************************************
+rot_int_0:
+	PUSH R0
+	PUSH R1
+	MOV  R0, evento_int
+	MOV  R1, 1			; assinala que houve uma interrupcao 0
+	MOV  [R0], R1			; na componente 0 da variável evento_int
+	POP  R1
+	POP  R0
+	RFE
