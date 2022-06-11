@@ -38,8 +38,7 @@ DEFINE_LINHA    		EQU 600AH		; endereço do comando para definir a linha
 DEFINE_COLUNA   		EQU 600CH		; endereço do comando para definir a coluna
 DEFINE_PIXEL    		EQU 6012H		; endereço do comando para escrever um pixel
 TOCA_SOM                EQU 605AH		; endereço do comando para tocar um som
-TERMINA_SOM             EQU 6066H		; endereço do comando para tocar um som
-
+TERMINA_MEDIA             EQU 6066H		; endereço do comando para parar a reprodução de um som ou vídeo
 
 APAGA_AVISO     		EQU 6040H		; endereço do comando para apagar o aviso de nenhum cenário selecionado
 APAGA_ECRÃ	 			EQU 6002H		; endereço do comando para apagar todos os pixels já desenhados
@@ -286,23 +285,31 @@ DEF_EXPLOSAO:
 PLACE   0				
 inicio:
 	MOV  SP, SP_inicial		; inicializa SP
-
 	MOV BTE, tab_exc
-
-	MOV  [APAGA_AVISO], R1		; apaga o aviso de nenhum cenário selecionado
-	MOV  [APAGA_ECRÃ], R1		; apaga todos os pixels já desenhados
-	MOV	R1, 1					; cenário de fundo número 1
-	MOV  [SELECIONA_VIDEO_FUNDO], R1	; seleciona o cenário de fundo
-	MOV	R1, 2							; cenário de fundo número 2
-	MOV  [SELECIONA_VIDEO_FUNDO], R1
-	MOV R1, 100H
-	MOV R7, DISPLAYS
-	MOV [R7], R1
+	MOV	[APAGA_ECRÃ], R1
+	MOV	[APAGA_AVISO], R1		; apaga o aviso de nenhum cenário selecionado
 	EI0					; permite interrupcões 0
 	EI1					; permite interrupcões 1
 	EI2					; permite interrupcões 2
 	EI					; permite interrupcões geral
 
+start_menu:
+	MOV	R1, 1					; cenário de fundo número 1
+	MOV  [SELECIONA_CENARIO_FUNDO], R1	; seleciona o cenário de fundo
+	MOV R6, 8
+	start_loop:
+		CALL teclado
+		CMP R9, 1
+		JNZ start_loop
+		CALL pressiona_teclas
+
+game_loop:
+	MOV	R1, 1					; cenário de fundo número 1
+	MOV  [SELECIONA_VIDEO_FUNDO], R1	; seleciona o cenário de fundo
+	MOV	R1, 2							; cenário de fundo número 2
+	MOV  [SELECIONA_VIDEO_FUNDO], R1
+	MOV R7, [ENERGIA]
+	CALL mostra_displays
 
 mostra_boneco:		; desenha os bonecos
 	CALL redesenha_ecra
@@ -339,6 +346,11 @@ encontrou_tecla:
 	JZ	pressionou_2
 
 	; verifica se a tecla pressionada é o 6
+	MOV R7, TECLA_D
+	CMP R6, R7
+	JZ pressionou_D
+
+	; verifica se a tecla pressionada é o 6
 	MOV R7, TECLA_6
 	CMP R6, R7
 	JZ pressionou_6
@@ -363,6 +375,15 @@ pressionou_6:
 
 	JMP mostra_boneco
 
+pressionou_D:
+	; verifica se a tecla já foi pressionada
+	CALL pressiona_teclas
+	CMP R4, 0
+	JNZ espera_tecla
+
+	CALL apaga_pixeis
+	JMP pause_loop
+
 ve_limites:
 	MOV	R6, [DEF_NAVE + 4]		; obtém a largura do boneco
 	MOV R2, [DEF_NAVE]
@@ -381,6 +402,26 @@ coluna_seguinte:
 	ADD	R0, R7			; para desenhar objeto na coluna seguinte (direita ou esquerda)
 	MOV [R4], R0
 	JMP	mostra_boneco	; vai desenhar o boneco de novo
+
+
+pause_loop:
+	MOV	R1, 0					; cenário de fundo número 0
+	MOV  [SELECIONA_CENARIO_FUNDO], R1	; seleciona o cenário de fundo
+	MOV	R1, 1							; cenário de fundo número 2
+	MOV  [TERMINA_MEDIA], R1
+	MOV R6, 8
+	pause_loop_1:
+		CALL	teclado			; leitura às teclas
+		CMP	R9, 0
+		JNZ pause_loop_1
+		CALL liberta_teclas
+	pause_loop_2:
+		CALL teclado
+		CMP R9, 2
+		JNZ pause_loop_2
+		CALL pressiona_teclas
+		JMP game_loop
+
 
 fim:
 	JMP fim
@@ -576,20 +617,23 @@ teclado:
 
 liberta_teclas:
 	PUSH R1
+	PUSH R2
 	PUSH R7
-	CMP	R6, 2 		; verifica se a linha sem teclas premidas é a segunda
+	MOV R2, 8
+	CMP	R6, R2 		; verifica se a linha sem teclas premidas é a quarta
 	JNZ liberta_teclas_fim
 	MOV R7, CARREGOU_BOTAO
 	MOV R1, 0
 	MOV [R7], R1 	; liberta tecla
 	liberta_teclas_fim:
 	POP R7
+	POP R2
 	POP R1
 	RET
 
 
 ; **********************************************************************
-; PRESSIONA_TECLAS - guarda a tecla que foi pressionada
+; PRESSIONA_TECLAS - guarda que a tecla que foi pressionada
 ;
 ; Retorna: R4 - (0) não carregou tecla / (1) carregou tecla
 ; **********************************************************************
@@ -670,7 +714,7 @@ move_meteoro:
 	MOV [R6], R1
 
 	; pára o som de tocar
-	MOV R6, TERMINA_SOM
+	MOV R6, TERMINA_MEDIA
 	MOV R1, 0
 	MOV [R6], R1
 
