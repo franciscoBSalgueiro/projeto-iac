@@ -434,10 +434,9 @@ desenha_boneco:
 	PUSH	R6
 	PUSH	R7
     PUSH    R8
-	MOV R7, 1
-	CALL testa_limites_linha
-	CMP R7, 0
-	JZ sai_desenha_pixels
+	PUSH	R9
+	CMP R2, 0
+	JLT sai_desenha_pixels
 	; TODO se x ou y fora dos limites, saltar para sai_desenha_pixels
 	MOV	R5, [R4]			; obtém a largura do boneco
     MOV R8, [R4]
@@ -452,12 +451,17 @@ desenha_pixels:
 		ADD  R1, 1          ; próxima coluna
 		SUB  R5, 1			; menos uma coluna para tratar
 		JNZ  desenha_coluna ; continua até percorrer toda a largura da primeira linha
+	proxima_linha:
 	ADD R2, 1				; próxima linha
+	MOV R9, MAX_LINHA
+	CMP R9, R2
+	JZ sai_desenha_pixels	; não desenha pixel se estiver for dos limites
 	MOV R5, R8				; repor a largura
 	SUB R1, R8				; alterar a coluna para a inicial
 	SUB R6, 1				; menos uma coluna para tratar
 	JNZ desenha_pixels 		; continua até percorrer toda a largura da segunda linha
 sai_desenha_pixels:
+	POP R9
     POP R8
 	POP R7
 	POP R6
@@ -587,32 +591,6 @@ impede_movimento:
 sai_testa_limites:	
 	POP	R6
 	POP	R5
-	RET
-
-; **********************************************************************
-; TESTA_LIMITES_LINHA - Testa se o boneco chegou aos limites inferior ou superior
-;				do ecrã e nesse caso impede o movimento (força R7 a 0)
-; Argumentos:	R2 - linha em que o objeto está
-;
-; Retorna: 	R7 - 0 se já tiver chegado ao limite, inalterado caso contrário	
-; **********************************************************************
-
-testa_limites_linha:
-	PUSH R5
-testa_limite_inferior:
-	MOV R5, MAX_LINHA
-	CMP R2, R5
-	JLT testa_limite_superior ; se não se abaixo da linha inferior testar o superior
-	MOV R7, 0				  ; se chegou ao limite, força R7 a 0 e sai
-	JMP	sai_testa_limites_linha
-testa_limite_superior:
-	MOV R5, MIN_LINHA
-	CMP R2, R5				
-	JGE sai_testa_limites_linha ; se não chegou ao limite superior mantem o valor de R7 e sai
-	MOV R7, 0					; caso contrário força R7 a zero e sai
-	JMP sai_testa_limites_linha
-sai_testa_limites_linha:
-	POP R5
 	RET
 
 ; **********************************************************************
@@ -1010,7 +988,7 @@ deteta_colisoes:
 	CMP R2, R1					; compara posição x do míssil com a do meteoro
 	JLT deteta_colisoes_fim		; à esquerda
 
-	ADD R1, 5					; posição x da direita do meteoro	
+	ADD R1, 4					; posição x da direita do meteoro	
 	CMP R2, R1					; compara posição x do míssil com a do meteoro
 	JGT deteta_colisoes_fim		; à direita
 
@@ -1021,7 +999,7 @@ deteta_colisoes:
 	CMP R2, R1					; compara posição y do míssil com a do meteoro
 	JLT deteta_colisoes_fim		; em cima
 
-	ADD R1, 5					; posição y de baixo do meteoro
+	ADD R1, 4					; posição y de baixo do meteoro
 	CMP R2, R1					; compara posição y do míssil com a do meteoro
 	JGT deteta_colisoes_fim		; em baixo
 
