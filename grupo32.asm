@@ -55,10 +55,10 @@ ATRASO			EQU	4000H		; atraso para limitar a velocidade de movimento do boneco
 Y_NAVE        	EQU 28			; linha inicial da nave 
 X_NAVE			EQU 30			; coluna inicial da nave 
 
-Y_TIPO_1		EQU 3
-Y_TIPO_2		EQU 6
-Y_TIPO_3		EQU 9
-Y_TIPO_4		EQU 12
+Y_TIPO_1		EQU 3			; linha máxima para o tipo 1 dos meteoros
+Y_TIPO_2		EQU 6			; linha máxima para o tipo 2 dos meteoros
+Y_TIPO_3		EQU 9			; linha máxima para o tipo 3 dos meteoros
+Y_TIPO_4		EQU 12			; linha máxima para o tipo 4 dos meteoros
 
 ; *************
 ; * DIMENSÕES
@@ -67,41 +67,22 @@ Y_TIPO_4		EQU 12
 L_NAVE	    	EQU	5			; largura da nave
 H_NAVE			EQU 4           ; altura da nave
 
-L_METEORO_T1	EQU 1			; largura do meteoro de tamanho 1
-H_METEORO_T1	EQU 1			; altura do meteoro cinzento de tamanho 1
+L_TIPO_1		EQU 1			; largura do meteoro de tipo 1
+H_TIPO_1		EQU 1			; altura do meteoro de tipo 1
+L_TIPO_2		EQU 2			; largura do meteoro de tipo 2
+H_TIPO_2		EQU 2			; altura do meteoro de tipo 2
+L_TIPO_3		EQU 3			; largura do meteoro de tipo 3
+H_TIPO_3		EQU 3			; altura do meteoro de tipo 3
+L_TIPO_4		EQU 4			; largura do meteoro de tipo 4
+H_TIPO_4		EQU 4			; altura do meteoro de tipo 4
+L_TIPO_5		EQU 5			; largura do meteoro de tipo 5
+H_TIPO_5		EQU 5			; altura do meteoro de tipo 5
 
-L_METEORO_T2	EQU 2			; largura do meteoro de tamanho 2
-H_METEORO_T2	EQU 2			; altura do meteoro cinzento de tamanho 2
+L_EXPLOSAO		EQU 5			; altura e largura da explosão
+H_EXPLOSAO		EQU 5			; altura e largura da explosão
 
-L_METEORO_T3	EQU 3			; largura do meteoro de tamanho 3
-H_METEORO_T3	EQU 3			; altura do meteoro de tamanho 3
-
-L_METEORO_T4	EQU 4			; largura do meteoro de tamanho 4
-H_METEORO_T4	EQU 4			; altura do meteoro de tamanho 4
-
-L_METEORO_T5	EQU 5           ; largura do meteoro de tamanho 5
-H_METEORO_T5	EQU 5           ; altura do meteoro de tamanho 5
-
-L_NAVE_MA_T1	EQU 1			; largura da nave má  de tamanho 1
-H_NAVE_MA_T1	EQU 1			; altura da nave má  de tamanho 1
-
-L_NAVE_MA_T2	EQU 2			; largura da nave má  de tamanho 2
-H_NAVE_MA_T2	EQU 2			; altura da nave má  de tamanho 2
-
-L_NAVE_MA_T3 	EQU 3           ; largura da nave má de tamanho 3
-H_NAVE_MA_T3  	EQU 3           ; altura da nave má de tamanho 3
-
-L_NAVE_MA_T4 	EQU 4           ; largura da nave má de tamanho 4
-H_NAVE_MA_T4 	EQU 4           ; altura da nave má de tamanho 4
-
-L_NAVE_MA_T5 	EQU 5           ; largura da nave má de tamanho 5
-H_NAVE_MA_T5  	EQU 5           ; altura da nave má de tamanho 5
-
-L_PEW_PEW		EQU 1			; largura do míssil
-H_PEW_PEW		EQU 1			; altura do míssil
-
-L_EXPLOSAO		EQU 5			; largura da explosão
-H_EXPLOSAO		EQU 5			; altura da explosão
+L_PEW_PEW		EQU 1			; altura e largura do míssil
+H_PEW_PEW		EQU 1			; altura e largura do míssil
 
 MIN_COLUNA		EQU 0			; número da coluna mais à esquerda do MediaCenter
 MAX_COLUNA		EQU 63			; número da coluna mais à direita do MediaCenter
@@ -171,22 +152,22 @@ DEF_NAVE:			; tabela que define a nave (posição, dimensões e cores)
     WORD        0, AMARELO, 0, AMARELO, 0
 
 DEF_METEORO_T1:	; tabela que define ocde tamanho 1 pequeno
-	WORD		L_METEORO_T1, H_METEORO_T1	; largura e altura do de tamanho 1 pequeno
+	WORD		L_TIPO_1, H_TIPO_1	; largura e altura do de tamanho 1 pequeno
 	WORD		CINZA_CLARO
 
 DEF_METEORO_T2:	; tabela que define o meteoro cinzento médio
-	WORD		L_METEORO_T2, H_METEORO_T2		; largura e altura do meteoro de tamanho 2
+	WORD		L_TIPO_2, H_TIPO_2		; largura e altura do meteoro de tamanho 2
 	WORD		CINZA_CLARO, CINZA_CLARO
 	WORD		CINZA_CLARO, CINZA_CLARO
 
 DEF_METEORO_T3:		; tabela que define o meteoro de tamanho 3
-    WORD        L_METEORO_T3, H_METEORO_T3			; largura e altura do meteoro de tamanho 3
+    WORD        L_TIPO_3, H_TIPO_3			; largura e altura do meteoro de tamanho 3
     WORD        0, CINZA_ESCURO, 0
     WORD        CINZA_CLARO, CINZA_CLARO, CINZA_ESCURO 
     WORD        0, CINZA_ESCURO, 0
 
 DEF_METEORO_T4:		; tabela que define o meteoro de tamanho 4
-    WORD        L_METEORO_T4, H_METEORO_T4			; largura e altura do meteoro de tamanho 4
+    WORD        L_TIPO_4, H_TIPO_4			; largura e altura do meteoro de tamanho 4
     WORD        0, CINZA_ESCURO, CINZA_ESCURO, 0
     WORD        CINZA_CLARO, CINZA_CLARO, CINZA_ESCURO, CINZA_ESCURO
     WORD        CINZA_CLARO, CINZA_CLARO, CINZA_CLARO, CINZA_ESCURO
@@ -200,7 +181,7 @@ DEF_POS_METEORO:
 	WORD 50, 1
 
 DEF_METEORO_T5:		; tabela que define o meteoro de tamanho 5
-    WORD        L_METEORO_T5, H_METEORO_T5 			; largura e altura do meteoro de tamanho 5
+    WORD        L_TIPO_5, H_TIPO_5 			; largura e altura do meteoro de tamanho 5
     WORD        0, CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, 0
     WORD        CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, CINZA_ESCURO
     WORD        CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO
@@ -208,36 +189,29 @@ DEF_METEORO_T5:		; tabela que define o meteoro de tamanho 5
     WORD        0, CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, 0
 
 DEF_NAVE_MA_T1:	; tabela que define a nave má cinzenta de tamanho 1
-	WORD		L_NAVE_MA_T1, H_NAVE_MA_T1	; largura e altura da nave má cinzenta pequena
+	WORD		L_TIPO_1, H_TIPO_1	; largura e altura da nave má cinzenta pequena
 	WORD		VERMELHO
 
 DEF_NAVE_MA_T2:	; tabela que define a nave má cinzenta média
-	WORD		L_NAVE_MA_T2, H_NAVE_MA_T2	; largura e altura da nave má cinzenta média
+	WORD		L_TIPO_2, H_TIPO_2	; largura e altura da nave má cinzenta média
 	WORD		VERMELHO, VERMELHO
 	WORD		VERMELHO, VERMELHO
 
 DEF_NAVE_MA_T3:		; tabela que define a nave má pequena
-	WORD		L_NAVE_MA_T3, H_NAVE_MA_T3			; largura e altura da nave má pequena
+	WORD		L_TIPO_3, H_TIPO_3			; largura e altura da nave má pequena
 	WORD		VERMELHO, 0, VERMELHO
 	WORD		0, VERMELHO, 0
 	WORD		VERMELHO, 0, VERMELHO
 
 DEF_NAVE_MA_T4:		; tabela que define a nave má média
-	WORD		L_NAVE_MA_T4, H_NAVE_MA_T4			; largura e altura da nave má média
+	WORD		L_TIPO_4, H_TIPO_4			; largura e altura da nave má média
 	WORD		VERMELHO, 0, 0, VERMELHO
 	WORD		VERMELHO, 0, 0, VERMELHO
 	WORD		0, VERMELHO, VERMELHO, 0
 	WORD		VERMELHO, 0, 0, VERMELHO
 
-DEF_POS_NAVE_MA:
-	WORD 4
-	WORD -1, -1
-	WORD -1, -1
-	WORD -1, -1
-	WORD -1, -1
-
 DEF_NAVE_MA_T5:		; tabela que define a nave má grande
-	WORD		L_NAVE_MA_T5, H_NAVE_MA_T5			; largura e altura da nave má grande
+	WORD		L_TIPO_5, H_TIPO_5			; largura e altura da nave má grande
 	WORD		VERMELHO, 0, 0, 0, VERMELHO
 	WORD		VERMELHO, 0, VERMELHO, 0, VERMELHO
 	WORD		0, VERMELHO, VERMELHO, VERMELHO, 0
@@ -251,6 +225,9 @@ DEF_PEW_PEW:
 	WORD		L_PEW_PEW, H_PEW_PEW			; largura e altura do míssil
 	WORD		LARANJA
 
+DEF_POS_EXPLOSAO:
+	WORD -1, -1
+
 DEF_EXPLOSAO:
 	WORD		L_EXPLOSAO, H_EXPLOSAO			;largura e altura da explosão
 	WORD		0, AMARELO, 0, AMARELO, 0
@@ -258,6 +235,9 @@ DEF_EXPLOSAO:
 	WORD		0, VERMELHO, 0, VERMELHO, 0
 	WORD		AMARELO, 0, LARANJA, 0, AMARELO
 	WORD		0, AMARELO, 0, AMARELO, 0
+
+EXPLOSAO_COUNTER:
+	WORD 0
 
 evento_int_displays:
 	LOCK 0
@@ -356,6 +336,11 @@ pressionou_0:
 	JMP ve_limites
 
 pressionou_1:
+	; verifica se a tecla já foi pressionada
+	CALL pressiona_teclas
+	CMP R4, 0
+	JNZ espera_tecla
+
 	CALL dispara_missil
 	JMP mostra_boneco
 
@@ -770,14 +755,26 @@ redesenha_ecra:
 	MOV R5, DEF_POS_METEORO
 	CALL	desenha_varios
 
+	MOV R5, [EXPLOSAO_COUNTER]
+	CMP R5, 0
+	JZ redesenha_ecra_fim
+	; decrementa contador da explosão
+	SUB R5, 1
+	MOV R4, EXPLOSAO_COUNTER
+	MOV [R4], R5
+
 	; seleciona o ecrã 2
 	MOV R0, 2
 	MOV R1, SELECIONA_ECRÃ
 	MOV [R1], R0
 
-	MOV R5, DEF_POS_NAVE_MA
-	CALL	desenha_varios
+	MOV R4, DEF_EXPLOSAO
+	MOV R0, DEF_POS_EXPLOSAO
+	MOV R1, [R0]
+	MOV R2, [R0+2]
+	CALL desenha_boneco
 
+	redesenha_ecra_fim:
 	POP R5
 	POP R4
 	POP R2
@@ -1005,8 +1002,20 @@ deteta_colisoes:
 
 
 encontrou_colisao:
-	CALL cria_meteoro
+	; cria explosão
+	MOV R2, DEF_POS_EXPLOSAO
+	MOV R1, [R5-2]
+	MOV [R2], R1
+	MOV R1, [R5]
+	ADD R2, 2
+	MOV [R2], R1
 
+	; põe contador da explosão a 3
+	MOV R2, EXPLOSAO_COUNTER
+	MOV R1, 3
+	MOV [R2], R1
+
+	CALL cria_meteoro
 	MOV R1, -1
 	MOV [R0], R1
 
