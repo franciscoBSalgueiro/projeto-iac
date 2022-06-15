@@ -388,9 +388,9 @@ coluna_seguinte:
 
 
 pause_loop:
-	DI0					; desative interrupções 0
+	DI0					; desativa interrupções 0
 	DI1					; desativa interrupções 1
-	DI2					; desative interrupções 2
+	DI2					; desativa interrupções 2
 	DI					; desativa interrupcões
 	MOV	R1, 2					; cenário de fundo número 2
 	MOV  [SELECIONA_CENARIO_FUNDO], R1	; seleciona o cenário de fundo
