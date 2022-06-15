@@ -108,6 +108,8 @@ MAX_COLUNA		EQU 63			; número da coluna mais à direita do MediaCenter
 MIN_LINHA		EQU 0			; número da linha mais acima do MediaCenter
 MAX_LINHA		EQU 32			; número da linha mais abaixo do MediaCenter
 
+ALCANCE_MISSIL	EQU 12		; número máximo da linha a que o míssil pode chegar
+
 ; ***********
 ; * CORES
 ; ***********
@@ -276,6 +278,7 @@ inicio:
 	MOV	[APAGA_ECRÃ], R1
 	MOV	[APAGA_AVISO], R1		; apaga o aviso de nenhum cenário selecionado
 
+
 start_menu:
 	MOV	R1, 2
 	MOV  [REPRODUZ_MEDIA], R1	; toca a música de fundo em loop
@@ -288,6 +291,11 @@ start_menu:
 		JNZ start_loop
 		CALL pressiona_teclas
 
+inicio_game_loop:
+	CALL controla_energia
+	CALL move_meteoro
+	CALL avanca_missil
+
 game_loop:
 	EI0					; permite interrupcões 0
 	EI1					; permite interrupcões 1
@@ -296,9 +304,6 @@ game_loop:
 	MOV	R1, 1					; cenário de fundo número 1
 	MOV  [REPRODUZ_MEDIA], R1	; seleciona o cenário de fundo
 	MOV R7, [ENERGIA]
-	CALL controla_energia
-	CALL move_meteoro
-	CALL avanca_missil
 
 mostra_boneco:		; desenha os bonecos
 	CALL redesenha_ecra
@@ -377,7 +382,6 @@ ve_limites:
 move_boneco:
 	MOV R11, ATRASO
 	CALL atraso
-    CALL apaga_pixeis
 
 coluna_seguinte:
 	MOV R4, DEF_POS_NAVE
@@ -430,10 +434,10 @@ desenha_boneco:
 	PUSH	R6
 	PUSH	R7
     PUSH    R8
+	MOV R7, 1
 	CALL testa_limites_linha
 	CMP R7, 0
 	JZ sai_desenha_pixels
-	CALL redefine_boneco
 	; TODO se x ou y fora dos limites, saltar para sai_desenha_pixels
 	MOV	R5, [R4]			; obtém a largura do boneco
     MOV R8, [R4]
@@ -598,13 +602,13 @@ testa_limites_linha:
 testa_limite_inferior:
 	MOV R5, MAX_LINHA
 	CMP R2, R5
-	JLT testa_limite_superior ; se não se encontrara na linha inferior testar o superior
+	JLT testa_limite_superior ; se não se abaixo da linha inferior testar o superior
 	MOV R7, 0				  ; se chegou ao limite, força R7 a 0 e sai
 	JMP	sai_testa_limites_linha
 testa_limite_superior:
 	MOV R5, MIN_LINHA
 	CMP R2, R5				
-	JGT sai_testa_limites_linha ; se não chegou ao limite superior mantem o valor de R7 e sai
+	JGE sai_testa_limites_linha ; se não chegou ao limite superior mantem o valor de R7 e sai
 	MOV R7, 0					; caso contrário força R7 a zero e sai
 	JMP sai_testa_limites_linha
 sai_testa_limites_linha:
@@ -877,6 +881,7 @@ PROCESS SP_inicial_missil	; indicação de que a rotina que se segue é um proce
 							; com indicação do valor para inicializar o SP
 avanca_missil:
 	MOV R0, DEF_POS_PEW_PEW
+	MOV R1, ALCANCE_MISSIL
 
 atualiza_missil:
 	CALL redesenha_ecra
@@ -884,6 +889,11 @@ atualiza_missil:
 
 	MOV R5, [R0+2]
 	SUB R5, 1
+	CMP R5, R1
+	JGT atualiza_missil_fim
+	MOV R5, -1
+
+atualiza_missil_fim:
 	MOV [R0+2], R5
 	JMP atualiza_missil
 
@@ -899,23 +909,27 @@ desenha_varios:
 	PUSH R4
 	PUSH R5
 	PUSH R8
+	PUSH R9
 	MOV R8, [R5] ; número de objetos
 	ADD R5, 2
 	SHL R8, 2	 ; número de bytes a avançar
-	MOV R4, R5	 ; R5 - tabela da posição
-	ADD R4, R8	 ; R4 - tabela do desenho
+	MOV R9, R5	 ; R5 - tabela da posição
+	ADD R9, R8	 ; R4 - tabela do desenho
 
-desenha_ciclo: 
+desenha_ciclo:
+	MOV R4, R9
 	SUB R8, 4	
 	CMP R8, 0
 	JLT sai_desenha_ciclo
 	MOV R1, [R5]
 	MOV R2, [R5+2]
+	CALL redefine_boneco
 	CALL desenha_boneco
 	ADD R5, 4
 	JMP desenha_ciclo
 
 sai_desenha_ciclo:
+	POP R9
 	POP R8
 	POP R5
 	POP R4
@@ -981,4 +995,3 @@ cria_meteoro:
 	POP R1
 	POP R0
 	RET
-	
