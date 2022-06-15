@@ -959,11 +959,10 @@ cria_meteoro:
 	PUSH R3
 	PUSH R5
 	MOV R0, 0
-	MOV R1, 10
 	CALL aleatorio	; valor aleatório para a coluna
 	MOV [R5], R0
 	SHL R3, 3
-	ADD R3, R1 ; mínima posição à esquerda
+	ADD R3, 2 ; mínima posição à esquerda
 	SUB R5, 2
 	MOV [R5], R3
 	POP R5
