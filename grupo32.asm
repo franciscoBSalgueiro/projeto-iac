@@ -55,35 +55,10 @@ ATRASO			EQU	4000H		; atraso para limitar a velocidade de movimento do boneco
 Y_NAVE        	EQU 28			; linha inicial da nave 
 X_NAVE			EQU 30			; coluna inicial da nave 
 
-Y_METEORO_T1	EQU 1			; linha meteoro cinzento pequeno
-X_METEORO_T1	EQU 20			; coluna meteoro cinzento pequeno
-
-Y_METEORO_T2	EQU 3			; linha meteoro cinzento médio
-X_METEORO_T2	EQU 20			; coluna meteoro cinzento médio
-
-Y_METEORO_T3	EQU 6			; linha meteoro pequeno
-X_METEORO_T3	EQU 20			; coluna meteoro pequeno
-
-Y_METEORO_T4	EQU 10			; linha meteoro médio
-X_METEORO_T4	EQU 20			; coluna meteoro médio
-
-Y_METEORO_T5	EQU 0			; linha meteoro grande
-X_METEORO_T5	EQU 20			; coluna meteoro grande
-
-Y_NAVE_MA_T1	EQU 1			; linha nave má cinzenta pequena
-X_NAVE_MA_T1	EQU 50			; coluna nave má cinzenta pequena
-
-Y_NAVE_MA_T2	EQU 3			; linha nave má cinzenta média
-X_NAVE_MA_T2	EQU 50			; coluna nave má cinzenta média
-
-Y_NAVE_MA_T3	EQU 6			; linha nave má pequena
-X_NAVE_MA_T3	EQU 50			; coluna nave má pequena
-
-Y_NAVE_MA_T4	EQU 10			; linha nave má média
-X_NAVE_MA_T4	EQU 50			; coluna nave má média
-
-Y_NAVE_MA_T5	EQU 17			; linha nave má grande
-X_NAVE_MA_T5	EQU 50			; coluna nave má grande
+Y_TIPO_1		EQU 0
+Y_TIPO_2		EQU 3
+Y_TIPO_3		EQU 6
+Y_TIPO_4		EQU 9
 
 ; *************
 ; * DIMENSÕES
@@ -252,6 +227,13 @@ DEF_NAVE_MA_T4:		; tabela que define a nave má média
 	WORD		0, VERMELHO, VERMELHO, 0
 	WORD		VERMELHO, 0, 0, VERMELHO
 
+DEF_POS_NAVE_MA:
+	WORD 4
+	WORD 10, 10
+	WORD -1, -1
+	WORD -1, -1
+	WORD -1, -1
+
 DEF_NAVE_MA_T5:		; tabela que define a nave má grande
 	WORD		L_NAVE_MA_T5, H_NAVE_MA_T5			; largura e altura da nave má grande
 	WORD		VERMELHO, 0, 0, 0, VERMELHO
@@ -261,7 +243,7 @@ DEF_NAVE_MA_T5:		; tabela que define a nave má grande
 	WORD		VERMELHO, 0, 0, 0, VERMELHO
 
 DEF_POS_PEW_PEW:
-	WORD 50, 50
+	WORD -1, -1
 
 DEF_PEW_PEW:
 	WORD		L_PEW_PEW, H_PEW_PEW			; largura e altura do míssil
@@ -451,6 +433,7 @@ desenha_boneco:
 	CALL testa_limites_linha
 	CMP R7, 0
 	JZ sai_desenha_pixels
+	CALL redefine_boneco
 	; TODO se x ou y fora dos limites, saltar para sai_desenha_pixels
 	MOV	R5, [R4]			; obtém a largura do boneco
     MOV R8, [R4]
@@ -480,6 +463,50 @@ sai_desenha_pixels:
 	POP	R2
 	POP R1
 	RET
+
+; TODO docstring decente
+; Argumentos:   R2 - posição y do boneco
+;				R4 - tabela que define o boneco
+redefine_boneco:
+	PUSH R5
+
+	MOV R5, Y_TIPO_1
+	CMP R2, R5
+	JLE boneco_tipo_1
+
+	MOV R5, Y_TIPO_2
+	CMP R2, R5
+	JLE boneco_tipo_2
+
+	MOV R5, Y_TIPO_3
+	CMP R2, R5
+	JLE boneco_tipo_3
+
+	MOV R5, Y_TIPO_4
+	CMP R2, R5
+	JLE boneco_tipo_4
+
+	JMP redefine_boneco_fim
+
+	boneco_tipo_1:
+		MOV R4, DEF_METEORO_T1
+		JMP redefine_boneco_fim
+
+	boneco_tipo_2:
+		MOV R4, DEF_METEORO_T2
+		JMP redefine_boneco_fim
+
+	boneco_tipo_3:
+		MOV R4, DEF_METEORO_T3
+		JMP redefine_boneco_fim
+
+	boneco_tipo_4:
+		MOV R4, DEF_METEORO_T4
+
+	redefine_boneco_fim:
+	POP R5
+	RET
+
 
 ; **********************************************************************
 ; ESCREVE_PIXEL - Escreve um pixel na linha e coluna indicadas.
@@ -759,6 +786,14 @@ redesenha_ecra:
 	MOV [R1], R0
 
 	MOV R5, DEF_POS_METEORO
+	CALL	desenha_varios
+
+	; seleciona o ecrã 2
+	MOV R0, 2
+	MOV R1, SELECIONA_ECRÃ
+	MOV [R1], R0
+
+	MOV R5, DEF_POS_NAVE_MA
 	CALL	desenha_varios
 
 	POP R5
