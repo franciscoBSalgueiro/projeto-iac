@@ -52,10 +52,8 @@ ATRASO			EQU	4000H		; atraso para limitar a velocidade de movimento do boneco
 ; * POSIÇÕES INICIAIS
 ; *********************
 
-
-
-Y_NAVE        	EQU 28			; linha da nave 
-X_NAVE			EQU 30			; coluna da nave 
+Y_NAVE        	EQU 28			; linha inicial da nave 
+X_NAVE			EQU 30			; coluna inicial da nave 
 
 Y_METEORO_T1	EQU 1			; linha meteoro cinzento pequeno
 X_METEORO_T1	EQU 20			; coluna meteoro cinzento pequeno
@@ -86,12 +84,6 @@ X_NAVE_MA_T4	EQU 50			; coluna nave má média
 
 Y_NAVE_MA_T5	EQU 17			; linha nave má grande
 X_NAVE_MA_T5	EQU 50			; coluna nave má grande
-
-Y_PEW_PEW	    EQU 25			; linha míssil
-X_PEW_PEW	    EQU 30			; coluna míssil
-
-Y_EXPLOSAO		EQU 10			; linha explosão
-X_EXPLOSAO		EQU 30			; coluna explosão
 
 ; *************
 ; * DIMENSÕES
@@ -170,32 +162,14 @@ PLACE		1000H
 	STACK 100H			; espaço reservado para a pilha (200 bytes)
 SP_inicial_prog_princ:				; inicialização do SP no endereço 1200H
 
-	STACK 100H			; espaço reservado para a pilha do processo "displays"
+	STACK 100H			; espaço reservado para a pilha do processo "avanca_missil"
+SP_inicial_missil:
+
+	STACK 100H			; espaço reservado para a pilha do processo "controla_energia"
 SP_inicial_displays:
 
-	STACK 100H			; espaço reservado para a pilha do processo "meteoro 0"
-SP_inicial_meteoro_0:
-
-	STACK 100H			; espaço reservado para a pilha do processo "meteoro 1"
-SP_inicial_meteoro_1:
-
-	STACK 100H			; espaço reservado para a pilha do processo "meteoro 2"
-SP_inicial_meteoro_2:
-
-	STACK 100H			; espaço reservado para a pilha do processo "missel 0"
-SP_inicial_missil_0:
-
-	STACK 100H			; espaço reservado para a pilha do processo "missel 1"
-SP_inicial_missil_1:
-
-	STACK 100H			; espaço reservado para a pilha do processo "missel 2"
-SP_inicial_missil_2:
-
-; tabela com os SP iniciais de cada processo dos misseis
-misseis_SP_tab:
-	WORD	SP_inicial_missil_0
-	WORD	SP_inicial_missil_1
-	WORD	SP_inicial_missil_2
+	STACK 100H			; espaço reservado para a pilha do processo "move_meteoro"
+SP_inicial_meteoro:
 
 ; Tabela das rotinas de exceções
 tab_exc:
@@ -242,9 +216,11 @@ DEF_METEORO_T4:		; tabela que define o meteoro de tamanho 4
     WORD        0, CINZA_ESCURO, CINZA_ESCURO, 0
 
 DEF_POS_METEORO:
-	WORD 2
-	WORD 10, 20
+	WORD 4
+	WORD 10, 25
 	WORD 20, 10
+	WORD 15, 15
+	WORD 50, 5
 
 DEF_METEORO_T5:		; tabela que define o meteoro de tamanho 5
     WORD        L_METEORO_T5, H_METEORO_T5 			; largura e altura do meteoro de tamanho 5
@@ -285,10 +261,7 @@ DEF_NAVE_MA_T5:		; tabela que define a nave má grande
 	WORD		VERMELHO, 0, 0, 0, VERMELHO
 
 DEF_POS_PEW_PEW:
-	WORD 3 ; número de pew pews
-	WORD -1, -1
-	WORD -1, -1
-	WORD -1, -1
+	WORD 50, 50
 
 DEF_PEW_PEW:
 	WORD		L_PEW_PEW, H_PEW_PEW			; largura e altura do míssil
@@ -303,9 +276,9 @@ DEF_EXPLOSAO:
 	WORD		0, AMARELO, 0, AMARELO, 0
 
 evento_int_displays:
-	LOCK 0			
+	LOCK 0
 
-evento_int_misseis:
+evento_int_missil:
 	LOCK 0
 
 evento_int_meteoros:
@@ -343,7 +316,7 @@ game_loop:
 	MOV R7, [ENERGIA]
 	CALL controla_energia
 	CALL move_meteoro
-	CALL avanca_misseis
+	CALL avanca_missil
 
 mostra_boneco:		; desenha os bonecos
 	CALL redesenha_ecra
@@ -739,10 +712,10 @@ rot_int_0:
 
 ; **********************************************************************
 ; ROT_INT_1 - 	Rotina de atendimento da interrupcão 1
-;			Assinala o evento da variável evento_int_misseis
+;			Assinala o evento da variável evento_int_missil
 ; **********************************************************************
 rot_int_1:
-	MOV	[evento_int_misseis], R0	; desbloqueia processo avanca_misseis
+	MOV	[evento_int_missil], R0	; desbloqueia processo avanca_missil
 	RFE
 
 ; **********************************************************************
@@ -774,9 +747,11 @@ redesenha_ecra:
 	MOV R2, [DEF_POS_NAVE+2]
 	CALL	desenha_boneco
 
-	; desenha a nave
-	MOV R5, DEF_POS_PEW_PEW
-	CALL	desenha_varios
+	; desenha o míssil
+	MOV R4, DEF_PEW_PEW
+	MOV R1, [DEF_POS_PEW_PEW]
+	MOV R2, [DEF_POS_PEW_PEW+2]
+	CALL	desenha_boneco
 
 	; seleciona o ecrã 1
 	MOV R0, 1
@@ -796,7 +771,7 @@ redesenha_ecra:
 
 ; **********************************************************************
 ; Processo
-; controla_energia - Processo que atualiza o valor mostrado nos displays
+; CONTROLA_ENERGIA - Processo que atualiza o valor mostrado nos displays
 ;
 ; **********************************************************************
 PROCESS SP_inicial_displays	; indicação de que a rotina que se segue é um processo,
@@ -817,7 +792,13 @@ atualiza_display:
 	JMP atualiza_display
 
 ; TODO docstring
-PROCESS SP_inicial_meteoro_0
+; **********************************************************************
+; processo
+; MOVE_METEORO
+;
+; **********************************************************************
+
+PROCESS SP_inicial_meteoro
 move_meteoro:
 	MOV R0, 0
 	MOV R4, DEF_POS_METEORO
@@ -839,32 +820,45 @@ move_meteoro_ciclo:
 		SUB R8, 2
 		CMP R8, 0
 		JLT move_meteoro_ciclo
-		MOV R10, [R5]
+		MOV R10, [R5]	; valor da posição y do meteoro
 		ADD R10, 1
+		MOV R2, MAX_LINHA
 		MOV [R5], R10
+		CMP R10, R2
+		JNZ move_meteoro_ciclo_ciclo_continua
+		CALL cria_meteoro
+		move_meteoro_ciclo_ciclo_continua:
 		ADD R5, 4
 		JMP move_meteoro_ciclo_ciclo
 
 ; TODO docstring
-PROCESS SP_inicial_missil_0	; indicação de que a rotina que se segue é um processo,
-							; com indicação do valor para inicializar o SP
-avanca_misseis:
-	MOV R0, DEF_PEW_PEW
-	MOV R1, DEF_NAVE
-	MOV R2, DEF_METEORO_T5
-	MOV R3, DEF_NAVE_MA_T5
+; **********************************************************************
+; processo
+; AVANCA_MISSIL - 
+;
+; **********************************************************************
 
-atualiza_misseis:
+PROCESS SP_inicial_missil	; indicação de que a rotina que se segue é um processo,
+							; com indicação do valor para inicializar o SP
+avanca_missil:
+	MOV R0, DEF_POS_PEW_PEW
+
+atualiza_missil:
 	CALL redesenha_ecra
-	MOV R10, [evento_int_misseis]
+	MOV R10, [evento_int_missil]
 
 	MOV R5, [R0+2]
 	SUB R5, 1
 	MOV [R0+2], R5
-	JMP atualiza_misseis
+	JMP atualiza_missil
 
 ; TODO docstrign decente
-; Argumento - R5 tabela de definições
+; **********************************************************************
+; DESENHA_VARIOS - 
+;
+; Argumento - R5 tabela das posições dos bonecos a desenhar
+; **********************************************************************
+
 desenha_varios:
 	PUSH R1
 	PUSH R4
@@ -877,7 +871,7 @@ desenha_varios:
 	ADD R4, R8	 ; R4 - tabela do desenho
 
 desenha_ciclo: 
-	SUB R8, 4
+	SUB R8, 4	
 	CMP R8, 0
 	JLT sai_desenha_ciclo
 	MOV R1, [R5]
@@ -895,6 +889,10 @@ sai_desenha_ciclo:
 
 
 ; TODO docstring
+; **********************************************************************
+; DISPARA_MISSIL - dispara o míssil da nave
+; **********************************************************************
+
 dispara_missil:
 	PUSH R1
 	PUSH R2
@@ -903,9 +901,11 @@ dispara_missil:
 	MOV R1, DEF_POS_PEW_PEW
 	MOV R2, DEF_POS_NAVE
 	MOV R3, [R2]
-	MOV [R1+2], R3
-	MOV R3, [R2+2]
-	MOV [R1+4], R3
+	ADD R3, 2				; Disparar centrado
+	MOV [R1], R3			; Escreve a posição x do míssil
+	MOV R3, [R2+2]			; Lê a posição x da nave para R3
+	SUB R3, 1				; Dispara à frente da nave
+	MOV [R1+2], R3			; Define a posição y do míssil
 
 	POP R3
 	POP R2
@@ -916,15 +916,34 @@ dispara_missil:
 ; ALEATORIO - Retorna um valor aleatório entre 0 e 7 atraváz da leitura do periférico
 ; de entrada PIN
 ;
-; Retorna: R4 - número aleatório entre 0 e 7
+; Retorna: R3 - número aleatório entre 0 e 7
 ; **********************************************************************
 
 aleatorio:
     PUSH R2
-    PUSH R3
-    MOV R2, TEC_COL
-    MOVB R4, [R3]
-    SHR R4, 5
-    POP R3
+    MOV R2, TEC_COL		; obtem  o endreço do periférico de entrada
+    MOVB R3, [R2]		; lê o valor no periférico de entrada
+    SHR R3, 5			; Coloca os bits 7 a 5 nos bits de 2 a 0
     POP R2
     RET
+
+;	Argumento - R5 endereço da posição y do meteoro a criar
+cria_meteoro:
+	PUSH R0
+	PUSH R1
+	PUSH R3
+	PUSH R5
+	MOV R0, 0
+	MOV R1, 10
+	CALL aleatorio	; valor aleatório para a coluna
+	MOV [R5], R0
+	SHL R3, 3
+	ADD R3, R1 ; mínima posição à esquerda
+	SUB R5, 2
+	MOV [R5], R3
+	POP R5
+	POP R3
+	POP R1
+	POP R0
+	RET
+	
