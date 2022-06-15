@@ -194,10 +194,10 @@ DEF_METEORO_T4:		; tabela que define o meteoro de tamanho 4
 
 DEF_POS_METEORO:
 	WORD 4
-	WORD 10, 25
-	WORD 20, 10
-	WORD 15, 15
-	WORD 50, 5
+	WORD 10, 22
+	WORD 18, 15
+	WORD 34, 8
+	WORD 50, 1
 
 DEF_METEORO_T5:		; tabela que define o meteoro de tamanho 5
     WORD        L_METEORO_T5, H_METEORO_T5 			; largura e altura do meteoro de tamanho 5
@@ -861,8 +861,9 @@ move_meteoro_ciclo:
 		JLT move_meteoro_ciclo
 		MOV R10, [R5]	; valor da posição y do meteoro
 		ADD R10, 1
-		MOV R2, MAX_LINHA
 		MOV [R5], R10
+		CALL deteta_colisoes
+		MOV R2, MAX_LINHA
 		CMP R10, R2
 		JNZ move_meteoro_ciclo_ciclo_continua
 		CALL cria_meteoro
@@ -962,7 +963,7 @@ dispara_missil:
 	RET
 
 ; **********************************************************************
-; ALEATORIO - Retorna um valor aleatório entre 0 e 7 atraváz da leitura do periférico
+; ALEATORIO - Retorna um valor aleatório entre 0 e 7 através da leitura do periférico
 ; de entrada PIN
 ;
 ; Retorna: R3 - número aleatório entre 0 e 7
@@ -970,7 +971,7 @@ dispara_missil:
 
 aleatorio:
     PUSH R2
-    MOV R2, TEC_COL		; obtem  o endreço do periférico de entrada
+    MOV R2, TEC_COL		; obtem  o endereço do periférico de entrada
     MOVB R3, [R2]		; lê o valor no periférico de entrada
     SHR R3, 5			; Coloca os bits 7 a 5 nos bits de 2 a 0
     POP R2
@@ -992,6 +993,47 @@ cria_meteoro:
 	MOV [R5], R3
 	POP R5
 	POP R3
+	POP R1
+	POP R0
+	RET
+
+
+; Argumentos: R5 - endereço da posição y do meteoro
+deteta_colisoes:
+	PUSH R0
+	PUSH R1
+	PUSH R2
+	MOV R0, DEF_POS_PEW_PEW
+	MOV R2, [R0]				; posição x do míssil
+
+	MOV R1, [R5-2]				; posição x da esquerda do meteoro
+	CMP R2, R1					; compara posição x do míssil com a do meteoro
+	JLT deteta_colisoes_fim		; à esquerda
+
+	ADD R1, 5					; posição x da direita do meteoro	
+	CMP R2, R1					; compara posição x do míssil com a do meteoro
+	JGT deteta_colisoes_fim		; à direita
+
+	ADD R0, 2
+	MOV R2, [R0]				; posição y do míssil
+
+	MOV R1, [R5]				; posição y de cima do meteoro
+	CMP R2, R1					; compara posição y do míssil com a do meteoro
+	JLT deteta_colisoes_fim		; em cima
+
+	ADD R1, 5					; posição y de baixo do meteoro
+	CMP R2, R1					; compara posição y do míssil com a do meteoro
+	JGT deteta_colisoes_fim		; em baixo
+
+
+encontrou_colisao:
+	CALL cria_meteoro
+
+	MOV R1, -1
+	MOV [R0], R1
+
+deteta_colisoes_fim:
+	POP R2
 	POP R1
 	POP R0
 	RET
