@@ -300,6 +300,18 @@ game_loop:
 	CALL move_meteoro
 	CALL avanca_missil
 
+game_loop2:		; loop a ser melhorado a única coisa que tem diferente com o game_loop é que não recomeça a música de fundo
+	EI0					; permite interrupcões 0
+	EI1					; permite interrupcões 1
+	EI2					; permite interrupcões 2
+	EI					; permite interrupcões geral
+	MOV	R1, 1					; cenário de fundo número 1
+	MOV  [SELECIONA_VIDEO_FUNDO], R1	; seleciona o cenário de fundo
+	MOV R7, [ENERGIA]
+	CALL controla_energia
+	CALL move_meteoro
+	CALL avanca_missil
+
 mostra_boneco:		; desenha os bonecos
 	CALL redesenha_ecra
 
@@ -407,7 +419,7 @@ pause_loop:
 		CMP R9, 2
 		JNZ pause_loop_2
 		CALL pressiona_teclas
-		JMP game_loop
+		JMP game_loop2
 
 
 fim:
