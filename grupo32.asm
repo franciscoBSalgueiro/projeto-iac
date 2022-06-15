@@ -55,10 +55,10 @@ ATRASO			EQU	4000H		; atraso para limitar a velocidade de movimento do boneco
 Y_NAVE        	EQU 28			; linha inicial da nave 
 X_NAVE			EQU 30			; coluna inicial da nave 
 
-Y_TIPO_1		EQU 0
-Y_TIPO_2		EQU 3
-Y_TIPO_3		EQU 6
-Y_TIPO_4		EQU 9
+Y_TIPO_1		EQU 3
+Y_TIPO_2		EQU 6
+Y_TIPO_3		EQU 9
+Y_TIPO_4		EQU 12
 
 ; *************
 ; * DIMENSÕES
@@ -229,7 +229,7 @@ DEF_NAVE_MA_T4:		; tabela que define a nave má média
 
 DEF_POS_NAVE_MA:
 	WORD 4
-	WORD 10, 10
+	WORD -1, -1
 	WORD -1, -1
 	WORD -1, -1
 	WORD -1, -1
