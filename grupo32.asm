@@ -44,7 +44,7 @@ APAGA_AVISO     		EQU 6040H		; endereço do comando para apagar o aviso de nenhu
 APAGA_ECRÃ	 			EQU 6002H		; endereço do comando para apagar todos os pixels já desenhados
 SELECIONA_ECRÃ			EQU 6004H		; endereço do comando que seleciona o ecrã especificado
 SELECIONA_CENARIO_FUNDO	EQU 6042H		; endereço do comando para selecionar uma imagem de fundo
-SELECIONA_VIDEO_FUNDO	EQU 605CH		; endereço do comando para selecionar um video de fundo
+REPRODUZ_MEDIA	EQU 605CH		; endereço do comando para selecionar um video de fundo
 
 ATRASO			EQU	4000H		; atraso para limitar a velocidade de movimento do boneco
 
@@ -277,6 +277,8 @@ inicio:
 	MOV	[APAGA_AVISO], R1		; apaga o aviso de nenhum cenário selecionado
 
 start_menu:
+	MOV	R1, 2
+	MOV  [REPRODUZ_MEDIA], R1	; toca a música de fundo em loop
 	MOV	R1, 1					; cenário de fundo número 1
 	MOV  [SELECIONA_CENARIO_FUNDO], R1	; seleciona o cenário de fundo
 	MOV R6, 8
@@ -292,21 +294,7 @@ game_loop:
 	EI2					; permite interrupcões 2
 	EI					; permite interrupcões geral
 	MOV	R1, 1					; cenário de fundo número 1
-	MOV  [SELECIONA_VIDEO_FUNDO], R1	; seleciona o cenário de fundo
-	MOV	R1, 2							; cenário de fundo número 2
-	MOV  [SELECIONA_VIDEO_FUNDO], R1
-	MOV R7, [ENERGIA]
-	CALL controla_energia
-	CALL move_meteoro
-	CALL avanca_missil
-
-game_loop2:		; loop a ser melhorado a única coisa que tem diferente com o game_loop é que não recomeça a música de fundo
-	EI0					; permite interrupcões 0
-	EI1					; permite interrupcões 1
-	EI2					; permite interrupcões 2
-	EI					; permite interrupcões geral
-	MOV	R1, 1					; cenário de fundo número 1
-	MOV  [SELECIONA_VIDEO_FUNDO], R1	; seleciona o cenário de fundo
+	MOV  [REPRODUZ_MEDIA], R1	; seleciona o cenário de fundo
 	MOV R7, [ENERGIA]
 	CALL controla_energia
 	CALL move_meteoro
@@ -419,7 +407,7 @@ pause_loop:
 		CMP R9, 2
 		JNZ pause_loop_2
 		CALL pressiona_teclas
-		JMP game_loop2
+		JMP game_loop
 
 
 fim:
