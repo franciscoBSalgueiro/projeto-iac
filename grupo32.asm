@@ -78,6 +78,11 @@ H_TIPO_4		EQU 4			; altura do meteoro de tipo 4
 L_TIPO_5		EQU 5			; largura do meteoro de tipo 5
 H_TIPO_5		EQU 5			; altura do meteoro de tipo 5
 
+OFFSET_TIPO_1	EQU 76
+OFFSET_TIPO_2	EQU 70
+OFFSET_TIPO_3	EQU 58
+OFFSET_TIPO_4	EQU 36
+
 L_EXPLOSAO		EQU 5			; altura e largura da explosão
 H_EXPLOSAO		EQU 5			; altura e largura da explosão
 
@@ -173,13 +178,6 @@ DEF_METEORO_T4:		; tabela que define o meteoro de tamanho 4
     WORD        CINZA_CLARO, CINZA_CLARO, CINZA_CLARO, CINZA_ESCURO
     WORD        0, CINZA_ESCURO, CINZA_ESCURO, 0
 
-DEF_POS_METEORO:
-	WORD 4
-	WORD 10, 22
-	WORD 18, 15
-	WORD 34, 8
-	WORD 50, 1
-
 DEF_METEORO_T5:		; tabela que define o meteoro de tamanho 5
     WORD        L_TIPO_5, H_TIPO_5 			; largura e altura do meteoro de tamanho 5
     WORD        0, CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, 0
@@ -217,6 +215,16 @@ DEF_NAVE_MA_T5:		; tabela que define a nave má grande
 	WORD		0, VERMELHO, VERMELHO, VERMELHO, 0
 	WORD		VERMELHO, 0, VERMELHO, 0, VERMELHO
 	WORD		VERMELHO, 0, 0, 0, VERMELHO
+
+DEF_TIPO_METEORO:
+	WORD 0, 0, 0, 1
+
+DEF_POS_METEORO:
+	WORD 4
+	WORD 10, 22
+	WORD 18, 15
+	WORD 34, 8
+	WORD 50, 1
 
 DEF_POS_PEW_PEW:
 	WORD -1, -1
@@ -482,19 +490,23 @@ redefine_boneco:
 	JMP redefine_boneco_fim
 
 	boneco_tipo_1:
-		MOV R4, DEF_METEORO_T1
+		MOV R5, OFFSET_TIPO_1
+		SUB R4, R5
 		JMP redefine_boneco_fim
 
 	boneco_tipo_2:
-		MOV R4, DEF_METEORO_T2
+		MOV R5, OFFSET_TIPO_2
+		SUB R4, R5
 		JMP redefine_boneco_fim
 
 	boneco_tipo_3:
-		MOV R4, DEF_METEORO_T3
+		MOV R5, OFFSET_TIPO_3
+		SUB R4, R5
 		JMP redefine_boneco_fim
 
 	boneco_tipo_4:
-		MOV R4, DEF_METEORO_T4
+		MOV R5, OFFSET_TIPO_4
+		SUB R4, R5
 
 	redefine_boneco_fim:
 	POP R5
@@ -886,14 +898,23 @@ desenha_varios:
 	PUSH R5
 	PUSH R8
 	PUSH R9
+	PUSH R10
+	MOV R10, DEF_TIPO_METEORO
 	MOV R8, [R5] ; número de objetos
 	ADD R5, 2
 	SHL R8, 2	 ; número de bytes a avançar
-	MOV R9, R5	 ; R5 - tabela da posição
-	ADD R9, R8	 ; R4 - tabela do desenho
 
 desenha_ciclo:
-	MOV R4, R9
+	MOV R9, [R10]
+	CMP R9, 0
+	JZ tipo_mau
+	tipo_bom:
+		MOV R4, DEF_METEORO_T5
+		JMP desenha_um
+	tipo_mau:
+		MOV R4, DEF_NAVE_MA_T5
+
+desenha_um:
 	SUB R8, 4	
 	CMP R8, 0
 	JLT sai_desenha_ciclo
@@ -902,9 +923,11 @@ desenha_ciclo:
 	CALL redefine_boneco
 	CALL desenha_boneco
 	ADD R5, 4
+	ADD R10, 2
 	JMP desenha_ciclo
 
 sai_desenha_ciclo:
+	POP R10
 	POP R9
 	POP R8
 	POP R5
