@@ -266,10 +266,14 @@ inicio:
 	MOV	[APAGA_ECRÃ], R1
 	MOV	[APAGA_AVISO], R1		; apaga o aviso de nenhum cenário selecionado
 
+	CALL controla_energia
+	CALL move_meteoro
+	CALL avanca_missil
 
-start_menu:
 	MOV	R1, 2
 	MOV  [REPRODUZ_MEDIA], R1	; toca a música de fundo em loop
+
+start_menu:
 	MOV	R1, 3					; vídeo de fundo da intro
 	MOV  [REPRODUZ_MEDIA], R1	; seleciona o cenário de fundo
 	MOV R6, 8
@@ -280,9 +284,13 @@ start_menu:
 		CALL pressiona_teclas
 
 inicio_game_loop:
-	CALL controla_energia
-	CALL move_meteoro
-	CALL avanca_missil
+	MOV R5, 12
+	define_pos_iniciais:
+	CALL cria_meteoro
+	SUB R5, 4
+	CMP R5, 0
+	JLT game_loop
+	JMP define_pos_iniciais
 
 game_loop:
 	MOV	R1, 3					; vídeo de fundo da intro
@@ -422,10 +430,6 @@ pause_loop:
 		CALL pressiona_teclas
 		JMP game_loop
 
-
-fim:
-	JMP fim
-
 game_over:
 	DI0					; desativa interrupções 0
 	DI1					; desativa interrupções 1
@@ -436,15 +440,15 @@ game_over:
 	MOV	R1, 1							; cenário de fundo número 1
 	MOV  [TERMINA_MEDIA], R1
 	MOV R6, 8
-	pause_loop_1:
+	game_over_loop_1:
 		CALL	teclado			; leitura às teclas
 		CMP	R9, 0
-		JNZ pause_loop_1
+		JNZ game_over_loop_1
 		CALL liberta_teclas
-	pause_loop_2:
+	game_over_loop_2:
 		CALL teclado
 		CMP R9, 1
-		JNZ pause_loop_2
+		JNZ game_over_loop_2
 		CALL pressiona_teclas
 		JMP start_menu
 
@@ -783,8 +787,7 @@ redesenha_ecra:
 
 	; seleciona o ecrã 0
 	MOV R0, 0 
-	MOV R1, SELECIONA_ECRÃ
-	MOV [R1], R0
+	CALL muda_ecra
 
 	; desenha a nave
 	MOV R4, DEF_NAVE
@@ -798,11 +801,6 @@ redesenha_ecra:
 	MOV R2, [DEF_POS_PEW_PEW+2]
 	CALL	desenha_boneco
 
-	; seleciona o ecrã 1
-	MOV R0, 1
-	MOV R1, SELECIONA_ECRÃ
-	MOV [R1], R0
-
 	MOV R5, DEF_POS_METEORO
 	CALL	desenha_varios
 
@@ -814,10 +812,9 @@ redesenha_ecra:
 	MOV R4, EXPLOSAO_COUNTER
 	MOV [R4], R5
 
-	; seleciona o ecrã 2
-	MOV R0, 2
-	MOV R1, SELECIONA_ECRÃ
-	MOV [R1], R0
+	; seleciona o ecrã 1
+	MOV R0, 1
+	CALL muda_ecra
 
 	MOV R4, DEF_EXPLOSAO
 	MOV R0, DEF_POS_EXPLOSAO
@@ -879,21 +876,23 @@ move_meteoro_ciclo:
 	MOV [R6], R0 ; reproduz o som
 	MOV [R7], R0 ; pára o som de tocar
 	MOV R8, R9	 ; cópia temporária de nº de meteoros
-	MOV R5, R4	 ; cópia temporária de tabela de posições
+	MOV R3, R4	 ; cópia temporária de tabela de posições
+	MOV R5, 0
 
 	move_meteoro_ciclo_ciclo:
 		SUB R8, 2
 		CMP R8, 0
 		JLT move_meteoro_ciclo
-		MOV R10, [R5]	; valor da posição y do meteoro
+		MOV R10, [R3]	; valor da posição y do meteoro
 		ADD R10, 1
-		MOV [R5], R10
+		MOV [R3], R10
 		CALL deteta_colisoes
 		MOV R2, MAX_LINHA
 		CMP R10, R2
 		JNZ move_meteoro_ciclo_ciclo_continua
 		CALL cria_meteoro
 		move_meteoro_ciclo_ciclo_continua:
+		ADD R3, 4
 		ADD R5, 4
 		JMP move_meteoro_ciclo_ciclo
 
@@ -932,6 +931,7 @@ atualiza_missil_fim:
 ; **********************************************************************
 
 desenha_varios:
+	PUSH R0
 	PUSH R1
 	PUSH R4
 	PUSH R5
@@ -942,8 +942,10 @@ desenha_varios:
 	MOV R8, [R5] ; número de objetos
 	ADD R5, 2
 	SHL R8, 2	 ; número de bytes a avançar
+	MOV R0, 2	 ; ecrã inicial
 
 desenha_ciclo:
+	CALL muda_ecra
 	MOV R9, [R10]
 	CMP R9, 0
 	JZ tipo_mau
@@ -963,6 +965,7 @@ desenha_um:
 	CALL desenha_boneco
 	ADD R5, 4
 	ADD R10, 2
+	ADD R0, 1
 	JMP desenha_ciclo
 
 sai_desenha_ciclo:
@@ -972,6 +975,7 @@ sai_desenha_ciclo:
 	POP R5
 	POP R4
 	POP R1
+	POP R0
 	RET
 
 
@@ -1018,7 +1022,7 @@ aleatorio:
 ; **********************************************************************
 ; CRIA_METEORO
 ;
-; Argumento - R5 endereço da posição y do meteoro a criar
+; Argumento - R5 número do meteoro
 ; **********************************************************************
 
 cria_meteoro:
@@ -1026,13 +1030,17 @@ cria_meteoro:
 	PUSH R1
 	PUSH R3
 	PUSH R5
+	PUSH R6
 	MOV R0, 0
+	MOV R6, DEF_POS_METEORO
+	ADD R6, 2
+	ADD R6, R5
 	CALL aleatorio	; valor aleatório para a coluna
-	MOV [R5], R0
+	MOV [R6+2], R0
 	SHL R3, 3
 	ADD R3, 2 ; mínima posição à esquerda
-	SUB R5, 2
-	MOV [R5], R3
+	MOV [R6], R3
+	POP R6
 	POP R5
 	POP R3
 	POP R1
@@ -1043,17 +1051,22 @@ cria_meteoro:
 ; **********************************************************************
 ; DETETA_COLISÕES 
 ;
-; Argumentos: R5 - endereço da posição y do meteoro
+; Argumentos: R5 - nº do meteoro a testar
 ; **********************************************************************
 
 deteta_colisoes:
 	PUSH R0
 	PUSH R1
 	PUSH R2
+	PUSH R3
+	PUSH R5
+	MOV R3, DEF_POS_METEORO
+	ADD R3, 2
+	ADD R3, R5
 	MOV R0, DEF_POS_PEW_PEW
 	MOV R2, [R0]				; posição x do míssil
 
-	MOV R1, [R5-2]				; posição x da esquerda do meteoro
+	MOV R1, [R3]				; posição x da esquerda do meteoro
 	CMP R2, R1					; compara posição x do míssil com a do meteoro
 	JLT deteta_colisoes_fim		; à esquerda
 
@@ -1064,7 +1077,7 @@ deteta_colisoes:
 	ADD R0, 2
 	MOV R2, [R0]				; posição y do míssil
 
-	MOV R1, [R5]				; posição y de cima do meteoro
+	MOV R1, [R3+2]				; posição y de cima do meteoro
 	CMP R2, R1					; compara posição y do míssil com a do meteoro
 	JLT deteta_colisoes_fim		; em cima
 
@@ -1076,9 +1089,9 @@ deteta_colisoes:
 encontrou_colisao:
 	; cria explosão
 	MOV R2, DEF_POS_EXPLOSAO
-	MOV R1, [R5-2]				; posição x da esquerda do meteoro
+	MOV R1, [R3]				; posição x da esquerda do meteoro
 	MOV [R2], R1				
-	MOV R1, [R5]
+	MOV R1, [R3+2]
 	ADD R2, 2
 	MOV [R2], R1
 
@@ -1091,8 +1104,19 @@ encontrou_colisao:
 	MOV R1, -1
 	MOV [R0], R1
 
+
 deteta_colisoes_fim:
+	POP R5
+	POP R3
 	POP R2
 	POP R1
 	POP R0
+	RET
+
+; argumentos - R0 número do ecrã para que mudar
+muda_ecra:
+	PUSH R1
+	MOV R1, SELECIONA_ECRÃ
+	MOV [R1], R0
+	POP R1
 	RET
