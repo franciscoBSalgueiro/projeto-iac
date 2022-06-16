@@ -137,8 +137,8 @@ SP_inicial_meteoro:
 ; Tabela das rotinas de exceções
 tab_exc:
 	WORD rot_int_0			; rotina de atendimento da interrupcão 0
-	WORD rot_int_1
-	WORD rot_int_2
+	WORD rot_int_1			; rotina de atendimento da interrupcão 1
+	WORD rot_int_2			; rotina de atendimento da interrupcão 2
 
 ENERGIA:	; energia inicial a ser mostrada nos displays
 	WORD 100
@@ -270,8 +270,8 @@ inicio:
 start_menu:
 	MOV	R1, 2
 	MOV  [REPRODUZ_MEDIA], R1	; toca a música de fundo em loop
-	MOV	R1, 1					; cenário de fundo número 1
-	MOV  [SELECIONA_CENARIO_FUNDO], R1	; seleciona o cenário de fundo
+	MOV	R1, 3					; vídeo de fundo da intro
+	MOV  [REPRODUZ_MEDIA], R1	; seleciona o cenário de fundo
 	MOV R6, 8
 	start_loop:
 		CALL teclado
@@ -285,6 +285,8 @@ inicio_game_loop:
 	CALL avanca_missil
 
 game_loop:
+	MOV	R1, 3					; vídeo de fundo da intro
+	MOV  [TERMINA_MEDIA], R1	; seleciona o cenário de fundo
 	EI0					; permite interrupcões 0
 	EI1					; permite interrupcões 1
 	EI2					; permite interrupcões 2
@@ -337,6 +339,11 @@ encontrou_tecla:
 	CMP R6, R7
 	JZ pressionou_D
 
+	; verifica se a tecla pressionada é o E
+	MOV R7, TECLA_E
+	CMP R6, R7
+	JZ pressionou_E	
+
 	JMP espera_tecla ; outras teclas são ignoradas
 
 pressionou_0:
@@ -364,6 +371,15 @@ pressionou_D:
 
 	CALL apaga_pixeis
 	JMP pause_loop
+
+pressionou_E:
+	; verifica se a tecla já foi pressionada
+	CALL pressiona_teclas
+	CMP R4, 0
+	JNZ espera_tecla
+
+	CALL apaga_pixeis
+	JMP game_over
 
 ve_limites:
 	MOV	R6, [DEF_NAVE]		; obtém a largura do boneco
@@ -409,6 +425,29 @@ pause_loop:
 
 fim:
 	JMP fim
+
+game_over:
+	DI0					; desativa interrupções 0
+	DI1					; desativa interrupções 1
+	DI2					; desativa interrupções 2
+	DI					; desativa interrupcões
+	MOV	R1, 0					; cenário de fundo número 0
+	MOV  [SELECIONA_CENARIO_FUNDO], R1	; seleciona o cenário de fundo
+	MOV	R1, 1							; cenário de fundo número 1
+	MOV  [TERMINA_MEDIA], R1
+	MOV R6, 8
+	pause_loop_1:
+		CALL	teclado			; leitura às teclas
+		CMP	R9, 0
+		JNZ pause_loop_1
+		CALL liberta_teclas
+	pause_loop_2:
+		CALL teclado
+		CMP R9, 1
+		JNZ pause_loop_2
+		CALL pressiona_teclas
+		JMP start_menu
+
 
 ; **********************************************************************
 ; DESENHA_BONECO - Desenha um boneco na linha e coluna indicadas
@@ -975,7 +1014,13 @@ aleatorio:
     POP R2
     RET
 
-;	Argumento - R5 endereço da posição y do meteoro a criar
+
+; **********************************************************************
+; CRIA_METEORO
+;
+; Argumento - R5 endereço da posição y do meteoro a criar
+; **********************************************************************
+
 cria_meteoro:
 	PUSH R0
 	PUSH R1
@@ -995,7 +1040,12 @@ cria_meteoro:
 	RET
 
 
+; **********************************************************************
+; DETETA_COLISÕES 
+;
 ; Argumentos: R5 - endereço da posição y do meteoro
+; **********************************************************************
+
 deteta_colisoes:
 	PUSH R0
 	PUSH R1
@@ -1026,8 +1076,8 @@ deteta_colisoes:
 encontrou_colisao:
 	; cria explosão
 	MOV R2, DEF_POS_EXPLOSAO
-	MOV R1, [R5-2]
-	MOV [R2], R1
+	MOV R1, [R5-2]				; posição x da esquerda do meteoro
+	MOV [R2], R1				
 	MOV R1, [R5]
 	ADD R2, 2
 	MOV [R2], R1
