@@ -17,34 +17,34 @@ TEC_COL				EQU 0E000H	; endereço das colunas do teclado (periférico PIN)
 MASCARA				EQU 0FH		; para isolar os 4 bits de menor peso, ao ler as colunas do teclado
 
 ; endereços das teclas
-TECLA_0				EQU 0011H
-TECLA_1				EQU 0012H
-TECLA_2				EQU	0014H
-TECLA_3				EQU	0018H
-TECLA_4				EQU 0021H
-TECLA_5				EQU 0022H
-TECLA_6				EQU	0024H
-TECLA_7				EQU	0028H
-TECLA_8				EQU 0041H
-TECLA_9				EQU 0042H
-TECLA_A				EQU	0044H
-TECLA_B				EQU	0048H
-TECLA_C				EQU 0081H
-TECLA_D				EQU 0082H
-TECLA_E				EQU	0084H
-TECLA_F				EQU	0088H
+TECLA_0				EQU 11H
+TECLA_1				EQU 12H
+TECLA_2				EQU	14H
+TECLA_3				EQU	18H
+TECLA_4				EQU 21H
+TECLA_5				EQU 22H
+TECLA_6				EQU	24H
+TECLA_7				EQU	28H
+TECLA_8				EQU 41H
+TECLA_9				EQU 42H
+TECLA_A				EQU	44H
+TECLA_B				EQU	48H
+TECLA_C				EQU 81H
+TECLA_D				EQU 82H
+TECLA_E				EQU	84H
+TECLA_F				EQU	88H
 
 DEFINE_LINHA    		EQU 600AH		; endereço do comando para definir a linha
 DEFINE_COLUNA   		EQU 600CH		; endereço do comando para definir a coluna
 DEFINE_PIXEL    		EQU 6012H		; endereço do comando para escrever um pixel
 TOCA_SOM                EQU 605AH		; endereço do comando para tocar um som
-TERMINA_MEDIA             EQU 6066H		; endereço do comando para parar a reprodução de um som ou vídeo
+TERMINA_MEDIA           EQU 6066H		; endereço do comando para parar a reprodução de um som ou vídeo
 
 APAGA_AVISO     		EQU 6040H		; endereço do comando para apagar o aviso de nenhum cenário selecionado
 APAGA_ECRÃ	 			EQU 6002H		; endereço do comando para apagar todos os pixels já desenhados
 SELECIONA_ECRÃ			EQU 6004H		; endereço do comando que seleciona o ecrã especificado
 SELECIONA_CENARIO_FUNDO	EQU 6042H		; endereço do comando para selecionar uma imagem de fundo
-SELECIONA_VIDEO_FUNDO	EQU 605CH		; endereço do comando para selecionar um video de fundo
+REPRODUZ_MEDIA	EQU 605CH		; endereço do comando para selecionar um video de fundo
 
 ATRASO			EQU	4000H		; atraso para limitar a velocidade de movimento do boneco
 
@@ -52,44 +52,13 @@ ATRASO			EQU	4000H		; atraso para limitar a velocidade de movimento do boneco
 ; * POSIÇÕES INICIAIS
 ; *********************
 
-Y_NAVE        	EQU 28			; linha da nave 
-X_NAVE			EQU 30			; coluna da nave 
+Y_NAVE        	EQU 28			; linha inicial da nave 
+X_NAVE			EQU 30			; coluna inicial da nave 
 
-Y_METEORO_T1	EQU 1			; linha meteoro cinzento pequeno
-X_METEORO_T1	EQU 20			; coluna meteoro cinzento pequeno
-
-Y_METEORO_T2	EQU 3			; linha meteoro cinzento médio
-X_METEORO_T2	EQU 20			; coluna meteoro cinzento médio
-
-Y_METEORO_T3	EQU 6			; linha meteoro pequeno
-X_METEORO_T3	EQU 20			; coluna meteoro pequeno
-
-Y_METEORO_T4	EQU 10			; linha meteoro médio
-X_METEORO_T4	EQU 20			; coluna meteoro médio
-
-Y_METEORO_T5	EQU 0			; linha meteoro grande
-X_METEORO_T5	EQU 20			; coluna meteoro grande
-
-Y_NAVE_MA_T1	EQU 1			; linha nave má cinzenta pequena
-X_NAVE_MA_T1	EQU 50			; coluna nave má cinzenta pequena
-
-Y_NAVE_MA_T2	EQU 3			; linha nave má cinzenta média
-X_NAVE_MA_T2	EQU 50			; coluna nave má cinzenta média
-
-Y_NAVE_MA_T3	EQU 6			; linha nave má pequena
-X_NAVE_MA_T3	EQU 50			; coluna nave má pequena
-
-Y_NAVE_MA_T4	EQU 10			; linha nave má média
-X_NAVE_MA_T4	EQU 50			; coluna nave má média
-
-Y_NAVE_MA_T5	EQU 17			; linha nave má grande
-X_NAVE_MA_T5	EQU 50			; coluna nave má grande
-
-Y_PEW_PEW	    EQU 10			; linha míssil
-X_PEW_PEW	    EQU 30			; coluna míssil
-
-Y_EXPLOSAO		EQU 10			; linha explosão
-X_EXPLOSAO		EQU 30			; coluna explosão
+Y_TIPO_1		EQU 3			; linha máxima para o tipo 1 dos meteoros
+Y_TIPO_2		EQU 6			; linha máxima para o tipo 2 dos meteoros
+Y_TIPO_3		EQU 9			; linha máxima para o tipo 3 dos meteoros
+Y_TIPO_4		EQU 12			; linha máxima para o tipo 4 dos meteoros
 
 ; *************
 ; * DIMENSÕES
@@ -98,46 +67,34 @@ X_EXPLOSAO		EQU 30			; coluna explosão
 L_NAVE	    	EQU	5			; largura da nave
 H_NAVE			EQU 4           ; altura da nave
 
-L_METEORO_T1	EQU 1			; largura do meteoro cinzento pequeno
-H_METEORO_T1	EQU 1			; altura do meteoro cinzento pequeno
+L_TIPO_1		EQU 1			; largura do meteoro de tipo 1
+H_TIPO_1		EQU 1			; altura do meteoro de tipo 1
+L_TIPO_2		EQU 2			; largura do meteoro de tipo 2
+H_TIPO_2		EQU 2			; altura do meteoro de tipo 2
+L_TIPO_3		EQU 3			; largura do meteoro de tipo 3
+H_TIPO_3		EQU 3			; altura do meteoro de tipo 3
+L_TIPO_4		EQU 4			; largura do meteoro de tipo 4
+H_TIPO_4		EQU 4			; altura do meteoro de tipo 4
+L_TIPO_5		EQU 5			; largura do meteoro de tipo 5
+H_TIPO_5		EQU 5			; altura do meteoro de tipo 5
 
-L_METEORO_T2	EQU 2			; largura do meteoro cinzento médio
-H_METEORO_T2	EQU 2			; altura do meteoro cinzento médio
+OFFSET_TIPO_1	EQU 76
+OFFSET_TIPO_2	EQU 70
+OFFSET_TIPO_3	EQU 58
+OFFSET_TIPO_4	EQU 36
 
-L_METEORO_T3	EQU 3			; largura do meteoro pequeno
-H_METEORO_T3	EQU 3			; altura do meteoro pequeno
+L_EXPLOSAO		EQU 5			; altura e largura da explosão
+H_EXPLOSAO		EQU 5			; altura e largura da explosão
 
-L_METEORO_T4	EQU 4			; largura do meteoro médio
-H_METEORO_T4	EQU 4			; altura do meteoro médio
-
-L_METEORO_T5	EQU 5           ; largura do meteoro grande
-H_METEORO_T5	EQU 5           ; altura do meteoro grande
-
-L_NAVE_MA_T1	EQU 1			; largura da nave má cinzenta pequena
-H_NAVE_MA_T1	EQU 1			; altura da nave má cinzenta pequena
-
-L_NAVE_MA_T2	EQU 2			; largura da nave má cinzenta média
-H_NAVE_MA_T2	EQU 2			; altura da nave má cinzenta média
-
-L_NAVE_MA_T3 	EQU 3           ; largura da nave má pequena
-H_NAVE_MA_T3  	EQU 3           ; altura da nave má pequena
-
-L_NAVE_MA_T4 	EQU 4           ; largura da nave má média
-H_NAVE_MA_T4 	EQU 4           ; altura da nave má média
-
-L_NAVE_MA_T5 	EQU 5           ; largura da nave má grande
-H_NAVE_MA_T5  	EQU 5           ; altura da nave má grande
-
-L_PEW_PEW		EQU 1			; largura do míssil
-H_PEW_PEW		EQU 1			; altura do míssil
-
-L_EXPLOSAO		EQU 5			; largura da explosão
-H_EXPLOSAO		EQU 5			; altura da explosão
+L_PEW_PEW		EQU 1			; altura e largura do míssil
+H_PEW_PEW		EQU 1			; altura e largura do míssil
 
 MIN_COLUNA		EQU 0			; número da coluna mais à esquerda do MediaCenter
 MAX_COLUNA		EQU 63			; número da coluna mais à direita do MediaCenter
-MIN_LINHA		EQU 0			; número da coluna mais à esquerda do MediaCenter
-MAX_LINHA		EQU 32			; número da coluna mais à direita do MediaCenter
+MIN_LINHA		EQU 0			; número da linha mais acima do MediaCenter
+MAX_LINHA		EQU 32			; número da linha mais abaixo do MediaCenter
+
+ALCANCE_MISSIL	EQU 12		; número máximo da linha a que o míssil pode chegar
 
 ; ***********
 ; * CORES
@@ -163,10 +120,19 @@ LARANJA			EQU 0FF80H
 ; ***********************************************************************
 
 PLACE		1000H
-pilha:
+
+; Reserva do espaço para as pilhas dos processos
 	STACK 100H			; espaço reservado para a pilha (200 bytes)
-					
-SP_inicial:				; inicialização do SP no endereço 1200H
+SP_inicial_prog_princ:				; inicialização do SP no endereço 1200H
+
+	STACK 100H			; espaço reservado para a pilha do processo "avanca_missil"
+SP_inicial_missil:
+
+	STACK 100H			; espaço reservado para a pilha do processo "controla_energia"
+SP_inicial_displays:
+
+	STACK 100H			; espaço reservado para a pilha do processo "move_meteoro"
+SP_inicial_meteoro:
 
 ; Tabela das rotinas de exceções
 tab_exc:
@@ -174,104 +140,103 @@ tab_exc:
 	WORD rot_int_1
 	WORD rot_int_2
 
-evento_int:
-	WORD 0				; se 1, indica que a interrupcão 0 ocorreu
-	WORD 0				; se 1, indica que a interrupcão 1 ocorreu
-	WORD 0				; se 1, indica que a interrupcão 2 ocorreu
-
 ENERGIA:	; energia inicial a ser mostrada nos displays
 	WORD 100
 
 CARREGOU_BOTAO:		; variável que guarda se alguma tecla está a ser pressionada
-	WORD	0
+	WORD 0
+
+DEF_POS_NAVE:
+	WORD X_NAVE, Y_NAVE	; posição inicial da nave
 
 DEF_NAVE:			; tabela que define a nave (posição, dimensões e cores)
-	WORD		X_NAVE, Y_NAVE					; posição inicial da nave
 	WORD		L_NAVE, H_NAVE					; largura e altura da nave
     WORD        0, 0, AZUL_ESCURO, 0, 0
 	WORD		AZUL, 0, AZUL, 0, AZUL			
 	WORD		AZUL, AZUL, AZUL, AZUL, AZUL    
     WORD        0, AMARELO, 0, AMARELO, 0
 
-DEF_METEORO_T1:	; tabela que define o meteoro cinzento pequeno
-	WORD		X_METEORO_T1, Y_METEORO_T1	; posição inicial do meteoro cinzento pequeno
-	WORD		L_METEORO_T1, H_METEORO_T1	; largura e altura do meteoro cinzento pequeno
+DEF_METEORO_T1:	; tabela que define ocde tamanho 1 pequeno
+	WORD		L_TIPO_1, H_TIPO_1	; largura e altura do de tamanho 1 pequeno
 	WORD		CINZA_CLARO
 
 DEF_METEORO_T2:	; tabela que define o meteoro cinzento médio
-	WORD		X_METEORO_T2, Y_METEORO_T2	; posição inicial do meteoro cinzenta médio
-	WORD		L_METEORO_T2, H_METEORO_T2		; largura e altura do meteoro cinzento médio
+	WORD		L_TIPO_2, H_TIPO_2		; largura e altura do meteoro de tamanho 2
 	WORD		CINZA_CLARO, CINZA_CLARO
 	WORD		CINZA_CLARO, CINZA_CLARO
 
-DEF_METEORO_T3:		; tabela que define o meteoro pequeno
-	WORD		X_METEORO_T3, Y_METEORO_T3 			; posição inicial do meteoro pequeno
-    WORD        L_METEORO_T3, H_METEORO_T3			; largura e altura do meteoro pequeno
+DEF_METEORO_T3:		; tabela que define o meteoro de tamanho 3
+    WORD        L_TIPO_3, H_TIPO_3			; largura e altura do meteoro de tamanho 3
     WORD        0, CINZA_ESCURO, 0
     WORD        CINZA_CLARO, CINZA_CLARO, CINZA_ESCURO 
     WORD        0, CINZA_ESCURO, 0
 
-
-DEF_METEORO_T4:		; tabela que define o meteoro médio
-	WORD		X_METEORO_T4, Y_METEORO_T4 			; posição inicial do meteoro médio
-    WORD        L_METEORO_T4, H_METEORO_T4			; largura e altura do meteoro médio
+DEF_METEORO_T4:		; tabela que define o meteoro de tamanho 4
+    WORD        L_TIPO_4, H_TIPO_4			; largura e altura do meteoro de tamanho 4
     WORD        0, CINZA_ESCURO, CINZA_ESCURO, 0
     WORD        CINZA_CLARO, CINZA_CLARO, CINZA_ESCURO, CINZA_ESCURO
     WORD        CINZA_CLARO, CINZA_CLARO, CINZA_CLARO, CINZA_ESCURO
     WORD        0, CINZA_ESCURO, CINZA_ESCURO, 0
 
-DEF_METEORO_T5:		; tabela que define o meteoro grande
-	WORD		X_METEORO_T5, Y_METEORO_T5 			; posição inicial do meteoro grande
-    WORD        L_METEORO_T5, H_METEORO_T5 			; largura e altura do meteoro grande
+DEF_METEORO_T5:		; tabela que define o meteoro de tamanho 5
+    WORD        L_TIPO_5, H_TIPO_5 			; largura e altura do meteoro de tamanho 5
     WORD        0, CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, 0
     WORD        CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, CINZA_ESCURO
     WORD        CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO
     WORD        CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, CINZA_ESCURO
     WORD        0, CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, 0
 
-DEF_NAVE_MA_T1:	; tabela que define a nave má cinzenta pequena
-	WORD		X_NAVE_MA_T1, Y_NAVE_MA_T1	; posição inicial da nave má cinzenta pequena
-	WORD		L_NAVE_MA_T1, H_NAVE_MA_T1	; largura e altura da nave má cinzenta pequena
+DEF_NAVE_MA_T1:	; tabela que define a nave má cinzenta de tamanho 1
+	WORD		L_TIPO_1, H_TIPO_1	; largura e altura da nave má cinzenta pequena
 	WORD		VERMELHO
 
 DEF_NAVE_MA_T2:	; tabela que define a nave má cinzenta média
-	WORD		X_NAVE_MA_T2, Y_NAVE_MA_T2	; posição inicial da nave má cinzenta média
-	WORD		L_NAVE_MA_T2, H_NAVE_MA_T2	; largura e altura da nave má cinzenta média
+	WORD		L_TIPO_2, H_TIPO_2	; largura e altura da nave má cinzenta média
 	WORD		VERMELHO, VERMELHO
 	WORD		VERMELHO, VERMELHO
 
 DEF_NAVE_MA_T3:		; tabela que define a nave má pequena
-	WORD		X_NAVE_MA_T3, Y_NAVE_MA_T3 			; posição inicial da nave má pequena
-	WORD		L_NAVE_MA_T3, H_NAVE_MA_T3			; largura e altura da nave má pequena
+	WORD		L_TIPO_3, H_TIPO_3			; largura e altura da nave má pequena
 	WORD		VERMELHO, 0, VERMELHO
 	WORD		0, VERMELHO, 0
 	WORD		VERMELHO, 0, VERMELHO
 
-
 DEF_NAVE_MA_T4:		; tabela que define a nave má média
-	WORD		X_NAVE_MA_T4, Y_NAVE_MA_T4 			; posição inicial da nave má média
-	WORD		L_NAVE_MA_T4, H_NAVE_MA_T4			; largura e altura da nave má média
+	WORD		L_TIPO_4, H_TIPO_4			; largura e altura da nave má média
 	WORD		VERMELHO, 0, 0, VERMELHO
 	WORD		VERMELHO, 0, 0, VERMELHO
 	WORD		0, VERMELHO, VERMELHO, 0
 	WORD		VERMELHO, 0, 0, VERMELHO
 
 DEF_NAVE_MA_T5:		; tabela que define a nave má grande
-	WORD		X_NAVE_MA_T5, Y_NAVE_MA_T5 			; posição inicial da nave má grande
-	WORD		L_NAVE_MA_T5, H_NAVE_MA_T5			; largura e altura da nave má grande
+	WORD		L_TIPO_5, H_TIPO_5			; largura e altura da nave má grande
 	WORD		VERMELHO, 0, 0, 0, VERMELHO
 	WORD		VERMELHO, 0, VERMELHO, 0, VERMELHO
 	WORD		0, VERMELHO, VERMELHO, VERMELHO, 0
 	WORD		VERMELHO, 0, VERMELHO, 0, VERMELHO
 	WORD		VERMELHO, 0, 0, 0, VERMELHO
 
+DEF_TIPO_METEORO:
+	WORD 0, 0, 0, 1
+
+DEF_POS_METEORO:
+	WORD 4
+	WORD 10, 22
+	WORD 18, 15
+	WORD 34, 8
+	WORD 50, 1
+
+DEF_POS_PEW_PEW:
+	WORD -1, -1
+
 DEF_PEW_PEW:
-	WORD		X_PEW_PEW, Y_PEW_PEW			; posição inicial do míssil
 	WORD		L_PEW_PEW, H_PEW_PEW			; largura e altura do míssil
 	WORD		LARANJA
 
+DEF_POS_EXPLOSAO:
+	WORD -1, -1
+
 DEF_EXPLOSAO:
-	WORD		X_EXPLOSAO, Y_EXPLOSAO			;posição inicial da explosão
 	WORD		L_EXPLOSAO, H_EXPLOSAO			;largura e altura da explosão
 	WORD		0, AMARELO, 0, AMARELO, 0
 	WORD		AMARELO, 0, LARANJA, 0, AMARELO
@@ -279,17 +244,32 @@ DEF_EXPLOSAO:
 	WORD		AMARELO, 0, LARANJA, 0, AMARELO
 	WORD		0, AMARELO, 0, AMARELO, 0
 
+EXPLOSAO_COUNTER:
+	WORD 0
+
+evento_int_displays:
+	LOCK 0
+
+evento_int_missil:
+	LOCK 0
+
+evento_int_meteoros:
+	LOCK 0
+
 ; *********************************************************************************
 ; * Código
 ; *********************************************************************************
 PLACE   0				
 inicio:
-	MOV  SP, SP_inicial		; inicializa SP
-	MOV BTE, tab_exc
+	MOV  SP, SP_inicial_prog_princ		; inicializa SP
+	MOV BTE, tab_exc				; inicializa BTE
 	MOV	[APAGA_ECRÃ], R1
 	MOV	[APAGA_AVISO], R1		; apaga o aviso de nenhum cenário selecionado
 
+
 start_menu:
+	MOV	R1, 2
+	MOV  [REPRODUZ_MEDIA], R1	; toca a música de fundo em loop
 	MOV	R1, 1					; cenário de fundo número 1
 	MOV  [SELECIONA_CENARIO_FUNDO], R1	; seleciona o cenário de fundo
 	MOV R6, 8
@@ -299,33 +279,30 @@ start_menu:
 		JNZ start_loop
 		CALL pressiona_teclas
 
+inicio_game_loop:
+	CALL controla_energia
+	CALL move_meteoro
+	CALL avanca_missil
+
 game_loop:
 	EI0					; permite interrupcões 0
 	EI1					; permite interrupcões 1
 	EI2					; permite interrupcões 2
 	EI					; permite interrupcões geral
-	MOV R0, evento_int
-	MOV R1, 0
-	MOV [R0], R1
-	MOV [R0+2], R1
-	MOV [R0+4], R1
 	MOV	R1, 1					; cenário de fundo número 1
-	MOV  [SELECIONA_VIDEO_FUNDO], R1	; seleciona o cenário de fundo
-	MOV	R1, 2							; cenário de fundo número 2
-	MOV  [SELECIONA_VIDEO_FUNDO], R1
+	MOV  [REPRODUZ_MEDIA], R1	; seleciona o cenário de fundo
 	MOV R7, [ENERGIA]
-	CALL mostra_displays
 
 mostra_boneco:		; desenha os bonecos
 	CALL redesenha_ecra
 
 espera_tecla:					; neste ciclo espera-se até uma tecla ser premida ou uma exceção acontecer
-	CALL testa_excecoes
+	YIELD
 
 	MOV  R6, 1					; testa a primeira linha
 	testa_linha:
 		CALL	teclado			; leitura às teclas
-		CMP	R9, 0
+		CMP	R9, 0				; verifica se a tecla foi pressionada
 		JNZ	encontrou_tecla		; espera, enquanto não houver tecla
 
 		CALL liberta_teclas
@@ -345,6 +322,11 @@ encontrou_tecla:
 	CMP	R6, R7
 	JZ	pressionou_0
 
+	; verifica se a tecla pressionada é o 1
+	MOV R7, TECLA_1
+	CMP	R6, R7
+	JZ	pressionou_1
+
 	; verifica se a tecla pressionada é o 2
 	MOV R7, TECLA_2
 	CMP	R6, R7
@@ -355,30 +337,24 @@ encontrou_tecla:
 	CMP R6, R7
 	JZ pressionou_D
 
-	; verifica se a tecla pressionada é o 6
-	MOV R7, TECLA_6
-	CMP R6, R7
-	JZ pressionou_6
-
 	JMP espera_tecla ; outras teclas são ignoradas
 
 pressionou_0:
 	MOV R7, -1	; recua a nave uma coluna
 	JMP ve_limites
 
-pressionou_2:
-	MOV R7, +1	; avança a nave uma coluna
-	JMP ve_limites
-
-pressionou_6:
+pressionou_1:
 	; verifica se a tecla já foi pressionada
 	CALL pressiona_teclas
 	CMP R4, 0
 	JNZ espera_tecla
 
-	CALL move_meteoro
-
+	CALL dispara_missil
 	JMP mostra_boneco
+
+pressionou_2:
+	MOV R7, +1	; avança a nave uma coluna
+	JMP ve_limites
 
 pressionou_D:
 	; verifica se a tecla já foi pressionada
@@ -390,8 +366,8 @@ pressionou_D:
 	JMP pause_loop
 
 ve_limites:
-	MOV	R6, [DEF_NAVE + 4]		; obtém a largura do boneco
-	MOV R2, [DEF_NAVE]
+	MOV	R6, [DEF_NAVE]		; obtém a largura do boneco
+	MOV R2, [DEF_POS_NAVE]
 	CALL	testa_limites		; vê se chegou aos limites do ecrã e se sim força R7 a 0
 	CMP	R7, 0
 	JZ	espera_tecla			; se não é para movimentar o objeto, vai ler o teclado de novo
@@ -399,10 +375,9 @@ ve_limites:
 move_boneco:
 	MOV R11, ATRASO
 	CALL atraso
-    CALL apaga_pixeis
 
 coluna_seguinte:
-	MOV R4, DEF_NAVE
+	MOV R4, DEF_POS_NAVE
 	MOV R0, [R4]
 	ADD	R0, R7			; para desenhar objeto na coluna seguinte (direita ou esquerda)
 	MOV [R4], R0
@@ -410,13 +385,13 @@ coluna_seguinte:
 
 
 pause_loop:
-	DI0
-	DI1
-	DI2
+	DI0					; desativa interrupções 0
+	DI1					; desativa interrupções 1
+	DI2					; desativa interrupções 2
 	DI					; desativa interrupcões
-	MOV	R1, 0					; cenário de fundo número 0
+	MOV	R1, 2					; cenário de fundo número 2
 	MOV  [SELECIONA_CENARIO_FUNDO], R1	; seleciona o cenário de fundo
-	MOV	R1, 1							; cenário de fundo número 2
+	MOV	R1, 1							; cenário de fundo número 1
 	MOV  [TERMINA_MEDIA], R1
 	MOV R6, 8
 	pause_loop_1:
@@ -438,7 +413,9 @@ fim:
 ; **********************************************************************
 ; DESENHA_BONECO - Desenha um boneco na linha e coluna indicadas
 ;			    com a forma e cor definidas na tabela indicada.
-; Argumentos:   R4 - tabela que define o boneco
+; Argumentos:   R1 - posição x do boneco
+;				R2 - posição y do boneco
+;				R4 - tabela que define o boneco
 ;
 ; **********************************************************************
 desenha_boneco:
@@ -448,11 +425,12 @@ desenha_boneco:
 	PUSH	R4
 	PUSH	R5
 	PUSH	R6
+	PUSH	R7
     PUSH    R8
-	MOV R2, [R4]			; obtém a posição x do boneco
-	ADD R4, 2
-	MOV R1, [R4]			; obtém a posição y do boneco
-	ADD R4, 2
+	PUSH	R9
+	CMP R2, 0
+	JLT sai_desenha_pixels
+	; TODO se x ou y fora dos limites, saltar para sai_desenha_pixels
 	MOV	R5, [R4]			; obtém a largura do boneco
     MOV R8, [R4]
 	ADD R4, 2				
@@ -463,15 +441,22 @@ desenha_pixels:
 		MOV	R3, [R4]		; obtém a cor do próximo pixel do boneco
 		CALL escreve_pixel
 		ADD	R4, 2			; endereço da cor do próximo pixel (2 porque cada cor de pixel é uma word)
-		ADD  R2, 1          ; próxima coluna
+		ADD  R1, 1          ; próxima coluna
 		SUB  R5, 1			; menos uma coluna para tratar
 		JNZ  desenha_coluna ; continua até percorrer toda a largura da primeira linha
-	ADD R1, 1				; próxima linha
+	proxima_linha:
+	ADD R2, 1				; próxima linha
+	MOV R9, MAX_LINHA
+	CMP R9, R2
+	JZ sai_desenha_pixels	; não desenha pixel se estiver for dos limites
 	MOV R5, R8				; repor a largura
-	SUB R2, R8				; alterar a coluna para a inicial
+	SUB R1, R8				; alterar a coluna para a inicial
 	SUB R6, 1				; menos uma coluna para tratar
 	JNZ desenha_pixels 		; continua até percorrer toda a largura da segunda linha
+sai_desenha_pixels:
+	POP R9
     POP R8
+	POP R7
 	POP R6
 	POP	R5
 	POP	R4
@@ -480,16 +465,64 @@ desenha_pixels:
 	POP R1
 	RET
 
+; TODO docstring decente
+; Argumentos:   R2 - posição y do boneco
+;				R4 - tabela que define o boneco
+redefine_boneco:
+	PUSH R5
+
+	MOV R5, Y_TIPO_1
+	CMP R2, R5
+	JLE boneco_tipo_1
+
+	MOV R5, Y_TIPO_2
+	CMP R2, R5
+	JLE boneco_tipo_2
+
+	MOV R5, Y_TIPO_3
+	CMP R2, R5
+	JLE boneco_tipo_3
+
+	MOV R5, Y_TIPO_4
+	CMP R2, R5
+	JLE boneco_tipo_4
+
+	JMP redefine_boneco_fim
+
+	boneco_tipo_1:
+		MOV R5, OFFSET_TIPO_1
+		SUB R4, R5
+		JMP redefine_boneco_fim
+
+	boneco_tipo_2:
+		MOV R5, OFFSET_TIPO_2
+		SUB R4, R5
+		JMP redefine_boneco_fim
+
+	boneco_tipo_3:
+		MOV R5, OFFSET_TIPO_3
+		SUB R4, R5
+		JMP redefine_boneco_fim
+
+	boneco_tipo_4:
+		MOV R5, OFFSET_TIPO_4
+		SUB R4, R5
+
+	redefine_boneco_fim:
+	POP R5
+	RET
+
+
 ; **********************************************************************
 ; ESCREVE_PIXEL - Escreve um pixel na linha e coluna indicadas.
-; Argumentos:   R1 - linha
-;               R2 - coluna
+; Argumentos:   R1 - coluna
+;               R2 - linha
 ;               R3 - cor do pixel (em formato ARGB de 16 bits)
 ;
 ; **********************************************************************
 escreve_pixel:
-	MOV  [DEFINE_LINHA], R1		; seleciona a linha
-	MOV  [DEFINE_COLUNA], R2	; seleciona a coluna
+	MOV  [DEFINE_COLUNA], R1	; seleciona a coluna
+	MOV  [DEFINE_LINHA], R2		; seleciona a linha
 	MOV  [DEFINE_PIXEL], R3		; altera a cor do pixel na linha e coluna já selecionadas
 	RET
 
@@ -506,6 +539,7 @@ ciclo_atraso:
 	POP	R11
 	RET
 
+
 ; **********************************************************************
 ; APAGA_PIXEIS - Apaga todos os pixéis no ecrã
 ;
@@ -521,7 +555,7 @@ apaga_pixeis:
 	RET
 
 ; **********************************************************************
-; TESTA_LIMITES - Testa se o boneco chegou aos limites do ecrã e nesse caso
+; TESTA_LIMITES - Testa se o boneco chegou aos limites laterais do ecrã e nesse caso
 ;			   impede o movimento (força R7 a 0)
 ; Argumentos:	R2 - coluna em que o objeto está
 ;			R6 - largura do boneco
@@ -533,18 +567,19 @@ apaga_pixeis:
 testa_limites:
 	PUSH	R5
 	PUSH	R6
+
 testa_limite_esquerdo:		; vê se o boneco chegou ao limite esquerdo
 	MOV	R5, MIN_COLUNA
 	CMP	R2, R5
-	JGT	testa_limite_direito
-	CMP	R7, 0				; passa a deslocar-se para a direita
+	JGT	testa_limite_direito ; se não chegou ao limite esquerdo testa o direito
+	CMP	R7, 0				 ; caso contrário passa a deslocar-se para a direita
 	JGE	sai_testa_limites
 	JMP	impede_movimento	; entre limites. Mantém o valor do R7
 testa_limite_direito:		; vê se o boneco chegou ao limite direito
 	ADD	R6, R2				; posição a seguir ao extremo direito do boneco
 	MOV	R5, MAX_COLUNA
 	CMP	R6, R5
-	JLE	sai_testa_limites	; entre limites. Mantém o valor do R7
+	JLE	sai_testa_limites	; se não chegou ao limite direito mantém o valor do R7
 	CMP	R7, 0				; passa a deslocar-se para a direita
 	JGT	impede_movimento
 	JMP	sai_testa_limites
@@ -667,79 +702,6 @@ pressiona_teclas:
 	POP R7
 	RET
 
-testa_excecoes:
-	PUSH R0
-	PUSH R1
-	MOV R0, evento_int
-
-	testa_exc_0:
-		MOV R1, [R0]
-		CMP R1, 0
-		JZ testa_exc_1
-		
-		CALL move_meteoro
-
-		; consumir exceção
-		MOV R1, 0
-		MOV [R0], R1
-
-
-	testa_exc_1:
-		MOV R1, [R0+2]
-		CMP R1, 0
-		JZ testa_exc_2
-
-		; consumir exceção
-		MOV R1, 0
-		MOV [R0+2], R1
-
-
-	testa_exc_2:
-		MOV R1, [R0+4]
-		CMP R1, 0
-		JZ sai_testa_excecoes
-
-		CALL diminui_energia
-
-		; consumir exceção
-		MOV R1, 0
-		MOV [R0+4], R1
-
-
-	sai_testa_excecoes:
-	POP R1
-	POP R0
-	RET
-
-move_meteoro:
-	PUSH R0
-	PUSH R1
-	PUSH R4
-	PUSH R6
-
-	; reproduz o som quando a tecla 6 é pressionada
-	MOV R6, TOCA_SOM
-	MOV R1, 0
-	MOV [R6], R1
-
-	; pára o som de tocar
-	MOV R6, TERMINA_MEDIA
-	MOV R1, 0
-	MOV [R6], R1
-
-	MOV R4, DEF_METEORO_T5
-	ADD R4, 2
-	MOV R0, [R4]			; obtém posição y do meteoro
-	ADD R0, 1				; move para a linha seguinte
-	MOV [R4], R0
-	
-	CALL redesenha_ecra
-	POP R6
-	POP R4
-	POP R1
-	POP R0
-	RET
-
 
 ; **********************************************************************
 ; Rotinas de interrupção
@@ -751,33 +713,23 @@ move_meteoro:
 ;			Assinala o evento na componente 0 da variável evento_int
 ; **********************************************************************
 rot_int_0:
-	PUSH R0
-	PUSH R1
-	MOV  R0, evento_int
-	MOV  R1, 1			; assinala que houve uma interrupcao 0
-	MOV  [R0], R1			; na componente 0 da variável evento_int
-	POP  R1
-	POP  R0
+	MOV	[evento_int_meteoros], R0	; desbloqueia processo meteoros
 	RFE
 
-
-; TODO: avançar míssil
+; **********************************************************************
+; ROT_INT_1 - 	Rotina de atendimento da interrupcão 1
+;			Assinala o evento da variável evento_int_missil
+; **********************************************************************
 rot_int_1:
+	MOV	[evento_int_missil], R0	; desbloqueia processo avanca_missil
 	RFE
 
 ; **********************************************************************
 ; ROT_INT_2 - 	Rotina de atendimento da interrupcão 2
-;			Assinala o evento na componente 2 da variável evento_int
+;			Assinala o evento da variável evento_int_displays
 ; **********************************************************************
 rot_int_2:
-	PUSH R0
-	PUSH R1
-	MOV  R0, evento_int
-	ADD R0, 4
-	MOV  R1, 1			; assinala que houve uma interrupcao 0
-	MOV  [R0], R1			; na componente 0 da variável evento_int
-	POP  R1
-	POP  R0
+	MOV	[evento_int_displays], R0	; desbloqueia processo controla_energia
 	RFE
 
 
@@ -786,6 +738,7 @@ redesenha_ecra:
 	PUSH R1
 	PUSH R2
 	PUSH R4
+	PUSH R5
 
 	CALL apaga_pixeis
 
@@ -796,6 +749,14 @@ redesenha_ecra:
 
 	; desenha a nave
 	MOV R4, DEF_NAVE
+	MOV R1, [DEF_POS_NAVE]
+	MOV R2, [DEF_POS_NAVE+2]
+	CALL	desenha_boneco
+
+	; desenha o míssil
+	MOV R4, DEF_PEW_PEW
+	MOV R1, [DEF_POS_PEW_PEW]
+	MOV R2, [DEF_POS_PEW_PEW+2]
 	CALL	desenha_boneco
 
 	; seleciona o ecrã 1
@@ -803,16 +764,30 @@ redesenha_ecra:
 	MOV R1, SELECIONA_ECRÃ
 	MOV [R1], R0
 
-	; desenha o meteoro cinzento médio
-	MOV R4, [DEF_METEORO_T5 + 2]
-	MOV R2, MAX_LINHA
-	CMP R4, R2 			; verifica se chegou à última linha
-	JGE sai_redesenha_ecra
-	MOV R4, DEF_METEORO_T5		; se não chegou ao limite, desenha meteoro cinzento médio
-	CALL	desenha_boneco
+	MOV R5, DEF_POS_METEORO
+	CALL	desenha_varios
 
+	MOV R5, [EXPLOSAO_COUNTER]
+	CMP R5, 0
+	JZ redesenha_ecra_fim
+	; decrementa contador da explosão
+	SUB R5, 1
+	MOV R4, EXPLOSAO_COUNTER
+	MOV [R4], R5
 
-	sai_redesenha_ecra:
+	; seleciona o ecrã 2
+	MOV R0, 2
+	MOV R1, SELECIONA_ECRÃ
+	MOV [R1], R0
+
+	MOV R4, DEF_EXPLOSAO
+	MOV R0, DEF_POS_EXPLOSAO
+	MOV R1, [R0]
+	MOV R2, [R0+2]
+	CALL desenha_boneco
+
+	redesenha_ecra_fim:
+	POP R5
 	POP R4
 	POP R2
 	POP R1
@@ -820,31 +795,254 @@ redesenha_ecra:
 	RET
 
 
+; **********************************************************************
+; Processo
+; CONTROLA_ENERGIA - Processo que atualiza o valor mostrado nos displays
+;
+; **********************************************************************
+PROCESS SP_inicial_displays	; indicação de que a rotina que se segue é um processo,
+							; com indicação do valor para inicializar o SP
+controla_energia:
+	MOV R0, ENERGIA
+	MOV R1, DISPLAYS
 
-; TODO adicionar docstring
-diminui_energia:
-	; diminui em 5 o valor nos displays
-	MOV	R7, [ENERGIA]
+atualiza_display:
+	MOV R7, [R0]			; valor da energia em decimal
+	CALL converte_hex		; converte valor de energia para ser legível nos displays
+	MOV [R1], R9			; atualiza valor no display
+
+	MOV R2, [evento_int_displays]
+
 	SUB R7, 5
-	CALL mostra_displays
+	MOV [R0], R7
+	JMP atualiza_display
+
+; TODO docstring
+; **********************************************************************
+; processo
+; MOVE_METEORO
+;
+; **********************************************************************
+
+PROCESS SP_inicial_meteoro
+move_meteoro:
+	MOV R0, 0
+	MOV R4, DEF_POS_METEORO
+	MOV R6, TOCA_SOM
+	MOV R7, TERMINA_MEDIA
+	MOV R9, [R4]	; número de meteoros
+	SHL R9, 1
+	ADD R4, 4
+
+move_meteoro_ciclo:
+	CALL redesenha_ecra
+	MOV R1, [evento_int_meteoros]
+	MOV [R6], R0 ; reproduz o som
+	MOV [R7], R0 ; pára o som de tocar
+	MOV R8, R9	 ; cópia temporária de nº de meteoros
+	MOV R5, R4	 ; cópia temporária de tabela de posições
+
+	move_meteoro_ciclo_ciclo:
+		SUB R8, 2
+		CMP R8, 0
+		JLT move_meteoro_ciclo
+		MOV R10, [R5]	; valor da posição y do meteoro
+		ADD R10, 1
+		MOV [R5], R10
+		CALL deteta_colisoes
+		MOV R2, MAX_LINHA
+		CMP R10, R2
+		JNZ move_meteoro_ciclo_ciclo_continua
+		CALL cria_meteoro
+		move_meteoro_ciclo_ciclo_continua:
+		ADD R5, 4
+		JMP move_meteoro_ciclo_ciclo
+
+; TODO docstring
+; **********************************************************************
+; processo
+; AVANCA_MISSIL - 
+;
+; **********************************************************************
+
+PROCESS SP_inicial_missil	; indicação de que a rotina que se segue é um processo,
+							; com indicação do valor para inicializar o SP
+avanca_missil:
+	MOV R0, DEF_POS_PEW_PEW
+	MOV R1, ALCANCE_MISSIL
+
+atualiza_missil:
+	CALL redesenha_ecra
+	MOV R10, [evento_int_missil]
+
+	MOV R5, [R0+2]
+	SUB R5, 1
+	CMP R5, R1
+	JGT atualiza_missil_fim
+	MOV R5, -1
+
+atualiza_missil_fim:
+	MOV [R0+2], R5
+	JMP atualiza_missil
+
+; TODO docstrign decente
+; **********************************************************************
+; DESENHA_VARIOS - 
+;
+; Argumento - R5 tabela das posições dos bonecos a desenhar
+; **********************************************************************
+
+desenha_varios:
+	PUSH R1
+	PUSH R4
+	PUSH R5
+	PUSH R8
+	PUSH R9
+	PUSH R10
+	MOV R10, DEF_TIPO_METEORO
+	MOV R8, [R5] ; número de objetos
+	ADD R5, 2
+	SHL R8, 2	 ; número de bytes a avançar
+
+desenha_ciclo:
+	MOV R9, [R10]
+	CMP R9, 0
+	JZ tipo_mau
+	tipo_bom:
+		MOV R4, DEF_METEORO_T5
+		JMP desenha_um
+	tipo_mau:
+		MOV R4, DEF_NAVE_MA_T5
+
+desenha_um:
+	SUB R8, 4	
+	CMP R8, 0
+	JLT sai_desenha_ciclo
+	MOV R1, [R5]
+	MOV R2, [R5+2]
+	CALL redefine_boneco
+	CALL desenha_boneco
+	ADD R5, 4
+	ADD R10, 2
+	JMP desenha_ciclo
+
+sai_desenha_ciclo:
+	POP R10
+	POP R9
+	POP R8
+	POP R5
+	POP R4
+	POP R1
+	RET
+
+
+; TODO docstring
+; **********************************************************************
+; DISPARA_MISSIL - dispara o míssil da nave
+; **********************************************************************
+
+dispara_missil:
+	PUSH R1
+	PUSH R2
+	PUSH R3
+
+	MOV R1, DEF_POS_PEW_PEW
+	MOV R2, DEF_POS_NAVE
+	MOV R3, [R2]
+	ADD R3, 2				; Disparar centrado
+	MOV [R1], R3			; Escreve a posição x do míssil
+	MOV R3, [R2+2]			; Lê a posição x da nave para R3
+	SUB R3, 1				; Dispara à frente da nave
+	MOV [R1+2], R3			; Define a posição y do míssil
+
+	POP R3
+	POP R2
+	POP R1
 	RET
 
 ; **********************************************************************
-; mostra_displays - Atualiza o valor mostrado nos displays
+; ALEATORIO - Retorna um valor aleatório entre 0 e 7 através da leitura do periférico
+; de entrada PIN
 ;
-; Argumentos:   R7 - Novo valor para a energia
+; Retorna: R3 - número aleatório entre 0 e 7
 ; **********************************************************************
-mostra_displays:
-	PUSH R0
-	PUSH R7
-	PUSH R9
-	MOV R0, ENERGIA
-	MOV [R0], R7			; altera o valor da energia
 
-	MOV R0, DISPLAYS
-	CALL converte_hex		; converte valor de energia para ser legível nos displays
-	MOV [R0], R9
-	POP R9
-	POP R7
+aleatorio:
+    PUSH R2
+    MOV R2, TEC_COL		; obtem  o endereço do periférico de entrada
+    MOVB R3, [R2]		; lê o valor no periférico de entrada
+    SHR R3, 5			; Coloca os bits 7 a 5 nos bits de 2 a 0
+    POP R2
+    RET
+
+;	Argumento - R5 endereço da posição y do meteoro a criar
+cria_meteoro:
+	PUSH R0
+	PUSH R1
+	PUSH R3
+	PUSH R5
+	MOV R0, 0
+	CALL aleatorio	; valor aleatório para a coluna
+	MOV [R5], R0
+	SHL R3, 3
+	ADD R3, 2 ; mínima posição à esquerda
+	SUB R5, 2
+	MOV [R5], R3
+	POP R5
+	POP R3
+	POP R1
+	POP R0
+	RET
+
+
+; Argumentos: R5 - endereço da posição y do meteoro
+deteta_colisoes:
+	PUSH R0
+	PUSH R1
+	PUSH R2
+	MOV R0, DEF_POS_PEW_PEW
+	MOV R2, [R0]				; posição x do míssil
+
+	MOV R1, [R5-2]				; posição x da esquerda do meteoro
+	CMP R2, R1					; compara posição x do míssil com a do meteoro
+	JLT deteta_colisoes_fim		; à esquerda
+
+	ADD R1, 4					; posição x da direita do meteoro	
+	CMP R2, R1					; compara posição x do míssil com a do meteoro
+	JGT deteta_colisoes_fim		; à direita
+
+	ADD R0, 2
+	MOV R2, [R0]				; posição y do míssil
+
+	MOV R1, [R5]				; posição y de cima do meteoro
+	CMP R2, R1					; compara posição y do míssil com a do meteoro
+	JLT deteta_colisoes_fim		; em cima
+
+	ADD R1, 4					; posição y de baixo do meteoro
+	CMP R2, R1					; compara posição y do míssil com a do meteoro
+	JGT deteta_colisoes_fim		; em baixo
+
+
+encontrou_colisao:
+	; cria explosão
+	MOV R2, DEF_POS_EXPLOSAO
+	MOV R1, [R5-2]
+	MOV [R2], R1
+	MOV R1, [R5]
+	ADD R2, 2
+	MOV [R2], R1
+
+	; põe contador da explosão a 3
+	MOV R2, EXPLOSAO_COUNTER
+	MOV R1, 3
+	MOV [R2], R1
+
+	CALL cria_meteoro
+	MOV R1, -1
+	MOV [R0], R1
+
+deteta_colisoes_fim:
+	POP R2
+	POP R1
 	POP R0
 	RET
