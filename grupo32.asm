@@ -364,7 +364,12 @@ pressionou_1:
 	CMP R4, 0
 	JNZ espera_tecla
 
+	MOV R0, [DEF_POS_PEW_PEW+2]
+	CMP R0, -1
+	JNZ pressionou_1_fim
+
 	CALL dispara_missil
+pressionou_1_fim:
 	JMP mostra_boneco
 
 pressionou_2:
@@ -1040,6 +1045,23 @@ cria_meteoro:
 	SHL R3, 3
 	ADD R3, 2 ; mínima posição à esquerda
 	MOV [R6], R3
+
+	; define tipo do meteoro
+	MOV R6, DEF_TIPO_METEORO
+	SHR R5, 1
+	ADD R6, R5
+	CALL aleatorio
+	SHR R3, 1
+	CMP R3, 0
+	JNZ cria_tipo_mau
+	cria_tipo_bom:
+		MOV R0, 1
+		MOV [R6], R0
+		JMP cria_meteoro_fim
+	cria_tipo_mau:
+		MOV R0, 0
+		MOV [R6], R0
+cria_meteoro_fim:
 	POP R6
 	POP R5
 	POP R3
