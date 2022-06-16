@@ -219,9 +219,9 @@ DEF_NAVE_MA_T5:		; tabela que define a nave má grande
 DEF_TIPO_METEORO:
 	WORD 0, 0, 0, 1
 
-DEF_POS_METEORO:
-	WORD 4
-	WORD 10, 22
+DEF_POS_METEORO:	
+	WORD 4		; número de meteoros
+	WORD 10, 22		; posições dos meteoros
 	WORD 18, 15
 	WORD 34, 8
 	WORD 50, 1
