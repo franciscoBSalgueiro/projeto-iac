@@ -883,6 +883,9 @@ move_meteoro_ciclo:
 		MOV R10, [R3]	; valor da posição y do meteoro
 		ADD R10, 1
 		MOV [R3], R10
+		MOV R0, DEF_POS_PEW_PEW
+		CALL deteta_colisoes
+		MOV R0, DEF_POS_NAVE
 		CALL deteta_colisoes
 		MOV R2, MAX_LINHA
 		CMP R10, R2
@@ -1065,7 +1068,9 @@ cria_meteoro_fim:
 ; **********************************************************************
 ; DETETA_COLISÕES 
 ;
-; Argumentos: R5 - nº do meteoro a testar
+; Argumentos: 
+;				R0 - tabela da posição do colidor
+;				R5 - nº do meteoro a testar
 ; **********************************************************************
 
 deteta_colisoes:
@@ -1080,7 +1085,6 @@ deteta_colisoes:
 	MOV R3, DEF_POS_METEORO
 	ADD R3, 2
 	ADD R3, R5
-	MOV R0, DEF_POS_PEW_PEW
 	MOV R2, [R0]				; posição x do míssil
 
 	MOV R1, [R3]				; posição x da esquerda do meteoro
@@ -1091,8 +1095,7 @@ deteta_colisoes:
 	CMP R2, R1					; compara posição x do míssil com a do meteoro
 	JGT deteta_colisoes_fim		; à direita
 
-	ADD R0, 2
-	MOV R2, [R0]				; posição y do míssil
+	MOV R2, [R0+2]				; posição y do míssil
 
 	MOV R1, [R3+2]				; posição y de cima do meteoro
 	CMP R2, R1					; compara posição y do míssil com a do meteoro
@@ -1104,9 +1107,14 @@ deteta_colisoes:
 
 
 encontrou_colisao:
+	MOV R1, DEF_POS_PEW_PEW
+	CMP R0, R1
+	JZ encontrou_colisao_missil
 
-	CMP R0, DEF_POS_PEW_PEW
-	JZ encontrou_colisao_missil:
+encontrou_colisao_nave:
+	MOV R0, ENERGIA_METEORO
+	MOV [evento_int_displays], R0 
+	JMP deteta_colisoes_fim
 
 encontrou_colisao_missil:
 	MOV R1, DEF_TIPO_METEORO
@@ -1120,9 +1128,6 @@ encontrou_colisao_missil:
 	MOV	[evento_int_displays], R2	; desbloqueia processo controla_energia
 	JMP cria_explosao
 
-encontrou_colisao_nave:
-	
-	JMP deteta_colisoes_fim
 
 cria_explosao:
 	; cria explosão
@@ -1140,7 +1145,7 @@ cria_explosao:
 
 	CALL cria_meteoro
 	MOV R1, -1
-	MOV [R0], R1
+	MOV [R0+2], R1
 
 deteta_colisoes_fim:
 	POP R9
