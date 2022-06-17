@@ -225,7 +225,7 @@ DEF_NAVE_MA_T5:		; tabela que define a nave má grande
 	WORD		VERMELHO, 0, 0, 0, VERMELHO
 
 DEF_TIPO_METEORO:
-	WORD 0, 0, 0, 1
+	WORD 0, 0, 0, 1		; (0) - nave má, (1) - meteoro
 
 DEF_POS_METEORO:	
 	WORD 4		; número de meteoros
@@ -456,6 +456,7 @@ game_over:
 	MOV	R1, 1							; cenário de fundo número 1
 	MOV  [TERMINA_MEDIA], R1
 	MOV R6, 8
+
 	game_over_loop_1:
 		CALL	teclado			; leitura às teclas
 		CMP	R9, 0
@@ -489,7 +490,7 @@ desenha_boneco:
 	PUSH	R9
 	CMP R2, 0
 	JLT sai_desenha_pixels
-	; TODO se x ou y fora dos limites, saltar para sai_desenha_pixels
+
 	MOV	R5, [R4]			; obtém a largura do boneco
     MOV R8, [R4]
 	ADD R4, 2				
@@ -524,9 +525,14 @@ sai_desenha_pixels:
 	POP R1
 	RET
 
-; TODO docstring decente
+
+; **********************************************************************
+; REDEFINE_BONECO
+;
 ; Argumentos:   R2 - posição y do boneco
 ;				R4 - tabela que define o boneco
+; **********************************************************************
+
 redefine_boneco:
 	PUSH R5
 
@@ -810,14 +816,14 @@ redesenha_ecra:
 
 	; desenha a nave
 	MOV R4, DEF_NAVE
-	MOV R1, [DEF_POS_NAVE]
-	MOV R2, [DEF_POS_NAVE+2]
+	MOV R1, [DEF_POS_NAVE]			; coloca a posição x da nave em R1
+	MOV R2, [DEF_POS_NAVE+2]		; coloca a posiçõa y da nave em R2
 	CALL	desenha_boneco
 
 	; desenha o míssil
 	MOV R4, DEF_PEW_PEW
-	MOV R1, [DEF_POS_PEW_PEW]
-	MOV R2, [DEF_POS_PEW_PEW+2]
+	MOV R1, [DEF_POS_PEW_PEW]		; coloca a posição x do míssil em R1
+	MOV R2, [DEF_POS_PEW_PEW+2]		; coloca a posiçõa y do míssil em R2
 	CALL	desenha_boneco
 
 	MOV R5, DEF_POS_METEORO
@@ -837,8 +843,8 @@ redesenha_ecra:
 
 	MOV R4, DEF_EXPLOSAO
 	MOV R0, DEF_POS_EXPLOSAO
-	MOV R1, [R0]
-	MOV R2, [R0+2]
+	MOV R1, [R0]				; coloca a posiçõa x da explosão em R1
+	MOV R2, [R0+2]				; coloca a posição y da explosão em R2
 	CALL desenha_boneco
 
 	redesenha_ecra_fim:
@@ -1035,10 +1041,10 @@ cria_meteoro:
 	MOV R6, DEF_POS_METEORO
 	ADD R6, 2
 	ADD R6, R5
-	CALL aleatorio	; valor aleatório para a coluna
-	MOV [R6+2], R0
+	CALL aleatorio		; valor aleatório para a coluna
+	MOV [R6+2], R0		; posição x do meteoro
 	SHL R3, 3
-	ADD R3, 2 ; mínima posição à esquerda
+	ADD R3, 2 			; mínima posição à esquerda
 	MOV [R6], R3
 
 	; define tipo do meteoro
@@ -1066,7 +1072,7 @@ cria_meteoro_fim:
 
 
 ; **********************************************************************
-; DETETA_COLISÕES 
+; DETETA_COLISÕES - deteta colisões, e cria a respetiva colisão
 ;
 ; Argumentos: 
 ;				R0 - tabela da posição do colidor
@@ -1167,7 +1173,12 @@ deteta_colisoes_fim:
 	POP R0
 	RET
 
+; **********************************************************************
+; MUDA_ECRÃ
+;
 ; argumentos - R0 número do ecrã para que mudar
+; **********************************************************************
+
 muda_ecra:
 	PUSH R1
 	MOV R1, SELECIONA_ECRÃ
@@ -1200,6 +1211,7 @@ atualiza_display:
 ; O QUE FALTA FAZER
 
 ; --CONTROLO DE ENERGIA-- DONE
+; FICAR SEM ENERGIA
 ; COLISAO COM NAVE
 ; COMENTARIOS
 ; MENOS PISCAR (opcional)
