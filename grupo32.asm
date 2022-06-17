@@ -83,6 +83,9 @@ OFFSET_TIPO_2	EQU 70
 OFFSET_TIPO_3	EQU 58
 OFFSET_TIPO_4	EQU 36
 
+TIPO_MAU		EQU 0
+TIPO_BOM		EQU 1
+
 L_EXPLOSAO		EQU 5			; altura e largura da explosão
 H_EXPLOSAO		EQU 5			; altura e largura da explosão
 
@@ -952,7 +955,7 @@ desenha_varios:
 desenha_ciclo:
 	CALL muda_ecra
 	MOV R9, [R10]
-	CMP R9, 0
+	CMP R9, TIPO_MAU
 	JZ tipo_mau
 	tipo_bom:
 		MOV R4, DEF_METEORO_T5
@@ -1055,11 +1058,11 @@ cria_meteoro:
 	CMP R3, 0
 	JNZ cria_tipo_mau
 	cria_tipo_bom:
-		MOV R0, 1
+		MOV R0, TIPO_BOM
 		MOV [R6], R0
 		JMP cria_meteoro_fim
 	cria_tipo_mau:
-		MOV R0, 0
+		MOV R0, TIPO_MAU
 		MOV [R6], R0
 cria_meteoro_fim:
 	POP R6
@@ -1082,6 +1085,14 @@ deteta_colisoes:
 	PUSH R2
 	PUSH R3
 	PUSH R5
+	MOV R1, DEF_TIPO_METEORO
+	MOV R0, R5
+	SHR R0, 1
+	ADD R1, R0
+	MOV R0, [R1]
+	CMP R0, TIPO_MAU
+	JNZ deteta_colisoes_fim
+
 	MOV R3, DEF_POS_METEORO
 	ADD R3, 2
 	ADD R3, R5
