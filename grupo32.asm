@@ -97,7 +97,7 @@ MAX_COLUNA		EQU 63			; número da coluna mais à direita do MediaCenter
 MIN_LINHA		EQU 0			; número da linha mais acima do MediaCenter
 MAX_LINHA		EQU 32			; número da linha mais abaixo do MediaCenter
 
-ALCANCE_MISSIL	EQU 12		; número máximo da linha a que o míssil pode chegar
+ALCANCE_MISSIL	EQU 16		; número máximo da linha a que o míssil pode chegar
 
 ENERGIA_MATAR	EQU 5
 ENERGIA_RELOGIO	EQU -5
@@ -1105,6 +1105,10 @@ deteta_colisoes:
 
 encontrou_colisao:
 
+	CMP R0, DEF_POS_PEW_PEW
+	JZ encontrou_colisao_missil:
+
+encontrou_colisao_missil:
 	MOV R1, DEF_TIPO_METEORO
 	MOV R9, R5
 	SHR R9, 1
@@ -1114,6 +1118,11 @@ encontrou_colisao:
 	JZ cria_explosao
 	MOV R2, ENERGIA_MATAR
 	MOV	[evento_int_displays], R2	; desbloqueia processo controla_energia
+	JMP cria_explosao
+
+encontrou_colisao_nave:
+	
+	JMP deteta_colisoes_fim
 
 cria_explosao:
 	; cria explosão
@@ -1132,7 +1141,6 @@ cria_explosao:
 	CALL cria_meteoro
 	MOV R1, -1
 	MOV [R0], R1
-
 
 deteta_colisoes_fim:
 	POP R9
@@ -1175,7 +1183,7 @@ atualiza_display:
 
 ; O QUE FALTA FAZER
 
-; CONTROLO DE ENERGIA
+; --CONTROLO DE ENERGIA-- DONE
 ; COLISAO COM NAVE
 ; COMENTARIOS
 ; MENOS PISCAR (opcional)
