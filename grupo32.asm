@@ -466,7 +466,7 @@ game_over:
 		CMP R9, 1
 		JNZ game_over_loop_2
 		CALL pressiona_teclas
-		JMP start_menu
+		JMP inicio_game_loop
 
 
 ; **********************************************************************
@@ -1187,11 +1187,11 @@ controla_energia:
 	MOV R1, DISPLAYS
 
 atualiza_display:
+	MOV R2, [evento_int_displays]
+
 	MOV R7, [R0]			; valor da energia em decimal
 	CALL converte_hex		; converte valor de energia para ser legível nos displays
 	MOV [R1], R9			; atualiza valor no display
-
-	MOV R2, [evento_int_displays]
 
 	ADD R7, R2
     MOV [R0], R7
