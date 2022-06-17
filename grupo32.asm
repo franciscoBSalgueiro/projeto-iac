@@ -467,6 +467,8 @@ game_over:
 		CMP R9, 1
 		JNZ game_over_loop_2
 		CALL pressiona_teclas
+		MOV R7, 100
+		MOV [ENERGIA], R7
 		JMP inicio_game_loop
 
 
