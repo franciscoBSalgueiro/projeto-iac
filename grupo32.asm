@@ -469,6 +469,8 @@ game_over:
 		CALL pressiona_teclas
 		MOV R7, 100
 		MOV [ENERGIA], R7
+		MOV	R1, 2
+		MOV  [REPRODUZ_MEDIA], R1	; toca a música de fundo em loop
 		JMP inicio_game_loop
 
 
