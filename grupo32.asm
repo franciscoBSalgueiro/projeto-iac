@@ -316,6 +316,9 @@ mostra_boneco:		; desenha os bonecos
 
 espera_tecla:					; neste ciclo espera-se até uma tecla ser premida ou uma exceção acontecer
 	YIELD
+	MOV R1, [ENERGIA]			
+	CMP R1, 0					; verifica se a energia chega a 0
+	JZ sem_energia
 
 	MOV  R6, 1					; testa a primeira linha
 	testa_linha:
@@ -404,6 +407,11 @@ pressionou_E:
 
 	CALL apaga_pixeis
 	JMP game_over
+
+; caso em que a energia chega a 0
+sem_energia:
+	CALL apaga_pixeis	; apaga ecrã
+	JMP game_over		; termina o jogo
 
 ve_limites:
 	MOV	R6, [DEF_NAVE]		; obtém a largura do boneco
