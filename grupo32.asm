@@ -99,6 +99,11 @@ MAX_LINHA		EQU 32			; número da linha mais abaixo do MediaCenter
 
 ALCANCE_MISSIL	EQU 12		; número máximo da linha a que o míssil pode chegar
 
+ENERGIA_MATAR	EQU 5
+ENERGIA_RELOGIO	EQU -5
+ENERGIA_DISPARA	EQU -5
+ENERGIA_METEORO	EQU 10
+
 ; ***********
 ; * CORES
 ; ***********
@@ -370,6 +375,9 @@ pressionou_1:
 	MOV R0, [DEF_POS_PEW_PEW+2]
 	CMP R0, -1
 	JNZ pressionou_1_fim
+
+	MOV R0, ENERGIA_DISPARA
+	MOV [evento_int_displays], R0
 
 	CALL dispara_missil
 pressionou_1_fim:
@@ -780,7 +788,10 @@ rot_int_1:
 ;			Assinala o evento da variável evento_int_displays
 ; **********************************************************************
 rot_int_2:
+	PUSH R0
+	MOV R0, ENERGIA_RELOGIO
 	MOV	[evento_int_displays], R0	; desbloqueia processo controla_energia
+	POP R0
 	RFE
 
 
@@ -838,28 +849,6 @@ redesenha_ecra:
 	POP R0
 	RET
 
-
-; **********************************************************************
-; Processo
-; CONTROLA_ENERGIA - Processo que atualiza o valor mostrado nos displays
-;
-; **********************************************************************
-PROCESS SP_inicial_displays	; indicação de que a rotina que se segue é um processo,
-							; com indicação do valor para inicializar o SP
-controla_energia:
-	MOV R0, ENERGIA
-	MOV R1, DISPLAYS
-
-atualiza_display:
-	MOV R7, [R0]			; valor da energia em decimal
-	CALL converte_hex		; converte valor de energia para ser legível nos displays
-	MOV [R1], R9			; atualiza valor no display
-
-	MOV R2, [evento_int_displays]
-
-	SUB R7, 5
-	MOV [R0], R7
-	JMP atualiza_display
 
 ; TODO docstring
 ; **********************************************************************
@@ -1085,13 +1074,8 @@ deteta_colisoes:
 	PUSH R2
 	PUSH R3
 	PUSH R5
-	MOV R1, DEF_TIPO_METEORO
-	MOV R0, R5
-	SHR R0, 1
-	ADD R1, R0
-	MOV R0, [R1]
-	CMP R0, TIPO_MAU
-	JNZ deteta_colisoes_fim
+	PUSH R9
+	
 
 	MOV R3, DEF_POS_METEORO
 	ADD R3, 2
@@ -1120,6 +1104,18 @@ deteta_colisoes:
 
 
 encontrou_colisao:
+
+	MOV R1, DEF_TIPO_METEORO
+	MOV R9, R5
+	SHR R9, 1
+	ADD R1, R9
+	MOV R9, [R1]
+	CMP R9, TIPO_BOM
+	JZ cria_explosao
+	MOV R2, ENERGIA_MATAR
+	MOV	[evento_int_displays], R2	; desbloqueia processo controla_energia
+
+cria_explosao:
 	; cria explosão
 	MOV R2, DEF_POS_EXPLOSAO
 	MOV R1, [R3]				; posição x da esquerda do meteoro
@@ -1139,6 +1135,7 @@ encontrou_colisao:
 
 
 deteta_colisoes_fim:
+	POP R9
 	POP R5
 	POP R3
 	POP R2
@@ -1153,3 +1150,32 @@ muda_ecra:
 	MOV [R1], R0
 	POP R1
 	RET
+
+; **********************************************************************
+; Processo
+; CONTROLA_ENERGIA - Processo que atualiza o valor mostrado nos displays
+;
+; **********************************************************************
+PROCESS SP_inicial_displays	; indicação de que a rotina que se segue é um processo,
+							; com indicação do valor para inicializar o SP
+controla_energia:
+	MOV R0, ENERGIA
+	MOV R1, DISPLAYS
+
+atualiza_display:
+	MOV R7, [R0]			; valor da energia em decimal
+	CALL converte_hex		; converte valor de energia para ser legível nos displays
+	MOV [R1], R9			; atualiza valor no display
+
+	MOV R2, [evento_int_displays]
+
+	ADD R7, R2
+    MOV [R0], R7
+	JMP atualiza_display
+
+; O QUE FALTA FAZER
+
+; CONTROLO DE ENERGIA
+; COLISAO COM NAVE
+; COMENTARIOS
+; MENOS PISCAR (opcional)
