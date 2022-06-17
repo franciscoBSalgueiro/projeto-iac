@@ -464,13 +464,13 @@ game_over:
 		CALL liberta_teclas
 	game_over_loop_2:
 		CALL teclado
-		CMP R9, 1
+		CMP R9, 1				; verifica se a tecla pressionada é o 'C'
 		JNZ game_over_loop_2
 		CALL pressiona_teclas
-		MOV R7, 100
+		MOV R7, 100					; reinicia o valor da energia
 		MOV [ENERGIA], R7
 		MOV	R1, 2
-		MOV  [REPRODUZ_MEDIA], R1	; toca a música de fundo em loop
+		MOV  [REPRODUZ_MEDIA], R1	; reinicia a música de fundo em loop
 		JMP inicio_game_loop
 
 
