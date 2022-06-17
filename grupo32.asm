@@ -1079,6 +1079,8 @@ deteta_colisoes:
 	PUSH R2
 	PUSH R3
 	PUSH R5
+	PUSH R6	
+	PUSH R7 
 	PUSH R9
 	
 
@@ -1138,6 +1140,13 @@ cria_explosao:
 	ADD R2, 2
 	MOV [R2], R1
 
+	; reproduz som quado há uma colisão
+	MOV R6, 4 					; número do som da colisão
+	MOV R7, TOCA_SOM
+	MOV [R7], R6				; toca o som número 4
+	MOV R7, TERMINA_MEDIA
+	MOV [R7], R6				; termina o som número 4
+
 	; põe contador da explosão a 3
 	MOV R2, EXPLOSAO_COUNTER
 	MOV R1, 3
@@ -1149,6 +1158,8 @@ cria_explosao:
 
 deteta_colisoes_fim:
 	POP R9
+	POP R7
+	POP R6
 	POP R5
 	POP R3
 	POP R2
