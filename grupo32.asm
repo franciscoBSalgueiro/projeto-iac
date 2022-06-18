@@ -479,6 +479,14 @@ game_over:
 		CALL pressiona_teclas
 		MOV R7, ENERGIA_INICIAL		; reinicia o valor da energia
 		MOV [ENERGIA], R7
+		MOV R7, DEF_POS_NAVE		; reinicia a posição da nave
+		MOV R1, X_NAVE
+		MOV [R7], R1
+		MOV R1, Y_NAVE
+		MOV [R7+2], R1
+		MOV R7, DEF_POS_PEW_PEW		; apaga os mísseis
+		MOV R1, -1
+		MOV [R7+2], R1
 		MOV	R1, 2
 		MOV  [REPRODUZ_MEDIA], R1	; reinicia a música de fundo em loop
 		JMP inicio_game_loop
@@ -1102,7 +1110,6 @@ deteta_colisoes:
 	PUSH R6	
 	PUSH R7 
 	PUSH R9
-	
 
 	MOV R3, DEF_POS_METEORO
 	ADD R3, 2
@@ -1140,7 +1147,8 @@ encontrou_colisao_nave:
 	MOV R9, [R0]
 	CMP R9, TIPO_MAU
 	JZ deteta_colisoes_fim
-
+	SHL R5, 1
+	CALL cria_meteoro
 	MOV R0, ENERGIA_METEORO
 	MOV [evento_int_displays], R0 
 	JMP deteta_colisoes_fim
@@ -1232,7 +1240,7 @@ atualiza_display:
 ; O QUE FALTA FAZER
 
 ; --CONTROLO DE ENERGIA-- DONE
-; FICAR SEM ENERGIA
+; --FICAR SEM ENERGIA-- DONE
 ; COLISAO COM NAVE
 ; COMENTARIOS
 ; MENOS PISCAR (opcional)
