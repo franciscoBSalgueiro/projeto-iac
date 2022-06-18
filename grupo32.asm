@@ -106,6 +106,11 @@ ENERGIA_RELOGIO	EQU -5		; energia perdida ao longo do tempo
 ENERGIA_DISPARA	EQU -5		; energia perdida por disparar um míssil
 ENERGIA_METEORO	EQU 10		; energia ganha por colidir com um meteoro bom
 
+ESTADO_NORMAL	EQU 0
+ESTADO_INICIO	EQU 1
+ESTADO_PAUSA	EQU 2
+ESTADO_PERDEU	EQU 3
+
 ; ***********
 ; * CORES
 ; ***********
@@ -337,10 +342,11 @@ mostra_boneco:		; desenha os bonecos
 	CALL redesenha_ecra
 
 espera_tecla:					; neste ciclo espera-se até uma tecla ser premida ou uma exceção acontecer
-	YIELD
+	WAIT
 	MOV R1, [ESTADO_JOGO]
-	CMP R1, 3					; verifica se o jogo chegou ao fim
+	CMP R1, ESTADO_PERDEU					; verifica se o jogo chegou ao fim
 	JZ game_over
+	CMP R1, ESTADO_PAUSA
 
 	MOV  R6, 1					; testa a primeira linha
 	testa_linha:
@@ -360,6 +366,10 @@ encontrou_tecla:
 	SHL  R6, 4         ; coloca linha no nibble high
     OR   R6, R9        ; junta coluna (nibble low)
 
+	MOV R4, [ESTADO_JOGO]
+	CMP R4, ESTADO_PAUSA
+	JZ testa_D
+
 	; verifica se a tecla pressionada é o 0
 	MOV R7, TECLA_0
 	CMP	R6, R7
@@ -375,15 +385,17 @@ encontrou_tecla:
 	CMP	R6, R7
 	JZ	pressionou_2
 
+	; verifica se a tecla pressionada é o E
+	MOV R7, TECLA_E
+	CMP R6, R7
+	JZ pressionou_E
+
+testa_D:
 	; verifica se a tecla pressionada é o D
 	MOV R7, TECLA_D
 	CMP R6, R7
 	JZ pressionou_D
 
-	; verifica se a tecla pressionada é o E
-	MOV R7, TECLA_E
-	CMP R6, R7
-	JZ pressionou_E	
 
 	JMP espera_tecla ; outras teclas são ignoradas
 
@@ -418,8 +430,31 @@ pressionou_D:
 	CMP R4, 0
 	JNZ espera_tecla
 
+	MOV R4, [ESTADO_JOGO]
+	CMP R4, ESTADO_NORMAL
+	JZ poe_pausa
+	CMP R4, ESTADO_PAUSA
+	JNZ espera_tecla
+tira_pausa:
+	EI
+	MOV	R1, 1					; cenário de fundo número 1
+	MOV  [REPRODUZ_MEDIA], R1	; seleciona o cenário de fundo
+	MOV R4, ESTADO_JOGO
+	MOV R3, ESTADO_NORMAL
+	MOV [R4], R3
+	JMP espera_tecla
+poe_pausa:
+	DI
+	MOV	R1, 2					; cenário de fundo número 2
+	MOV  [SELECIONA_CENARIO_FUNDO], R1	; seleciona o cenário de fundo
+	MOV	R1, 1							; cenário de fundo número 1
+	MOV  [TERMINA_MEDIA], R1
+	MOV R6, 8
+	MOV R4, ESTADO_JOGO
+	MOV R3, ESTADO_PAUSA
+	MOV [R4], R3
 	CALL apaga_pixeis
-	JMP pause_loop
+	JMP espera_tecla
 
 pressionou_E:
 	; verifica se a tecla já foi pressionada
@@ -448,29 +483,6 @@ coluna_seguinte:
 	MOV [R4], R0
 	JMP	mostra_boneco	; vai desenhar o boneco de novo
 
-
-pause_loop:
-	DI0					; desativa interrupções 0
-	DI1					; desativa interrupções 1
-	DI2					; desativa interrupções 2
-	DI					; desativa interrupcões
-	MOV	R1, 2					; cenário de fundo número 2
-	MOV  [SELECIONA_CENARIO_FUNDO], R1	; seleciona o cenário de fundo
-	MOV	R1, 1							; cenário de fundo número 1
-	MOV  [TERMINA_MEDIA], R1
-	MOV R6, 8
-	pause_loop_1:
-		CALL	teclado			; leitura às teclas
-		CMP	R9, 0
-		JNZ pause_loop_1
-		CALL liberta_teclas
-	pause_loop_2:	
-		CALL teclado			; leitura às teclas
-		CMP R9, 2
-		JNZ pause_loop_2
-		CALL pressiona_teclas
-		JMP game_loop
-
 game_over:
 	DI0					; desativa interrupções 0
 	DI1					; desativa interrupções 1
@@ -494,7 +506,7 @@ game_over:
 		JNZ game_over_loop_2
 		CALL pressiona_teclas
 		MOV R2, ESTADO_JOGO
-		MOV R3, 0
+		MOV R3, ESTADO_NORMAL
 		MOV [R2], R3
 		JMP inicio_game_loop
 
@@ -1165,7 +1177,7 @@ encontrou_colisao_nave_bom:
 
 encontrou_colisao_nave_mau:
 	MOV R2, ESTADO_JOGO
-	MOV R3, 3
+	MOV R3, ESTADO_PERDEU
 	MOV [R2], R3
 	JMP deteta_colisoes_fim
 
@@ -1257,7 +1269,7 @@ atualiza_display:
 	CMP R7, 0
 	JNZ atualiza_display
 	MOV R2, ESTADO_JOGO
-	MOV R3, 3
+	MOV R3, ESTADO_PERDEU
 	MOV [R2], R3
 	JNZ atualiza_display
 
