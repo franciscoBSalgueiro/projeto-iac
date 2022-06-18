@@ -230,7 +230,7 @@ DEF_TIPO_METEORO:
 	WORD 0, 0, 0, 1		; (0) - nave má, (1) - meteoro
 
 DEF_POS_METEORO:	
-	WORD 4		; número de meteoros
+	WORD 4			; número de meteoros
 	WORD 10, 22		; posições dos meteoros
 	WORD 18, 15
 	WORD 34, 8
@@ -886,14 +886,15 @@ redesenha_ecra:
 	RET
 
 
-; TODO docstring
 ; **********************************************************************
 ; processo
-; MOVE_METEORO
+; MOVE_METEORO - processo que move o meteoro até chegar ao fim do ecrã,
+;				criando um novo nesse caso
 ;
 ; **********************************************************************
 
 PROCESS SP_inicial_meteoro
+
 move_meteoro:
 	MOV R0, 0
 	MOV R4, DEF_POS_METEORO
@@ -906,31 +907,31 @@ move_meteoro:
 move_meteoro_ciclo:
 	CALL redesenha_ecra
 	MOV R1, [evento_int_meteoros]
-	MOV [R7], R0 ; pára o som de tocar
-	MOV [R6], R0 ; reproduz o som
-	MOV R8, R9	 ; cópia temporária de nº de meteoros
-	MOV R3, R4	 ; cópia temporária de tabela de posições
+	MOV [R7], R0 			; pára o som de tocar
+	MOV [R6], R0 			; reproduz o som
+	MOV R8, R9	 			; cópia temporária de nº de meteoros
+	MOV R3, R4	 			; cópia temporária de tabela de posições
 	MOV R5, 0
 
-	move_meteoro_ciclo_ciclo:
+	move_meteoro_ciclo_2:
 		SUB R8, 2
 		CMP R8, 0
 		JLT move_meteoro_ciclo
-		MOV R10, [R3]	; valor da posição y do meteoro
-		ADD R10, 1
-		MOV [R3], R10
+		MOV R10, [R3]				; valor da posição y do meteoro
+		ADD R10, 1			
+		MOV [R3], R10				; atualiza posição y do meteoro
 		MOV R0, DEF_POS_PEW_PEW
-		CALL deteta_colisoes
-		MOV R0, DEF_POS_NAVE
-		CALL deteta_colisoes
+		CALL deteta_colisoes		; verifica se houve colisão com o míssil
+		MOV R0, DEF_POS_NAVE	
+		CALL deteta_colisoes		; verifica se houve colisão com a nave
 		MOV R2, MAX_LINHA
-		CMP R10, R2
-		JNZ move_meteoro_ciclo_ciclo_continua
-		CALL cria_meteoro
-		move_meteoro_ciclo_ciclo_continua:
+		CMP R10, R2								; verifica se chegou à linha máxima
+		JNZ move_meteoro_ciclo_2_continua		; continua ciclo enquanto não chegar à linha máxima
+		CALL cria_meteoro						; caso contrário cria um novo meteoro
+		move_meteoro_ciclo_2_continua:
 		ADD R3, 4
 		ADD R5, 4
-		JMP move_meteoro_ciclo_ciclo
+		JMP move_meteoro_ciclo_2
 
 
 ; **********************************************************************
