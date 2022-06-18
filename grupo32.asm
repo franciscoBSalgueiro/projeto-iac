@@ -52,6 +52,8 @@ DEFINE_COLUNA   		EQU 600CH		; endereço do comando para definir a coluna
 DEFINE_PIXEL    		EQU 6012H		; endereço do comando para escrever um pixel
 TOCA_SOM                EQU 605AH		; endereço do comando para tocar um som
 TERMINA_MEDIA           EQU 6066H		; endereço do comando para parar a reprodução de um som ou vídeo
+PAUSA_MEDIA				EQU 605EH		; endereço do comando para pausar a reprodução de um som ou vídeo
+RETOMA_MEDIA			EQU 6060H		; endereço do comando para retomar a reprodução de um som ou vídeo
 
 APAGA_AVISO     		EQU 6040H		; endereço do comando para apagar o aviso de nenhum cenário selecionado
 APAGA_ECRÃ	 			EQU 6002H		; endereço do comando para apagar todos os pixels já desenhados
@@ -455,6 +457,8 @@ pressionou_D:
 	JNZ espera_tecla
 tira_pausa:
 	EI
+	MOV R1, SOM_MUSICA
+	MOV [RETOMA_MEDIA], R1				; retoma a música
 	MOV	R1, VIDEO_FUNDO			; cenário de fundo número 1
 	MOV  [REPRODUZ_MEDIA], R1	; seleciona o cenário de fundo
 	MOV R4, ESTADO_JOGO
@@ -463,15 +467,16 @@ tira_pausa:
 	JMP espera_tecla
 poe_pausa:
 	DI
-	MOV	R1, FUNDO_PAUSA					; cenário de fundo número 3
+	CALL apaga_pixeis
+	MOV R1, SOM_MUSICA
+	MOV [PAUSA_MEDIA], R1				; pausa a música
+	MOV R1, VIDEO_FUNDO
+	MOV [TERMINA_MEDIA], R1				; termina o vídeo de fundo
+	MOV	R1, FUNDO_PAUSA					; cenário de fundo de pausa
 	MOV  [SELECIONA_CENARIO_FUNDO], R1	; seleciona o cenário de fundo
-	MOV	R1, 1							; cenário de fundo número 1
-	MOV  [TERMINA_MEDIA], R1
-	MOV R6, 8
 	MOV R4, ESTADO_JOGO
 	MOV R3, ESTADO_PAUSA
 	MOV [R4], R3
-	CALL apaga_pixeis
 	JMP espera_tecla
 
 pressionou_E:
