@@ -566,20 +566,20 @@ redefine_boneco:
 	PUSH R5
 
 	MOV R5, Y_TIPO_1
-	CMP R2, R5
-	JLE boneco_tipo_1
+	CMP R2, R5				; verifica se o boneco do tipo 1 atingiu o Y máximo
+	JLE boneco_tipo_1		; desenha boneco tipo 1 se Y atual for menor ou igual que Y máximo
 
 	MOV R5, Y_TIPO_2
-	CMP R2, R5
-	JLE boneco_tipo_2
+	CMP R2, R5				; verifica se o boneco do tipo 2 atingiu o Y máximo
+	JLE boneco_tipo_2		; desenha boneco tipo 2 se Y atual for menor ou igual que Y máximo
 
 	MOV R5, Y_TIPO_3
-	CMP R2, R5
-	JLE boneco_tipo_3
+	CMP R2, R5				; verifica se o boneco do tipo 3 atingiu o Y máximo
+	JLE boneco_tipo_3		; desenha boneco tipo 3 se Y atual for menor ou igual que Y máximo
 
 	MOV R5, Y_TIPO_4
-	CMP R2, R5
-	JLE boneco_tipo_4
+	CMP R2, R5				; verifica se o boneco do tipo 3 atingiu o Y máximo
+	JLE boneco_tipo_4		; desenha boneco tipo 4 se Y atual for menor ou igual que Y máximo
 
 	JMP redefine_boneco_fim
 
@@ -643,7 +643,7 @@ apaga_pixeis:
 	PUSH R4
 	MOV R0, APAGA_ECRÃ
 	MOV R4, 1
-	MOV [R0], R4
+	MOV [R0], R4	; apaga todos os pixéis desenhados
 	POP R0
 	POP R4
 	RET
