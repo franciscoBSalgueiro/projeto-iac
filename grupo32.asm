@@ -16,6 +16,19 @@ TEC_LIN				EQU 0C000H	; endereço das linhas do teclado (periférico POUT-2)
 TEC_COL				EQU 0E000H	; endereço das colunas do teclado (periférico PIN)
 MASCARA				EQU 0FH		; para isolar os 4 bits de menor peso, ao ler as colunas do teclado
 
+VIDEO_INTRO			EQU 0
+SOM_MUSICA			EQU 1
+VIDEO_FUNDO			EQU 2
+SOM_EXPLOSAO		EQU 3
+SOM_COLISAO			EQU 4
+SOM_GAME_OVER		EQU 5
+SOM_MISSIL			EQU 6
+
+FUNDO_PERDEU_ENERGIA	EQU 0
+FUNDO_PERDEU_COLISAO	EQU 1
+FUNDO_PERDEU_DESISTIU	EQU 2
+FUNDO_PAUSA				EQU 3
+
 ; endereços das teclas
 TECLA_0				EQU 11H
 TECLA_1				EQU 12H
@@ -293,11 +306,8 @@ inicio:
 	CALL move_meteoro			; cria o processo move_meteoro
 	CALL avanca_missil			; cria o processo avanca_missil
 
-	MOV	R1, 2
-	MOV  [REPRODUZ_MEDIA], R1	; toca a música de fundo em loop
-
 start_menu:
-	MOV	R1, 3					; vídeo de fundo da intro
+	MOV	R1, VIDEO_INTRO			; vídeo de fundo da intro
 	MOV  [REPRODUZ_MEDIA], R1	; seleciona o cenário de fundo
 	MOV R6, 8
 	start_loop:
@@ -307,6 +317,12 @@ start_menu:
 		CALL pressiona_teclas
 
 inicio_game_loop:
+	MOV R1, VIDEO_INTRO
+	MOV [TERMINA_MEDIA], R1				; pára de tocar música de fundo
+
+	MOV	R1, SOM_MUSICA
+	MOV  [REPRODUZ_MEDIA], R1	; toca a música de fundo em loop
+
 	MOV R7, ENERGIA_INICIAL		; reinicia o valor da energia
 	MOV [ENERGIA], R7
 	MOV R0, 0
@@ -317,11 +333,9 @@ inicio_game_loop:
 	MOV [R7], R1				; define a posição x da nave
 	MOV R1, Y_NAVE
 	MOV [R7+2], R1				; define a posição y da nave
-	MOV R7, DEF_POS_PEW_PEW		; apaga os mísseis
+	MOV R7, DEF_POS_PEW_PEW	
 	MOV R1, -1
-	MOV [R7+2], R1
-	MOV	R1, 2
-	MOV [REPRODUZ_MEDIA], R1	; reinicia a música de fundo em loop
+	MOV [R7+2], R1				; apaga os mísseis
 
 	; cria os meteoros
 	MOV R5, 12				
@@ -339,7 +353,7 @@ game_loop:
 	EI1							; permite interrupcões 1
 	EI2							; permite interrupcões 2
 	EI							; permite interrupcões geral
-	MOV	R1, 1					; cenário de fundo número 1
+	MOV	R1, VIDEO_FUNDO			; cenário de fundo
 	MOV  [REPRODUZ_MEDIA], R1	; seleciona o cenário de fundo
 	MOV R7, [ENERGIA]
 
@@ -441,7 +455,7 @@ pressionou_D:
 	JNZ espera_tecla
 tira_pausa:
 	EI
-	MOV	R1, 1					; cenário de fundo número 1
+	MOV	R1, VIDEO_FUNDO			; cenário de fundo número 1
 	MOV  [REPRODUZ_MEDIA], R1	; seleciona o cenário de fundo
 	MOV R4, ESTADO_JOGO
 	MOV R3, ESTADO_NORMAL
@@ -449,7 +463,7 @@ tira_pausa:
 	JMP espera_tecla
 poe_pausa:
 	DI
-	MOV	R1, 2							; cenário de fundo número 2
+	MOV	R1, FUNDO_PAUSA					; cenário de fundo número 3
 	MOV  [SELECIONA_CENARIO_FUNDO], R1	; seleciona o cenário de fundo
 	MOV	R1, 1							; cenário de fundo número 1
 	MOV  [TERMINA_MEDIA], R1
@@ -493,6 +507,12 @@ game_over:
 	DI2					; desativa interrupções 2
 	DI					; desativa interrupcões
 	CALL apaga_pixeis	; apaga ecrã
+	MOV R1, SOM_MUSICA
+	MOV [TERMINA_MEDIA], R1				; pára de tocar música de fundo
+	MOV R1, VIDEO_FUNDO
+	MOV [TERMINA_MEDIA], R1				; pára de tocar música de fundo
+	MOV R6, SOM_GAME_OVER 				; número do som de game over
+	CALL efeito_sonoro
 	MOV	R1, [ESTADO_JOGO]				; cenário de fundo correspondente ao tipo de perda
 	MOV  [SELECIONA_CENARIO_FUNDO], R1	; seleciona o cenário de fundo
 	MOV	R1, 1							; cenário de fundo número 1
@@ -944,6 +964,9 @@ dispara_missil:
 	PUSH R2
 	PUSH R3
 
+	MOV R6, SOM_MISSIL
+	CALL efeito_sonoro
+
 	MOV R1, DEF_POS_PEW_PEW
 	MOV R2, DEF_POS_NAVE
 	MOV R3, [R2]
@@ -1079,7 +1102,7 @@ compara_posicoes:
 encontrou_colisao:
 	MOV R1, DEF_POS_PEW_PEW		
 	CMP R0, R1					; há colisão com um missíl se as posições forem iguais
-	JZ encontrou_colisao_missil		
+	JZ encontrou_colisao_missil
 
 encontrou_colisao_nave:
 	MOV R0, DEF_TIPO_METEORO
@@ -1090,6 +1113,10 @@ encontrou_colisao_nave:
 	JZ encontrou_colisao_nave_mau
 
 encontrou_colisao_nave_bom:
+	; reproduz som quando há uma colisão com meteoro
+	MOV R6, SOM_COLISAO 					; número do som da colisão
+	CALL efeito_sonoro
+
 	SHL R5, 1						; número do meteoro
 	CALL cria_meteoro
 	MOV R0, ENERGIA_METEORO			; atualiza a energia respetiva
@@ -1124,12 +1151,9 @@ cria_explosao:
 	ADD R2, 2
 	MOV [R2], R1				; coloca na posição y da explosão
 
-	; reproduz som quado há uma colisão
-	MOV R6, 4 					; número do som da colisão
-	MOV R7, TERMINA_MEDIA
-	MOV [R7], R6				; termina o som número 4
-	MOV R7, TOCA_SOM
-	MOV [R7], R6				; toca o som número 4
+	; reproduz som quando há uma colisão
+	MOV R6, SOM_EXPLOSAO		; número do som da explosão
+	CALL efeito_sonoro
 
 	; põe contador da explosão a 3
 	MOV R2, EXPLOSAO_COUNTER
@@ -1156,7 +1180,7 @@ deteta_colisoes_fim:
 ; **********************************************************************
 ; MUDA_ECRÃ
 ;
-; argumentos - R0 número do ecrã para que mudar
+; Argumentos - R0 número do ecrã para que mudar
 ; **********************************************************************
 
 muda_ecra:
@@ -1164,6 +1188,20 @@ muda_ecra:
 	MOV R1, SELECIONA_ECRÃ
 	MOV [R1], R0
 	POP R1
+	RET
+
+; **********************************************************************
+; MUDA_ECRÃ
+;
+; Argumentos - R6 número do efeito sonoro a reproduzir
+; **********************************************************************
+efeito_sonoro:
+	PUSH R7
+	MOV R7, TERMINA_MEDIA
+	MOV [R7], R6				; termina o som anterior de tocar
+	MOV R7, TOCA_SOM
+	MOV [R7], R6				; reproduz o som
+	POP R7
 	RET
 
 
@@ -1186,8 +1224,6 @@ PROCESS SP_inicial_meteoro
 move_meteoro:
 	MOV R0, 0
 	MOV R4, DEF_POS_METEORO
-	MOV R6, TOCA_SOM
-	MOV R7, TERMINA_MEDIA
 	MOV R9, [R4]	; número de meteoros
 	SHL R9, 1
 	ADD R4, 4
@@ -1195,8 +1231,6 @@ move_meteoro:
 move_meteoro_ciclo:
 	CALL redesenha_ecra
 	MOV R1, [evento_int_meteoros]
-	MOV [R7], R0 			; pára o som de tocar
-	MOV [R6], R0 			; reproduz o som
 	MOV R8, R9	 			; cópia temporária de nº de meteoros
 	MOV R3, R4	 			; cópia temporária de tabela de posições
 	MOV R5, 0

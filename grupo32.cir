@@ -718,8 +718,8 @@
     "positionX" : 206,
     "positionY" : 90,
     "simGuiVisibleInSimulation" : true,
-    "simGuiXRelative" : 16,
-    "simGuiYRelative" : 34,
+    "simGuiXRelative" : 0,
+    "simGuiYRelative" : 0,
     "simGuiWidth" : 740,
     "simGuiHeight" : 818,
     "clockPeriod" : 200,
@@ -1512,15 +1512,9 @@
     "windowScreenWidthPixels" : 1024,
     "windowScreenHeightixels" : 512,
     "defaultPenColor" : 51063,
-    "image paths" : [ "media\\game_over.png", "media\\explosao.png", "media\\pausa_cfundo.png", "media\\menu_pausa.png" ],
+    "image paths" : [ "media\\game_over.png", "media\\game_over2.png", "media\\game_over3.png", "media\\pausa_cfundo.png" ],
     "sounds/videos settings" : [ {
-      "filePathName" : "media\\meteor_sound.wav",
-      "relative sound volume" : 1.0,
-      "relative start time" : 0.0,
-      "relative stop time" : 1.0,
-      "playAsClip" : false
-    }, {
-      "filePathName" : "media\\background.mp4",
+      "filePathName" : "media\\intro.mp4",
       "relative sound volume" : 1.0,
       "relative start time" : 0.0,
       "relative stop time" : 1.0,
@@ -1532,7 +1526,7 @@
       "relative stop time" : 1.0,
       "playAsClip" : false
     }, {
-      "filePathName" : "media\\intro.mp4",
+      "filePathName" : "media\\background.mp4",
       "relative sound volume" : 1.0,
       "relative start time" : 0.0,
       "relative stop time" : 1.0,
@@ -1540,6 +1534,24 @@
     }, {
       "filePathName" : "media\\explosion_sound.wav",
       "relative sound volume" : 0.51,
+      "relative start time" : 0.0,
+      "relative stop time" : 1.0,
+      "playAsClip" : false
+    }, {
+      "filePathName" : "media\\power_up.wav",
+      "relative sound volume" : 1.0,
+      "relative start time" : 0.0,
+      "relative stop time" : 1.0,
+      "playAsClip" : false
+    }, {
+      "filePathName" : "media\\game_over.wav",
+      "relative sound volume" : 1.0,
+      "relative start time" : 0.0,
+      "relative stop time" : 1.0,
+      "playAsClip" : false
+    }, {
+      "filePathName" : "media\\missil.wav",
+      "relative sound volume" : 1.0,
       "relative start time" : 0.0,
       "relative stop time" : 1.0,
       "playAsClip" : false
@@ -1665,7 +1677,7 @@
     "simGuiXRelative" : 620,
     "simGuiYRelative" : 605,
     "simGuiWidth" : 326,
-    "simGuiHeight" : 260,
+    "simGuiHeight" : 218,
     "clockPeriod" : 400,
     "startAutomatically" : true,
     "simulationMaster" : false,
@@ -1692,7 +1704,7 @@
     "simGuiXRelative" : 904,
     "simGuiYRelative" : 606,
     "simGuiWidth" : 326,
-    "simGuiHeight" : 260,
+    "simGuiHeight" : 218,
     "clockPeriod" : 200,
     "startAutomatically" : true,
     "simulationMaster" : false,
@@ -1719,7 +1731,7 @@
     "simGuiXRelative" : 1194,
     "simGuiYRelative" : 606,
     "simGuiWidth" : 326,
-    "simGuiHeight" : 260,
+    "simGuiHeight" : 218,
     "clockPeriod" : 3000,
     "startAutomatically" : true,
     "simulationMaster" : false,
