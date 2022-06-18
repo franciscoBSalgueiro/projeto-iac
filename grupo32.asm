@@ -999,8 +999,8 @@ desenha_um:
 	JLT sai_desenha_ciclo
 	MOV R1, [R5]
 	MOV R2, [R5+2]
-	CALL redefine_boneco
-	CALL desenha_boneco
+	CALL redefine_boneco	; altera tipo do boneco
+	CALL desenha_boneco		; desenha o novo boneco
 	ADD R5, 4
 	ADD R10, 2
 	ADD R0, 1
