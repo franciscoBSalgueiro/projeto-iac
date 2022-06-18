@@ -99,10 +99,12 @@ MAX_LINHA		EQU 32			; número da linha mais abaixo do MediaCenter
 
 ALCANCE_MISSIL	EQU 16		; número máximo da linha a que o míssil pode chegar
 
-ENERGIA_MATAR	EQU 5
-ENERGIA_RELOGIO	EQU -5
-ENERGIA_DISPARA	EQU -5
-ENERGIA_METEORO	EQU 10
+
+ENERGIA_INICIAL	EQU 100		; energia no início do jogo
+ENERGIA_MATAR	EQU 5		; energia ganha por matar uma nave má
+ENERGIA_RELOGIO	EQU -5		; energia perdida ao longo do tempo
+ENERGIA_DISPARA	EQU -5		; energia perdida por disparar um míssil
+ENERGIA_METEORO	EQU 10		; energia ganha por colidir com um meteoro bom
 
 ; ***********
 ; * CORES
@@ -148,8 +150,8 @@ tab_exc:
 	WORD rot_int_1			; rotina de atendimento da interrupcão 1
 	WORD rot_int_2			; rotina de atendimento da interrupcão 2
 
-ENERGIA:	; energia inicial a ser mostrada nos displays
-	WORD 100
+ENERGIA:	; energia a ser mostrada nos displays
+	WORD ENERGIA_INICIAL
 
 CARREGOU_BOTAO:		; variável que guarda se alguma tecla está a ser pressionada
 	WORD 0
@@ -164,8 +166,8 @@ DEF_NAVE:			; tabela que define a nave (posição, dimensões e cores)
 	WORD		AZUL, AZUL, AZUL, AZUL, AZUL    
     WORD        0, AMARELO, 0, AMARELO, 0
 
-DEF_METEORO_T1:	; tabela que define ocde tamanho 1 pequeno
-	WORD		L_TIPO_1, H_TIPO_1	; largura e altura do de tamanho 1 pequeno
+DEF_METEORO_T1:	; tabela que define o meteoro de tamanho 1
+	WORD		L_TIPO_1, H_TIPO_1	; largura e altura do de tamanho 1
 	WORD		CINZA_CLARO
 
 DEF_METEORO_T2:	; tabela que define o meteoro cinzento médio
@@ -194,30 +196,30 @@ DEF_METEORO_T5:		; tabela que define o meteoro de tamanho 5
     WORD        CINZA_CLARO, CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, CINZA_ESCURO
     WORD        0, CINZA_ESCURO, CINZA_CLARO, CINZA_ESCURO, 0
 
-DEF_NAVE_MA_T1:	; tabela que define a nave má cinzenta de tamanho 1
-	WORD		L_TIPO_1, H_TIPO_1	; largura e altura da nave má cinzenta pequena
+DEF_NAVE_MA_T1:	; tabela que define a nave má de tamanho 1
+	WORD		L_TIPO_1, H_TIPO_1	; largura e altura da nave má cinzenta de tamanho 1
 	WORD		VERMELHO
 
-DEF_NAVE_MA_T2:	; tabela que define a nave má cinzenta média
-	WORD		L_TIPO_2, H_TIPO_2	; largura e altura da nave má cinzenta média
+DEF_NAVE_MA_T2:	; tabela que define a nave má de tamanho 2
+	WORD		L_TIPO_2, H_TIPO_2	; largura e altura da nave má cinzenta tamanho 2
 	WORD		VERMELHO, VERMELHO
 	WORD		VERMELHO, VERMELHO
 
-DEF_NAVE_MA_T3:		; tabela que define a nave má pequena
-	WORD		L_TIPO_3, H_TIPO_3			; largura e altura da nave má pequena
+DEF_NAVE_MA_T3:		; tabela que define a nave má de tamanho 3
+	WORD		L_TIPO_3, H_TIPO_3			; largura e altura da nave má de tamanho 3
 	WORD		VERMELHO, 0, VERMELHO
 	WORD		0, VERMELHO, 0
 	WORD		VERMELHO, 0, VERMELHO
 
-DEF_NAVE_MA_T4:		; tabela que define a nave má média
-	WORD		L_TIPO_4, H_TIPO_4			; largura e altura da nave má média
+DEF_NAVE_MA_T4:		; tabela que define a nave má de tamanho 4
+	WORD		L_TIPO_4, H_TIPO_4			; largura e altura da nave má de tamanho 4
 	WORD		VERMELHO, 0, 0, VERMELHO
 	WORD		VERMELHO, 0, 0, VERMELHO
 	WORD		0, VERMELHO, VERMELHO, 0
 	WORD		VERMELHO, 0, 0, VERMELHO
 
-DEF_NAVE_MA_T5:		; tabela que define a nave má grande
-	WORD		L_TIPO_5, H_TIPO_5			; largura e altura da nave má grande
+DEF_NAVE_MA_T5:		; tabela que define a nave má de tamanho 5
+	WORD		L_TIPO_5, H_TIPO_5			; largura e altura da nave má de tamanho 5
 	WORD		VERMELHO, 0, 0, 0, VERMELHO
 	WORD		VERMELHO, 0, VERMELHO, 0, VERMELHO
 	WORD		0, VERMELHO, VERMELHO, VERMELHO, 0
@@ -245,14 +247,14 @@ DEF_POS_EXPLOSAO:
 	WORD -1, -1
 
 DEF_EXPLOSAO:
-	WORD		L_EXPLOSAO, H_EXPLOSAO			;largura e altura da explosão
+	WORD		L_EXPLOSAO, H_EXPLOSAO			; largura e altura da explosão
 	WORD		0, AMARELO, 0, AMARELO, 0
 	WORD		AMARELO, 0, LARANJA, 0, AMARELO
 	WORD		0, VERMELHO, 0, VERMELHO, 0
 	WORD		AMARELO, 0, LARANJA, 0, AMARELO
 	WORD		0, AMARELO, 0, AMARELO, 0
 
-EXPLOSAO_COUNTER:
+EXPLOSAO_COUNTER:	; counter para a duração da explosão
 	WORD 0
 
 evento_int_displays:
@@ -467,7 +469,7 @@ game_over:
 		CMP R9, 1
 		JNZ game_over_loop_2
 		CALL pressiona_teclas
-		MOV R7, 100
+		MOV R7, ENERGIA_INICIAL
 		MOV [ENERGIA], R7
 		JMP inicio_game_loop
 
@@ -878,8 +880,8 @@ move_meteoro:
 move_meteoro_ciclo:
 	CALL redesenha_ecra
 	MOV R1, [evento_int_meteoros]
-	MOV [R6], R0 ; reproduz o som
 	MOV [R7], R0 ; pára o som de tocar
+	MOV [R6], R0 ; reproduz o som
 	MOV R8, R9	 ; cópia temporária de nº de meteoros
 	MOV R3, R4	 ; cópia temporária de tabela de posições
 	MOV R5, 0
@@ -1074,7 +1076,7 @@ cria_meteoro_fim:
 
 
 ; **********************************************************************
-; DETETA_COLISÕES - deteta colisões, e cria a respetiva colisão
+; DETETA_COLISÕES - deteta colisões e cria a respetiva colisão
 ;
 ; Argumentos: 
 ;				R0 - tabela da posição do colidor
@@ -1095,24 +1097,24 @@ deteta_colisoes:
 	MOV R3, DEF_POS_METEORO
 	ADD R3, 2
 	ADD R3, R5
-	MOV R2, [R0]				; posição x do míssil
+	MOV R2, [R0]				; posição x do objeto a colidir
 
 	MOV R1, [R3]				; posição x da esquerda do meteoro
-	CMP R2, R1					; compara posição x do míssil com a do meteoro
+	CMP R2, R1					; compara posição x do objeto a colidir com a do meteoro
 	JLT deteta_colisoes_fim		; à esquerda
 
 	ADD R1, 4					; posição x da direita do meteoro	
-	CMP R2, R1					; compara posição x do míssil com a do meteoro
+	CMP R2, R1					; compara posição x do objeto a colidir com a do meteoro
 	JGT deteta_colisoes_fim		; à direita
 
-	MOV R2, [R0+2]				; posição y do míssil
+	MOV R2, [R0+2]				; posição y do objeto a colidir
 
 	MOV R1, [R3+2]				; posição y de cima do meteoro
-	CMP R2, R1					; compara posição y do míssil com a do meteoro
+	CMP R2, R1					; compara posição y do objeto a colidir com a do meteoro
 	JLT deteta_colisoes_fim		; em cima
 
 	ADD R1, 4					; posição y de baixo do meteoro
-	CMP R2, R1					; compara posição y do míssil com a do meteoro
+	CMP R2, R1					; compara posição y do objeto a colidir com a do meteoro
 	JGT deteta_colisoes_fim		; em baixo
 
 
@@ -1122,6 +1124,13 @@ encontrou_colisao:
 	JZ encontrou_colisao_missil
 
 encontrou_colisao_nave:
+	MOV R0, DEF_TIPO_METEORO
+	SHR R5, 1
+	ADD R0, R5
+	MOV R9, [R0]
+	CMP R9, TIPO_MAU
+	JZ deteta_colisoes_fim
+
 	MOV R0, ENERGIA_METEORO
 	MOV [evento_int_displays], R0 
 	JMP deteta_colisoes_fim
@@ -1150,10 +1159,10 @@ cria_explosao:
 
 	; reproduz som quado há uma colisão
 	MOV R6, 4 					; número do som da colisão
-	MOV R7, TOCA_SOM
-	MOV [R7], R6				; toca o som número 4
 	MOV R7, TERMINA_MEDIA
 	MOV [R7], R6				; termina o som número 4
+	MOV R7, TOCA_SOM
+	MOV [R7], R6				; toca o som número 4
 
 	; põe contador da explosão a 3
 	MOV R2, EXPLOSAO_COUNTER
