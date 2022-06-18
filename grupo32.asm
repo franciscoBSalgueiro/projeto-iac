@@ -257,6 +257,9 @@ DEF_EXPLOSAO:
 EXPLOSAO_COUNTER:	; counter para a duração da explosão
 	WORD 0
 
+ESTADO_JOGO:		; flag para indicar o estado do jogo
+	WORD 0			; 0 - normal, 1 - início, 2 - pausa, 3 - fim
+
 evento_int_displays:
 	LOCK 0
 
@@ -294,6 +297,22 @@ start_menu:
 		CALL pressiona_teclas
 
 inicio_game_loop:
+	MOV R7, ENERGIA_INICIAL		; reinicia o valor da energia
+	MOV [ENERGIA], R7
+	MOV R0, 0
+	MOV [evento_int_displays], R0
+
+	MOV R7, DEF_POS_NAVE		; reinicia a posição da nave
+	MOV R1, X_NAVE
+	MOV [R7], R1
+	MOV R1, Y_NAVE
+	MOV [R7+2], R1
+	MOV R7, DEF_POS_PEW_PEW		; apaga os mísseis
+	MOV R1, -1
+	MOV [R7+2], R1
+	MOV	R1, 2
+	MOV [REPRODUZ_MEDIA], R1	; reinicia a música de fundo em loop
+
 	MOV R5, 12
 	define_pos_iniciais:
 	CALL cria_meteoro
@@ -305,10 +324,10 @@ inicio_game_loop:
 game_loop:
 	MOV	R1, 3					; vídeo de fundo da intro
 	MOV  [TERMINA_MEDIA], R1	; seleciona o cenário de fundo
-	EI0					; permite interrupcões 0
-	EI1					; permite interrupcões 1
-	EI2					; permite interrupcões 2
-	EI					; permite interrupcões geral
+	EI0							; permite interrupcões 0
+	EI1							; permite interrupcões 1
+	EI2							; permite interrupcões 2
+	EI							; permite interrupcões geral
 	MOV	R1, 1					; cenário de fundo número 1
 	MOV  [REPRODUZ_MEDIA], R1	; seleciona o cenário de fundo
 	MOV R7, [ENERGIA]
@@ -318,9 +337,9 @@ mostra_boneco:		; desenha os bonecos
 
 espera_tecla:					; neste ciclo espera-se até uma tecla ser premida ou uma exceção acontecer
 	YIELD
-	MOV R1, [ENERGIA]			
-	CMP R1, 0					; verifica se a energia chega a 0
-	JZ sem_energia
+	MOV R1, [ESTADO_JOGO]
+	CMP R1, 3
+	JZ game_over
 
 	MOV  R6, 1					; testa a primeira linha
 	testa_linha:
@@ -410,11 +429,6 @@ pressionou_E:
 	CALL apaga_pixeis
 	JMP game_over
 
-; caso em que a energia chega a 0
-sem_energia:
-	CALL apaga_pixeis	; apaga ecrã
-	JMP game_over		; termina o jogo
-
 ve_limites:
 	MOV	R6, [DEF_NAVE]		; obtém a largura do boneco
 	MOV R2, [DEF_POS_NAVE]
@@ -461,6 +475,7 @@ game_over:
 	DI1					; desativa interrupções 1
 	DI2					; desativa interrupções 2
 	DI					; desativa interrupcões
+	CALL apaga_pixeis	; apaga ecrã
 	MOV	R1, 0					; cenário de fundo número 0
 	MOV  [SELECIONA_CENARIO_FUNDO], R1	; seleciona o cenário de fundo
 	MOV	R1, 1							; cenário de fundo número 1
@@ -477,18 +492,9 @@ game_over:
 		CMP R9, 1				; verifica se a tecla pressionada é o 'C'
 		JNZ game_over_loop_2
 		CALL pressiona_teclas
-		MOV R7, ENERGIA_INICIAL		; reinicia o valor da energia
-		MOV [ENERGIA], R7
-		MOV R7, DEF_POS_NAVE		; reinicia a posição da nave
-		MOV R1, X_NAVE
-		MOV [R7], R1
-		MOV R1, Y_NAVE
-		MOV [R7+2], R1
-		MOV R7, DEF_POS_PEW_PEW		; apaga os mísseis
-		MOV R1, -1
-		MOV [R7+2], R1
-		MOV	R1, 2
-		MOV  [REPRODUZ_MEDIA], R1	; reinicia a música de fundo em loop
+		MOV R2, ESTADO_JOGO
+		MOV R3, 0
+		MOV [R2], R3
 		JMP inicio_game_loop
 
 
@@ -1146,11 +1152,19 @@ encontrou_colisao_nave:
 	ADD R0, R5
 	MOV R9, [R0]
 	CMP R9, TIPO_MAU
-	JZ deteta_colisoes_fim
+	JZ encontrou_colisao_nave_mau
+
+encontrou_colisao_nave_bom:
 	SHL R5, 1
 	CALL cria_meteoro
 	MOV R0, ENERGIA_METEORO
 	MOV [evento_int_displays], R0 
+	JMP deteta_colisoes_fim
+
+encontrou_colisao_nave_mau:
+	MOV R2, ESTADO_JOGO
+	MOV R3, 3
+	MOV [R2], R3
 	JMP deteta_colisoes_fim
 
 encontrou_colisao_missil:
@@ -1225,22 +1239,30 @@ PROCESS SP_inicial_displays	; indicação de que a rotina que se segue é um pro
 controla_energia:
 	MOV R0, ENERGIA
 	MOV R1, DISPLAYS
+	MOV R7, ENERGIA_INICIAL
 
 atualiza_display:
-	MOV R2, [evento_int_displays]
-
-	MOV R7, [R0]			; valor da energia em decimal
 	CALL converte_hex		; converte valor de energia para ser legível nos displays
 	MOV [R1], R9			; atualiza valor no display
 
+	MOV R2, [evento_int_displays]
+
+	MOV R7, [R0]			; valor da energia em decimal
 	ADD R7, R2
-    MOV [R0], R7
-	JMP atualiza_display
+	MOV [R0], R7
+
+	; caso em que a energia chega a 0
+	CMP R7, 0
+	JNZ atualiza_display
+	MOV R2, ESTADO_JOGO
+	MOV R3, 3
+	MOV [R2], R3
+	JNZ atualiza_display
 
 ; O QUE FALTA FAZER
 
 ; --CONTROLO DE ENERGIA-- DONE
 ; --FICAR SEM ENERGIA-- DONE
-; COLISAO COM NAVE
+; --COLISAO COM NAVE-- DONE
 ; COMENTARIOS
 ; MENOS PISCAR (opcional)
