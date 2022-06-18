@@ -101,7 +101,7 @@ MAX_LINHA		EQU 32			; número da linha mais abaixo do MediaCenter
 ALCANCE_MISSIL	EQU 16		; número máximo da linha a que o míssil pode chegar
 
 
-ENERGIA_INICIAL	EQU 100		; energia no início do jogo
+ENERGIA_INICIAL	EQU 10		; energia no início do jogo
 ENERGIA_MATAR	EQU 5		; energia ganha por matar uma nave má
 ENERGIA_RELOGIO	EQU -5		; energia perdida ao longo do tempo
 ENERGIA_DISPARA	EQU -5		; energia perdida por disparar um míssil
@@ -343,11 +343,10 @@ mostra_boneco:		; desenha os bonecos
 	CALL redesenha_ecra
 
 espera_tecla:					; neste ciclo espera-se até uma tecla ser premida ou uma exceção acontecer
-	WAIT
+	YIELD
 	MOV R1, [ESTADO_JOGO]
 	CMP R1, ESTADO_PERDEU					; verifica se o jogo chegou ao fim
 	JZ game_over
-	CMP R1, ESTADO_PAUSA
 
 	MOV  R6, 1					; testa a primeira linha
 	testa_linha:
@@ -1269,10 +1268,11 @@ atualiza_display:
 	; caso em que a energia chega a 0
 	CMP R7, 0
 	JNZ atualiza_display
+
 	MOV R2, ESTADO_JOGO
 	MOV R3, ESTADO_PERDEU
 	MOV [R2], R3
-	JNZ atualiza_display
+	JMP atualiza_display
 
 ; O QUE FALTA FAZER
 
