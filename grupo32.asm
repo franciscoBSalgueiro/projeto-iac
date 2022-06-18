@@ -608,22 +608,22 @@ redefine_boneco:
 
 	boneco_tipo_1:
 		MOV R5, OFFSET_TIPO_1
-		SUB R4, R5
+		SUB R4, R5					; muda o desenho do boneco para o tipo 1
 		JMP redefine_boneco_fim
 
 	boneco_tipo_2:
 		MOV R5, OFFSET_TIPO_2
-		SUB R4, R5
+		SUB R4, R5					; muda o desenho do boneco para o tipo 2
 		JMP redefine_boneco_fim
 
 	boneco_tipo_3:
 		MOV R5, OFFSET_TIPO_3
-		SUB R4, R5
+		SUB R4, R5					; muda o desenho do boneco para o tipo 3
 		JMP redefine_boneco_fim
 
 	boneco_tipo_4:
 		MOV R5, OFFSET_TIPO_4
-		SUB R4, R5
+		SUB R4, R5					; muda o desenho do boneco para o tipo 4
 
 	redefine_boneco_fim:
 	POP R5
@@ -868,7 +868,7 @@ redesenha_ecra:
 
 	MOV R4, DEF_EXPLOSAO
 	MOV R0, DEF_POS_EXPLOSAO
-	MOV R1, [R0]				; coloca a posiçõa x da explosão em R1
+	MOV R1, [R0]				; coloca a posição x da explosão em R1
 	MOV R2, [R0+2]				; coloca a posição y da explosão em R2
 	CALL desenha_boneco
 
