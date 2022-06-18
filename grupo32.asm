@@ -78,6 +78,7 @@ H_TIPO_4		EQU 4			; altura do meteoro de tipo 4
 L_TIPO_5		EQU 5			; largura do meteoro de tipo 5
 H_TIPO_5		EQU 5			; altura do meteoro de tipo 5
 
+; distância em words entre cada um dos tipos e a tabela de tamanho 5
 OFFSET_TIPO_1	EQU 76
 OFFSET_TIPO_2	EQU 70
 OFFSET_TIPO_3	EQU 58
@@ -579,19 +580,19 @@ redefine_boneco:
 
 	MOV R5, Y_TIPO_1
 	CMP R2, R5				; verifica se o boneco do tipo 1 atingiu o Y máximo
-	JLE boneco_tipo_1		; desenha boneco tipo 1 se Y atual for menor ou igual que Y máximo
+	JLE boneco_tipo_1		; altera o tipo de boneco se o Y atual for maior que o Y máximo
 
 	MOV R5, Y_TIPO_2
 	CMP R2, R5				; verifica se o boneco do tipo 2 atingiu o Y máximo
-	JLE boneco_tipo_2		; desenha boneco tipo 2 se Y atual for menor ou igual que Y máximo
+	JLE boneco_tipo_2		; altera o tipo de boneco se o Y atual for maior que o Y máximo
 
 	MOV R5, Y_TIPO_3
 	CMP R2, R5				; verifica se o boneco do tipo 3 atingiu o Y máximo
-	JLE boneco_tipo_3		; desenha boneco tipo 3 se Y atual for menor ou igual que Y máximo
+	JLE boneco_tipo_3		; altera o tipo de boneco se o Y atual for maior que o Y máximo
 
 	MOV R5, Y_TIPO_4
-	CMP R2, R5				; verifica se o boneco do tipo 3 atingiu o Y máximo
-	JLE boneco_tipo_4		; desenha boneco tipo 4 se Y atual for menor ou igual que Y máximo
+	CMP R2, R5				; verifica se o boneco do tipo 4 atingiu o Y máximo
+	JLE boneco_tipo_4		;  altera o tipo de boneco se o Y atual for maior que o Y máximo
 
 	JMP redefine_boneco_fim
 
@@ -996,8 +997,8 @@ desenha_varios:
 desenha_ciclo:
 	CALL muda_ecra
 	MOV R9, [R10]
-	CMP R9, TIPO_MAU
-	JZ tipo_mau
+	CMP R9, TIPO_MAU	; verifica se é do tipo bom ou mau
+	JZ tipo_mau			; salta se for do tipo mau
 	tipo_bom:
 		MOV R4, DEF_METEORO_T5
 		JMP desenha_um
@@ -1006,7 +1007,7 @@ desenha_ciclo:
 
 desenha_um:
 	SUB R8, 4	
-	CMP R8, 0
+	CMP R8, 0				; verifica se ainda há mais objetos
 	JLT sai_desenha_ciclo
 	MOV R1, [R5]
 	MOV R2, [R5+2]
@@ -1068,8 +1069,8 @@ aleatorio:
 
 
 ; **********************************************************************
-; CRIA_METEORO
-;
+; CRIA_METEORO - escolhe aleatóriamente o tipo de meteoro a ser criado,
+;				e cria o mesmo em posições aleatórias
 ; Argumento - R5 número do meteoro
 ; **********************************************************************
 
@@ -1094,16 +1095,16 @@ cria_meteoro:
 	SHR R5, 1
 	ADD R6, R5
 	CALL aleatorio
-	SHR R3, 1
-	CMP R3, 0
-	JNZ cria_tipo_mau
-	cria_tipo_bom:
+	SHR R3, 1			; obtém um numero aleatório
+	CMP R3, 0			; verifica o tipo de meteoro
+	JNZ cria_tipo_mau	; foi escolhido aleatóriamente o tipo mau
+	cria_tipo_bom:		; caso contrário é criado o tipo bom
 		MOV R0, TIPO_BOM
-		MOV [R6], R0
+		MOV [R6], R0		; coloca um (1) no tipo de meteoro
 		JMP cria_meteoro_fim
 	cria_tipo_mau:
-		MOV R0, TIPO_MAU
-		MOV [R6], R0
+		MOV R0, TIPO_MAU	
+		MOV [R6], R0		; coloca um (0) no tipo de meteoro
 cria_meteoro_fim:
 	POP R6
 	POP R5
