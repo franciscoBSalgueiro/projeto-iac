@@ -78,6 +78,7 @@ H_TIPO_4		EQU 4			; altura do meteoro de tipo 4
 L_TIPO_5		EQU 5			; largura do meteoro de tipo 5
 H_TIPO_5		EQU 5			; altura do meteoro de tipo 5
 
+; distância em words entre cada um dos tipos e a tabela de tamanho 5
 OFFSET_TIPO_1	EQU 76
 OFFSET_TIPO_2	EQU 70
 OFFSET_TIPO_3	EQU 58
@@ -578,7 +579,7 @@ redefine_boneco:
 	JLE boneco_tipo_3		; desenha boneco tipo 3 se Y atual for menor ou igual que Y máximo
 
 	MOV R5, Y_TIPO_4
-	CMP R2, R5				; verifica se o boneco do tipo 3 atingiu o Y máximo
+	CMP R2, R5				; verifica se o boneco do tipo 4 atingiu o Y máximo
 	JLE boneco_tipo_4		; desenha boneco tipo 4 se Y atual for menor ou igual que Y máximo
 
 	JMP redefine_boneco_fim
