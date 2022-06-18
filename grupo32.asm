@@ -318,6 +318,9 @@ mostra_boneco:		; desenha os bonecos
 
 espera_tecla:					; neste ciclo espera-se até uma tecla ser premida ou uma exceção acontecer
 	YIELD
+	MOV R1, [ENERGIA]			
+	CMP R1, 0					; verifica se a energia chega a 0
+	JZ sem_energia
 
 	MOV  R6, 1					; testa a primeira linha
 	testa_linha:
@@ -407,6 +410,11 @@ pressionou_E:
 	CALL apaga_pixeis
 	JMP game_over
 
+; caso em que a energia chega a 0
+sem_energia:
+	CALL apaga_pixeis	; apaga ecrã
+	JMP game_over		; termina o jogo
+
 ve_limites:
 	MOV	R6, [DEF_NAVE]		; obtém a largura do boneco
 	MOV R2, [DEF_POS_NAVE]
@@ -466,11 +474,13 @@ game_over:
 		CALL liberta_teclas
 	game_over_loop_2:
 		CALL teclado
-		CMP R9, 1
+		CMP R9, 1				; verifica se a tecla pressionada é o 'C'
 		JNZ game_over_loop_2
 		CALL pressiona_teclas
-		MOV R7, ENERGIA_INICIAL
+		MOV R7, ENERGIA_INICIAL		; reinicia o valor da energia
 		MOV [ENERGIA], R7
+		MOV	R1, 2
+		MOV  [REPRODUZ_MEDIA], R1	; reinicia a música de fundo em loop
 		JMP inicio_game_loop
 
 

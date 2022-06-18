@@ -1,7 +1,7 @@
 {
   "comment" : "This is a JSON file describing a digital circuit, which can be loaded into the SEPE (Simulador Especial Para Ensino), a computer architecture simulator.",
-  "savedWithSimulatorVersion" : "2.1.3",
-  "savedWithSimulatorBuildOn" : "2022-05-27  at  13:52:58",
+  "savedWithSimulatorVersion" : "2.1.4",
+  "savedWithSimulatorBuildOn" : "2022-06-17  at  13:23:36",
   "editorLocked" : true,
   "startAutomatically" : true,
   "showConnectionColors" : false,
@@ -1537,6 +1537,12 @@
       "relative start time" : 0.0,
       "relative stop time" : 1.0,
       "playAsClip" : false
+    }, {
+      "filePathName" : "media\\explosion_sound.wav",
+      "relative sound volume" : 0.51,
+      "relative start time" : 0.0,
+      "relative stop time" : 1.0,
+      "playAsClip" : false
     } ],
     "addressable data" : {
       "className" : "ModuleExtensionMemoryMediaCenter",
@@ -1659,7 +1665,7 @@
     "simGuiXRelative" : 620,
     "simGuiYRelative" : 605,
     "simGuiWidth" : 326,
-    "simGuiHeight" : 218,
+    "simGuiHeight" : 260,
     "clockPeriod" : 400,
     "startAutomatically" : true,
     "simulationMaster" : false,
@@ -1686,7 +1692,7 @@
     "simGuiXRelative" : 904,
     "simGuiYRelative" : 606,
     "simGuiWidth" : 326,
-    "simGuiHeight" : 218,
+    "simGuiHeight" : 260,
     "clockPeriod" : 200,
     "startAutomatically" : true,
     "simulationMaster" : false,
@@ -1713,7 +1719,7 @@
     "simGuiXRelative" : 1194,
     "simGuiYRelative" : 606,
     "simGuiWidth" : 326,
-    "simGuiHeight" : 218,
+    "simGuiHeight" : 260,
     "clockPeriod" : 3000,
     "startAutomatically" : true,
     "simulationMaster" : false,
