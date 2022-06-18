@@ -932,10 +932,10 @@ move_meteoro_ciclo:
 		ADD R5, 4
 		JMP move_meteoro_ciclo_ciclo
 
-; TODO docstring
+
 ; **********************************************************************
 ; processo
-; AVANCA_MISSIL - 
+; AVANCA_MISSIL - processo que avança a posição do míssil
 ;
 ; **********************************************************************
 
@@ -949,9 +949,9 @@ atualiza_missil:
 	CALL redesenha_ecra
 	MOV R10, [evento_int_missil]
 
-	MOV R5, [R0+2]
-	SUB R5, 1
-	CMP R5, R1
+	MOV R5, [R0+2]		; posição y do míssil
+	SUB R5, 1			; avança o míssil
+	CMP R5, R1			; verifica se a o míssil chega à linha 16
 	JGT atualiza_missil_fim
 	MOV R5, -1
 
