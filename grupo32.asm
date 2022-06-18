@@ -1125,34 +1125,49 @@ deteta_colisoes:
 	PUSH R1
 	PUSH R2
 	PUSH R3
+	PUSH R4
 	PUSH R5
 	PUSH R6	
 	PUSH R7 
 	PUSH R9
+	PUSH R10
 
-	MOV R3, DEF_POS_METEORO
-	ADD R3, 2
-	ADD R3, R5
 	MOV R2, [R0]				; posição x do objeto a colidir
+	MOV R3, [R0+2]				; posição y do objeto a colidir
 
-	MOV R1, [R3]				; posição x da esquerda do meteoro
-	CMP R2, R1					; compara posição x do objeto a colidir com a do meteoro
-	JLT deteta_colisoes_fim		; à esquerda
+	MOV R10, DEF_POS_METEORO
+	ADD R10, 2
+	ADD R10, R5
+	MOV R6, [R10]				; posição x do meteoro
+	ADD R6, 2					; centro x do meteoro
+	MOV R7, [R10+2]				; posição y do meteoro
+	ADD R7, 2					; centro y do meteoro
 
-	ADD R1, 4					; posição x da direita do meteoro	
-	CMP R2, R1					; compara posição x do objeto a colidir com a do meteoro
-	JGT deteta_colisoes_fim		; à direita
+	MOV R1, DEF_POS_PEW_PEW
+	CMP R0, R1
+	JZ tipo_missil
+	MOV R1, DEF_POS_NAVE
+	CMP R0, R1
+	JZ tipo_nave 
 
-	MOV R2, [R0+2]				; posição y do objeto a colidir
+tipo_missil:
+	MOV R4, 3					; distância máxima do meteoro
+	JMP compara_posicoes
+tipo_nave:
+	MOV R4, 5					; distância máxima do meteoro
+	ADD R2, 2					; centro x da nave
+	ADD R3, 2					; centro y da nave
 
-	MOV R1, [R3+2]				; posição y de cima do meteoro
-	CMP R2, R1					; compara posição y do objeto a colidir com a do meteoro
-	JLT deteta_colisoes_fim		; em cima
-
-	ADD R1, 4					; posição y de baixo do meteoro
-	CMP R2, R1					; compara posição y do objeto a colidir com a do meteoro
-	JGT deteta_colisoes_fim		; em baixo
-
+compara_posicoes:
+	MUL R4, R4
+	SUB R6, R2					; distância horizontal
+	MUL R6, R6
+	CMP R6, R4
+	JGE deteta_colisoes_fim
+	SUB R7, R3					; distância	vertical
+	MUL R7, R7
+	CMP R7, R4
+	JGE deteta_colisoes_fim
 
 encontrou_colisao:
 	MOV R1, DEF_POS_PEW_PEW		
@@ -1196,9 +1211,9 @@ encontrou_colisao_missil:
 cria_explosao:
 	; cria explosão
 	MOV R2, DEF_POS_EXPLOSAO
-	MOV R1, [R3]				; posição x da esquerda do meteoro
+	MOV R1, [R10]				; posição x da esquerda do meteoro
 	MOV [R2], R1				; coloca na posição x da explosão
-	MOV R1, [R3+2]				; posição y de cima do meteoro
+	MOV R1, [R10+2]				; posição y de cima do meteoro
 	ADD R2, 2
 	MOV [R2], R1				; coloca na posição y da explosão
 
@@ -1219,10 +1234,12 @@ cria_explosao:
 	MOV [R0+2], R1
 
 deteta_colisoes_fim:
+	POP R10
 	POP R9
 	POP R7
 	POP R6
 	POP R5
+	POP R4
 	POP R3
 	POP R2
 	POP R1
