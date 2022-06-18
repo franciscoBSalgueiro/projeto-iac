@@ -107,10 +107,11 @@ ENERGIA_RELOGIO	EQU -5		; energia perdida ao longo do tempo
 ENERGIA_DISPARA	EQU -5		; energia perdida por disparar um míssil
 ENERGIA_METEORO	EQU 10		; energia ganha por colidir com um meteoro bom
 
-ESTADO_NORMAL	EQU 0
-ESTADO_INICIO	EQU 1
-ESTADO_PAUSA	EQU 2
-ESTADO_PERDEU	EQU 3
+; flags de estado do programa
+ESTADO_PERDEU_1		EQU 0	; perdeu por energia
+ESTADO_PERDEU_2		EQU 1	; perdeu por colisão com nave má
+ESTADO_NORMAL		EQU 2
+ESTADO_PAUSA		EQU 3
 
 ; ***********
 ; * CORES
@@ -264,7 +265,7 @@ EXPLOSAO_COUNTER:	; counter para a duração da explosão
 	WORD 0
 
 ESTADO_JOGO:		; flag para indicar o estado do jogo
-	WORD 0			; 0 - normal, 1 - início, 2 - pausa, 3 - fim
+	WORD 2			; 0 e 1 - game over, 2 - normal, 3 - pausa
 
 evento_int_displays:
 	LOCK 0
@@ -348,8 +349,8 @@ mostra_boneco:		; desenha os bonecos
 espera_tecla:					; neste ciclo espera-se até uma tecla ser premida ou uma exceção acontecer
 	YIELD
 	MOV R1, [ESTADO_JOGO]
-	CMP R1, ESTADO_PERDEU					; verifica se o jogo chegou ao fim
-	JZ game_over
+	CMP R1, ESTADO_PERDEU_2					; verifica se o jogo chegou ao fim
+	JLE game_over
 
 	MOV  R6, 1					; testa a primeira linha
 	testa_linha:
@@ -492,7 +493,7 @@ game_over:
 	DI2					; desativa interrupções 2
 	DI					; desativa interrupcões
 	CALL apaga_pixeis	; apaga ecrã
-	MOV	R1, 0					; cenário de fundo número 0
+	MOV	R1, [ESTADO_JOGO]				; cenário de fundo correspondente ao tipo de perda
 	MOV  [SELECIONA_CENARIO_FUNDO], R1	; seleciona o cenário de fundo
 	MOV	R1, 1							; cenário de fundo número 1
 	MOV  [TERMINA_MEDIA], R1
@@ -1097,7 +1098,7 @@ encontrou_colisao_nave_bom:
 
 encontrou_colisao_nave_mau:
 	MOV R2, ESTADO_JOGO				
-	MOV R3, ESTADO_PERDEU
+	MOV R3, ESTADO_PERDEU_2
 	MOV [R2], R3					; atualiza estado para o fim do jogo
 	JMP deteta_colisoes_fim
 
@@ -1274,7 +1275,7 @@ atualiza_display:
 	JNZ atualiza_display
 
 	MOV R2, ESTADO_JOGO
-	MOV R3, ESTADO_PERDEU
+	MOV R3, ESTADO_PERDEU_1
 	MOV [R2], R3
 	JMP atualiza_display
 
