@@ -275,9 +275,12 @@ evento_int_missil:
 evento_int_meteoros:
 	LOCK 0
 
-; *********************************************************************************
-; * Código
-; *********************************************************************************
+; **********************************************************************
+; **********************************************************************
+; 							CÓDIGO PRINCIPAL
+; **********************************************************************
+; **********************************************************************
+
 PLACE   0				
 inicio:
 	MOV  SP, SP_inicial_prog_princ		; inicializa SP
@@ -509,6 +512,13 @@ game_over:
 		MOV R3, ESTADO_NORMAL
 		MOV [R2], R3
 		JMP inicio_game_loop
+
+
+; **********************************************************************
+; **********************************************************************
+; 							ROTINAS AUXILIARES
+; **********************************************************************
+; **********************************************************************
 
 
 ; **********************************************************************
@@ -809,39 +819,11 @@ pressiona_teclas:
 	POP R7
 	RET
 
-
 ; **********************************************************************
-; Rotinas de interrupção
+; REDESENHA_ECRA - volta a desenhar todos os bonecos nas suas 
+; posições atuais e em ecrãs diferentes de forma a não se intercetarem.
+;
 ; **********************************************************************
-
-
-; **********************************************************************
-; ROT_INT_0 - 	Rotina de atendimento da interrupcão 0
-;			Assinala o evento da variável evento_int_meteoros
-; **********************************************************************
-rot_int_0:
-	MOV	[evento_int_meteoros], R0	; desbloqueia processo meteoros
-	RFE
-
-; **********************************************************************
-; ROT_INT_1 - 	Rotina de atendimento da interrupcão 1
-;			Assinala o evento da variável evento_int_missil
-; **********************************************************************
-rot_int_1:
-	MOV	[evento_int_missil], R0	; desbloqueia processo avanca_missil
-	RFE
-
-; **********************************************************************
-; ROT_INT_2 - 	Rotina de atendimento da interrupcão 2
-;			Assinala o evento da variável evento_int_displays
-; **********************************************************************
-rot_int_2:
-	PUSH R0
-	MOV R0, ENERGIA_RELOGIO
-	MOV	[evento_int_displays], R0	; desbloqueia processo controla_energia
-	POP R0
-	RFE
-
 
 redesenha_ecra:
 	PUSH R0
@@ -896,82 +878,6 @@ redesenha_ecra:
 	POP R1
 	POP R0
 	RET
-
-
-; **********************************************************************
-; processo
-; MOVE_METEORO - processo que move o meteoro até chegar ao fim do ecrã,
-;				criando um novo nesse caso
-;
-; **********************************************************************
-
-PROCESS SP_inicial_meteoro
-
-move_meteoro:
-	MOV R0, 0
-	MOV R4, DEF_POS_METEORO
-	MOV R6, TOCA_SOM
-	MOV R7, TERMINA_MEDIA
-	MOV R9, [R4]	; número de meteoros
-	SHL R9, 1
-	ADD R4, 4
-
-move_meteoro_ciclo:
-	CALL redesenha_ecra
-	MOV R1, [evento_int_meteoros]
-	MOV [R7], R0 			; pára o som de tocar
-	MOV [R6], R0 			; reproduz o som
-	MOV R8, R9	 			; cópia temporária de nº de meteoros
-	MOV R3, R4	 			; cópia temporária de tabela de posições
-	MOV R5, 0
-
-	move_meteoro_ciclo_2:
-		SUB R8, 2
-		CMP R8, 0
-		JLT move_meteoro_ciclo
-		MOV R10, [R3]				; valor da posição y do meteoro
-		ADD R10, 1			
-		MOV [R3], R10				; atualiza posição y do meteoro
-		MOV R0, DEF_POS_PEW_PEW
-		CALL deteta_colisoes		; verifica se houve colisão com o míssil
-		MOV R0, DEF_POS_NAVE	
-		CALL deteta_colisoes		; verifica se houve colisão com a nave
-		MOV R2, MAX_LINHA
-		CMP R10, R2								; verifica se chegou à linha máxima
-		JNZ move_meteoro_ciclo_2_continua		; continua ciclo enquanto não chegar à linha máxima
-		CALL cria_meteoro						; caso contrário cria um novo meteoro
-		move_meteoro_ciclo_2_continua:
-		ADD R3, 4
-		ADD R5, 4
-		JMP move_meteoro_ciclo_2
-
-
-; **********************************************************************
-; processo
-; AVANCA_MISSIL - processo que avança a posição do míssil
-;
-; **********************************************************************
-
-PROCESS SP_inicial_missil	
-
-avanca_missil:
-	MOV R0, DEF_POS_PEW_PEW
-	MOV R1, ALCANCE_MISSIL
-
-atualiza_missil:
-	CALL redesenha_ecra
-	MOV R10, [evento_int_missil]
-
-	MOV R5, [R0+2]		; posição y do míssil
-	SUB R5, 1			; avança o míssil
-	CMP R5, R1			; verifica se a o míssil chega à linha 16
-	JGT atualiza_missil_fim
-	MOV R5, -1
-
-atualiza_missil_fim:
-	MOV [R0+2], R5
-	JMP atualiza_missil
-
 
 ; **********************************************************************
 ; DESENHA_VARIOS 
@@ -1052,8 +958,8 @@ dispara_missil:
 	RET
 
 ; **********************************************************************
-; ALEATORIO - Retorna um valor aleatório entre 0 e 7 através da leitura do periférico
-; de entrada PIN
+; ALEATORIO - Retorna um valor aleatório entre 0 e 7 através da 
+; leitura do periférico de entrada PIN
 ;
 ; Retorna: R3 - número aleatório entre 0 e 7
 ; **********************************************************************
@@ -1259,6 +1165,88 @@ muda_ecra:
 	POP R1
 	RET
 
+
+; **********************************************************************
+; **********************************************************************
+; 							PROCESSOS
+; **********************************************************************
+; **********************************************************************
+
+
+; **********************************************************************
+; Processo
+; MOVE_METEORO - processo que move o meteoro até chegar ao fim do ecrã,
+;				criando um novo nesse caso
+;
+; **********************************************************************
+
+PROCESS SP_inicial_meteoro
+
+move_meteoro:
+	MOV R0, 0
+	MOV R4, DEF_POS_METEORO
+	MOV R6, TOCA_SOM
+	MOV R7, TERMINA_MEDIA
+	MOV R9, [R4]	; número de meteoros
+	SHL R9, 1
+	ADD R4, 4
+
+move_meteoro_ciclo:
+	CALL redesenha_ecra
+	MOV R1, [evento_int_meteoros]
+	MOV [R7], R0 			; pára o som de tocar
+	MOV [R6], R0 			; reproduz o som
+	MOV R8, R9	 			; cópia temporária de nº de meteoros
+	MOV R3, R4	 			; cópia temporária de tabela de posições
+	MOV R5, 0
+
+	move_meteoro_ciclo_2:
+		SUB R8, 2
+		CMP R8, 0
+		JLT move_meteoro_ciclo
+		MOV R10, [R3]				; valor da posição y do meteoro
+		ADD R10, 1			
+		MOV [R3], R10				; atualiza posição y do meteoro
+		MOV R0, DEF_POS_PEW_PEW
+		CALL deteta_colisoes		; verifica se houve colisão com o míssil
+		MOV R0, DEF_POS_NAVE	
+		CALL deteta_colisoes		; verifica se houve colisão com a nave
+		MOV R2, MAX_LINHA
+		CMP R10, R2								; verifica se chegou à linha máxima
+		JNZ move_meteoro_ciclo_2_continua		; continua ciclo enquanto não chegar à linha máxima
+		CALL cria_meteoro						; caso contrário cria um novo meteoro
+		move_meteoro_ciclo_2_continua:
+		ADD R3, 4
+		ADD R5, 4
+		JMP move_meteoro_ciclo_2
+
+
+; **********************************************************************
+; Processo
+; AVANCA_MISSIL - processo que avança a posição do míssil
+;
+; **********************************************************************
+
+PROCESS SP_inicial_missil	
+
+avanca_missil:
+	MOV R0, DEF_POS_PEW_PEW
+	MOV R1, ALCANCE_MISSIL
+
+atualiza_missil:
+	CALL redesenha_ecra
+	MOV R10, [evento_int_missil]
+
+	MOV R5, [R0+2]		; posição y do míssil
+	SUB R5, 1			; avança o míssil
+	CMP R5, R1			; verifica se a o míssil chega à linha 16
+	JGT atualiza_missil_fim
+	MOV R5, -1
+
+atualiza_missil_fim:
+	MOV [R0+2], R5
+	JMP atualiza_missil
+
 ; **********************************************************************
 ; Processo
 ; CONTROLA_ENERGIA - Processo que atualiza o valor mostrado nos displays
@@ -1290,3 +1278,36 @@ atualiza_display:
 	MOV [R2], R3
 	JMP atualiza_display
 
+
+; **********************************************************************
+; **********************************************************************
+; 						ROTINAS DE INTERRUPÇÃO
+; **********************************************************************
+; **********************************************************************
+
+; **********************************************************************
+; ROT_INT_0 - 	Rotina de atendimento da interrupcão 0
+;			Assinala o evento da variável evento_int_meteoros
+; **********************************************************************
+rot_int_0:
+	MOV	[evento_int_meteoros], R0	; desbloqueia processo meteoros
+	RFE
+
+; **********************************************************************
+; ROT_INT_1 - 	Rotina de atendimento da interrupcão 1
+;			Assinala o evento da variável evento_int_missil
+; **********************************************************************
+rot_int_1:
+	MOV	[evento_int_missil], R0	; desbloqueia processo avanca_missil
+	RFE
+
+; **********************************************************************
+; ROT_INT_2 - 	Rotina de atendimento da interrupcão 2
+;			Assinala o evento da variável evento_int_displays
+; **********************************************************************
+rot_int_2:
+	PUSH R0
+	MOV R0, ENERGIA_RELOGIO
+	MOV	[evento_int_displays], R0	; desbloqueia processo controla_energia
+	POP R0
+	RFE
