@@ -101,7 +101,7 @@ MAX_LINHA		EQU 32			; número da linha mais abaixo do MediaCenter
 ALCANCE_MISSIL	EQU 16		; número máximo da linha a que o míssil pode chegar
 
 
-ENERGIA_INICIAL	EQU 10		; energia no início do jogo
+ENERGIA_INICIAL	EQU 100		; energia no início do jogo
 ENERGIA_MATAR	EQU 5		; energia ganha por matar uma nave má
 ENERGIA_RELOGIO	EQU -5		; energia perdida ao longo do tempo
 ENERGIA_DISPARA	EQU -5		; energia perdida por disparar um míssil
