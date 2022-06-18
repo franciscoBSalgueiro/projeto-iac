@@ -445,7 +445,7 @@ tira_pausa:
 	JMP espera_tecla
 poe_pausa:
 	DI
-	MOV	R1, 2					; cenário de fundo número 2
+	MOV	R1, 2							; cenário de fundo número 2
 	MOV  [SELECIONA_CENARIO_FUNDO], R1	; seleciona o cenário de fundo
 	MOV	R1, 1							; cenário de fundo número 1
 	MOV  [TERMINA_MEDIA], R1
@@ -952,8 +952,8 @@ move_meteoro_ciclo:
 ;
 ; **********************************************************************
 
-PROCESS SP_inicial_missil	; indicação de que a rotina que se segue é um processo,
-							; com indicação do valor para inicializar o SP
+PROCESS SP_inicial_missil	
+
 avanca_missil:
 	MOV R0, DEF_POS_PEW_PEW
 	MOV R1, ALCANCE_MISSIL
@@ -1175,9 +1175,9 @@ encontrou_colisao_nave_bom:
 	JMP deteta_colisoes_fim
 
 encontrou_colisao_nave_mau:
-	MOV R2, ESTADO_JOGO
+	MOV R2, ESTADO_JOGO				
 	MOV R3, ESTADO_PERDEU
-	MOV [R2], R3
+	MOV [R2], R3					; atualiza estado para o fim do jogo
 	JMP deteta_colisoes_fim
 
 encontrou_colisao_missil:
@@ -1247,8 +1247,8 @@ muda_ecra:
 ; CONTROLA_ENERGIA - Processo que atualiza o valor mostrado nos displays
 ;
 ; **********************************************************************
-PROCESS SP_inicial_displays	; indicação de que a rotina que se segue é um processo,
-							; com indicação do valor para inicializar o SP
+PROCESS SP_inicial_displays	
+
 controla_energia:
 	MOV R0, ENERGIA
 	MOV R1, DISPLAYS
@@ -1262,7 +1262,7 @@ atualiza_display:
 
 	MOV R7, [R0]			; valor da energia em decimal
 	ADD R7, R2
-	MOV [R0], R7
+	MOV [R0], R7			; atualiza valor da energia
 
 	; caso em que a energia chega a 0
 	CMP R7, 0
@@ -1273,10 +1273,3 @@ atualiza_display:
 	MOV [R2], R3
 	JMP atualiza_display
 
-; O QUE FALTA FAZER
-
-; --CONTROLO DE ENERGIA-- DONE
-; --FICAR SEM ENERGIA-- DONE
-; --COLISAO COM NAVE-- DONE
-; COMENTARIOS
-; MENOS PISCAR (opcional)
