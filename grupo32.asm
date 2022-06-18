@@ -1056,8 +1056,8 @@ aleatorio:
 
 
 ; **********************************************************************
-; CRIA_METEORO
-;
+; CRIA_METEORO - escolhe aleatóriamente o tipo de meteoro a ser criado,
+;				e cria o mesmo em posições aleatórias
 ; Argumento - R5 número do meteoro
 ; **********************************************************************
 
@@ -1082,16 +1082,16 @@ cria_meteoro:
 	SHR R5, 1
 	ADD R6, R5
 	CALL aleatorio
-	SHR R3, 1
-	CMP R3, 0
-	JNZ cria_tipo_mau
-	cria_tipo_bom:
+	SHR R3, 1			; obtém um numero aleatório
+	CMP R3, 0			; verifica o tipo de meteoro
+	JNZ cria_tipo_mau	; foi escolhido aleatóriamente o tipo mau
+	cria_tipo_bom:		; caso contrário é criado o tipo bom
 		MOV R0, TIPO_BOM
-		MOV [R6], R0
+		MOV [R6], R0		; coloca um (1) no tipo de meteoro
 		JMP cria_meteoro_fim
 	cria_tipo_mau:
-		MOV R0, TIPO_MAU
-		MOV [R6], R0
+		MOV R0, TIPO_MAU	
+		MOV [R6], R0		; coloca um (0) no tipo de meteoro
 cria_meteoro_fim:
 	POP R6
 	POP R5
