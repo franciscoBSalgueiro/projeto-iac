@@ -279,9 +279,9 @@ inicio:
 	MOV	[APAGA_ECRÃ], R1
 	MOV	[APAGA_AVISO], R1		; apaga o aviso de nenhum cenário selecionado
 
-	CALL controla_energia
-	CALL move_meteoro
-	CALL avanca_missil
+	CALL controla_energia		; cria o processo controla_energia
+	CALL move_meteoro			; cria o processo move_meteoro
+	CALL avanca_missil			; cria o processo avanca_missil
 
 	MOV	R1, 2
 	MOV  [REPRODUZ_MEDIA], R1	; toca a música de fundo em loop
@@ -303,17 +303,18 @@ inicio_game_loop:
 	MOV [evento_int_displays], R0
 
 	MOV R7, DEF_POS_NAVE		; reinicia a posição da nave
-	MOV R1, X_NAVE
-	MOV [R7], R1
+	MOV R1, X_NAVE				
+	MOV [R7], R1				; define a posição x da nave
 	MOV R1, Y_NAVE
-	MOV [R7+2], R1
+	MOV [R7+2], R1				; define a posição y da nave
 	MOV R7, DEF_POS_PEW_PEW		; apaga os mísseis
 	MOV R1, -1
 	MOV [R7+2], R1
 	MOV	R1, 2
 	MOV [REPRODUZ_MEDIA], R1	; reinicia a música de fundo em loop
 
-	MOV R5, 12
+	; cria os meteoros
+	MOV R5, 12				
 	define_pos_iniciais:
 	CALL cria_meteoro
 	SUB R5, 4
@@ -338,7 +339,7 @@ mostra_boneco:		; desenha os bonecos
 espera_tecla:					; neste ciclo espera-se até uma tecla ser premida ou uma exceção acontecer
 	YIELD
 	MOV R1, [ESTADO_JOGO]
-	CMP R1, 3
+	CMP R1, 3					; verifica se o jogo chegou ao fim
 	JZ game_over
 
 	MOV  R6, 1					; testa a primeira linha
@@ -463,8 +464,8 @@ pause_loop:
 		CMP	R9, 0
 		JNZ pause_loop_1
 		CALL liberta_teclas
-	pause_loop_2:
-		CALL teclado
+	pause_loop_2:	
+		CALL teclado			; leitura às teclas
 		CMP R9, 2
 		JNZ pause_loop_2
 		CALL pressiona_teclas
@@ -749,6 +750,7 @@ teclado:
 
 ; **********************************************************************
 ; LIBERTA_TECLAS - liberta teclas que não estão a ser pressionadas
+;
 ; Argumentos:	R6 - linha a testar (em formato 1, 2, 4 ou 8)
 ; **********************************************************************
 
@@ -803,7 +805,7 @@ pressiona_teclas:
 
 ; **********************************************************************
 ; ROT_INT_0 - 	Rotina de atendimento da interrupcão 0
-;			Assinala o evento na componente 0 da variável evento_int
+;			Assinala o evento da variável evento_int_meteoros
 ; **********************************************************************
 rot_int_0:
 	MOV	[evento_int_meteoros], R0	; desbloqueia processo meteoros
@@ -957,9 +959,9 @@ atualiza_missil_fim:
 	MOV [R0+2], R5
 	JMP atualiza_missil
 
-; TODO docstrign decente
+
 ; **********************************************************************
-; DESENHA_VARIOS - 
+; DESENHA_VARIOS 
 ;
 ; Argumento - R5 tabela das posições dos bonecos a desenhar
 ; **********************************************************************
@@ -1013,7 +1015,6 @@ sai_desenha_ciclo:
 	RET
 
 
-; TODO docstring
 ; **********************************************************************
 ; DISPARA_MISSIL - dispara o míssil da nave
 ; **********************************************************************
