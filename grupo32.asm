@@ -1105,9 +1105,8 @@ cria_meteoro_fim:
 ; **********************************************************************
 ; DETETA_COLISÕES - deteta colisões e cria a respetiva colisão
 ;
-; Argumentos: 
-;				R0 - tabela da posição do colidor
-;				R5 - nº do meteoro a testar
+; Argumentos: ;		R0 - tabela da posição do colidor
+;					R5 - nº do meteoro a testar
 ; **********************************************************************
 
 deteta_colisoes:
@@ -1145,40 +1144,40 @@ deteta_colisoes:
 
 
 encontrou_colisao:
-	MOV R1, DEF_POS_PEW_PEW
-	CMP R0, R1
-	JZ encontrou_colisao_missil
+	MOV R1, DEF_POS_PEW_PEW		
+	CMP R0, R1					; há colisão com um missíl se as posições forem iguais
+	JZ encontrou_colisao_missil		
 
 encontrou_colisao_nave:
 	MOV R0, DEF_TIPO_METEORO
-	SHR R5, 1
-	ADD R0, R5
-	MOV R9, [R0]
-	CMP R9, TIPO_MAU
+	SHR R5, 1					; número do meteoro a testar
+	ADD R0, R5			
+	MOV R9, [R0]				
+	CMP R9, TIPO_MAU			; verifica se a colisão foi com o tipo mau
 	JZ encontrou_colisao_nave_mau
 
 encontrou_colisao_nave_bom:
-	SHL R5, 1
+	SHL R5, 1						; número do meteoro
 	CALL cria_meteoro
-	MOV R0, ENERGIA_METEORO
-	MOV [evento_int_displays], R0 
+	MOV R0, ENERGIA_METEORO			; atualiza a energia respetiva
+	MOV [evento_int_displays], R0 	; desbloqueia processo controla_energia
 	JMP deteta_colisoes_fim
 
 encontrou_colisao_nave_mau:
-	MOV R2, ESTADO_JOGO
+	MOV R2, ESTADO_JOGO				
 	MOV R3, 3
-	MOV [R2], R3
+	MOV [R2], R3				; altera o estado do jogo para o fim
 	JMP deteta_colisoes_fim
 
 encontrou_colisao_missil:
-	MOV R1, DEF_TIPO_METEORO
+	MOV R1, DEF_TIPO_METEORO		
 	MOV R9, R5
 	SHR R9, 1
 	ADD R1, R9
 	MOV R9, [R1]
 	CMP R9, TIPO_BOM
-	JZ cria_explosao
-	MOV R2, ENERGIA_MATAR
+	JZ cria_explosao				; míssil colide com o tipo bom
+	MOV R2, ENERGIA_MATAR			; atualiza a energia respetiva
 	MOV	[evento_int_displays], R2	; desbloqueia processo controla_energia
 	JMP cria_explosao
 
@@ -1187,10 +1186,10 @@ cria_explosao:
 	; cria explosão
 	MOV R2, DEF_POS_EXPLOSAO
 	MOV R1, [R3]				; posição x da esquerda do meteoro
-	MOV [R2], R1				
-	MOV R1, [R3+2]
+	MOV [R2], R1				; coloca na posição x da explosão
+	MOV R1, [R3+2]				; posição y de cima do meteoro
 	ADD R2, 2
-	MOV [R2], R1
+	MOV [R2], R1				; coloca na posição y da explosão
 
 	; reproduz som quado há uma colisão
 	MOV R6, 4 					; número do som da colisão
